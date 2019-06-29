@@ -14,7 +14,7 @@ This library replicates the basic features like calendarview,eventview,parallaxi
 
 (4) left side event day animation same as google calendar app
 
-(5) when date select from top side smooth scroll accroding to him
+(5) when date select from top side smooth scroll accroding to him and many more
 
 
  
