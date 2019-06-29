@@ -6,7 +6,7 @@ This library replicates the basic features like calendarview,eventview,parallaxi
  width=225 height=400>
  
  # Special thanks to these contributors
-[AgendaCalendarView](https://github.com/Tibolte/AgendaCalendarView),
+[AgendaCalendarView](https://github.com/Tibolte/AgendaCalendarView),[scrollparallaximageview](https://github.com/gjiazhe/ScrollParallaxImageView)
  
 ##  Developer
   jignesh khunt
