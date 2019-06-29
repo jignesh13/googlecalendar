@@ -5,6 +5,13 @@ This library replicates the basic features like calendarview,eventview,parallaxi
 <image src=/calendargi.gif
  width=225 height=400>
  
+ ## feature
+collapse toolbar with calendarview same like google calendar app
+smooth scrolling with month change during scrolling
+scrolling with parallexeffect in image of months
+left side event day animation same as google calendar app
+when date select from top side smooth scroll accroding to him
+ 
  # Special thanks to these contributors
 [AgendaCalendarView](https://github.com/Tibolte/AgendaCalendarView),[scrollparallaximageview](https://github.com/gjiazhe/ScrollParallaxImageView)
  
