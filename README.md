@@ -4,7 +4,11 @@ This library replicates the basic features like calendarview,eventview,parallaxi
 
 <image src=/calendargi.gif
  width=225 height=400>
-
+ 
+##  Developer
+  jignesh khunt
+  (jigneshkhunt13@gmail.com)
+  
   
 ## License
    Copyright 2019 jignesh khunt
