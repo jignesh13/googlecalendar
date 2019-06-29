@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list android:opacity="opaque"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="?android:colorBackground" />
+    <item android:id="@+id/launchscreens_product_logo" android:bottom="64.0dip">
+        <bitmap android:gravity="center" android:src="@drawable/product_logo_calendar_color_144" />
+    </item>
+    <item android:id="@+id/launchscreens_logo_text" android:bottom="104.0dip">
+        <bitmap android:gravity="bottom|center" android:src="@drawable/googlelogo_dark20_color_132x44" android:tint="?android:textColorPrimary" />
+    </item>
+</layer-list>

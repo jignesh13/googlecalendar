@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="horizontal"
+    >
+    <TextView xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/view_item_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/white_touch"
+        android:clickable="true"
+        android:fontFamily="@font/googlesansmed"
+        android:orientation="horizontal"
+        android:padding="6dp"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".MainActivity"
+        tools:text="Aardvark" />
+
+
+
+</android.support.constraint.ConstraintLayout>
