@@ -236,9 +236,17 @@ public class GooglecalenderView extends LinearLayout {
             eventhash.put(todaydate,new String[]{"todaydate"});
         }
         else {
+
             List<String> list=Arrays.asList(eventhash.get(todaydate));
             list=new ArrayList<>(list);
-            list.add("todaydate");
+            boolean b=true;
+            for(String s:list){
+                if (!s.startsWith("start")||!s.startsWith("tojigs")){
+                    b=false;
+                    break;
+                }
+            }
+           if (b)list.add("todaydate");
             String[] mStringArray = new String[list.size()];
             eventhash.put(todaydate,list.toArray(mStringArray));
         }
@@ -248,6 +256,7 @@ public class GooglecalenderView extends LinearLayout {
        ArrayList<EventModel> eventModelslist=new ArrayList<>();
         for (HashMap.Entry<LocalDate,String[]> localDateStringEntry:treeMap.entrySet()){
            for(String s:localDateStringEntry.getValue()){
+               if (s==null)continue;
                int type=0;
                if (s.startsWith("todaydate"))type=2;
                else if (s.equals("start"))type=1;
