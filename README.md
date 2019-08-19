@@ -1,6 +1,9 @@
 # GoogleCalendar
-google calendar replicate full design of google calendar app 
-This library replicates the basic features like calendarview,eventview,parallaximageview,agendaview
+
+Make copy of the official Google Calendar app for your Android phone add some few feature
+
+• Different ways to view your calendar - Quickly switch between month, week and day view.
+• Events from Gmail - Flight, hotel, concert, restaurant reservations and more are added to your calendar automatically.
 
 <image src=/calendargi.gif
  width=225 height=400>
