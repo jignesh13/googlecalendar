@@ -1,13 +1,23 @@
 package com.example.GoogleCalendar;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.GridLayout;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -47,6 +57,7 @@ public class FirstFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fraglay, container, false);
         gridView=view.findViewById(R.id.recyclerview);
         gridView.setLayoutManager(new GridLayoutManager(getActivity(),7));
@@ -54,36 +65,45 @@ public class FirstFragment extends Fragment {
         updategrid(dayModels);
         return view;
     }
-   public void updategrid(ArrayList<DayModel> dayModelArrayList){
-        this.dayModels=dayModelArrayList;
-        for (int i=0;i<dayModels.size();i++){
-            if (i==0)dayModels.get(i).setSelected(true);
-            else dayModels.get(i).setSelected(false);
-        }
-        gridView.getAdapter().notifyDataSetChanged();
 
+
+
+    private void updategrid(ArrayList<DayModel> dayModelArrayList){
+        this.dayModels=dayModelArrayList;
+        gridView.getAdapter().notifyDataSetChanged();
     }
+    public void updategrid(){
+     gridView.getAdapter().notifyDataSetChanged();
+    }
+
+
     class Myadapter extends RecyclerView.Adapter<Myadapter.ViewHolder>{
 
         @Override
         public Myadapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = getActivity().getLayoutInflater().inflate(R.layout.gridlay, parent, false);
-            return new ViewHolder(view);
+
+                View view = getActivity().getLayoutInflater().inflate(R.layout.gridlay, parent, false);
+                return new ViewHolder(view);
+
         }
+
+
 
         @Override
         public void onBindViewHolder(Myadapter.ViewHolder holder, int position) {
 
+
             if (position>=firstday){
                 position=position-firstday;
                 DayModel dayModel=dayModels.get(position);
+                boolean selected=dayModel.getDay()==MainActivity.lastdate.getDayOfMonth()&&dayModel.getMonth()==MainActivity.lastdate.getMonthOfYear()&&dayModel.getYear()==MainActivity.lastdate.getYear()?true:false;
 
                 if (dayModel.isToday()){
                     holder.textView.setBackgroundResource(R.drawable.circle);
                     holder.textView.setTextColor(Color.WHITE);
 
                 }
-                else if (dayModel.isSelected()){
+                else if (selected){
                     holder.textView.setBackgroundResource(R.drawable.selectedback);
                     holder.textView.setTextColor(Color.rgb(91,128,231));
 
@@ -94,7 +114,8 @@ public class FirstFragment extends Fragment {
 
                 }
                 holder.textView.setText(dayModels.get(position).getDay()+"");
-                if (dayModel.getEventlist()&&!dayModel.isSelected()){
+
+                if (dayModel.getEventlist()&&!selected){
                     holder.eventview.setVisibility(View.VISIBLE);
                 }
                 else {
@@ -113,6 +134,7 @@ public class FirstFragment extends Fragment {
 
         @Override
         public int getItemCount() {
+
             return dayModels.size()+firstday;
         }
         class ViewHolder extends RecyclerView.ViewHolder{
@@ -130,8 +152,11 @@ public class FirstFragment extends Fragment {
                             for (DayModel dayModel:dayModels){
                                 dayModel.setSelected(false);
                             }
-                            dayModels.get(getAdapterPosition()-firstday).setSelected(true);
+                            DayModel dayModel=dayModels.get(getAdapterPosition()-firstday);
+                            MainActivity.lastdate=new LocalDate(year,month,dayModels.get(getAdapterPosition()-firstday).getDay());
+
                             EventBus.getDefault().post(new MessageEvent(new LocalDate(year,month,dayModels.get(getAdapterPosition()-firstday).getDay())));
+                           // dayModels.get(getAdapterPosition()-firstday).setSelected(true);
                             notifyDataSetChanged();
                         }
 

@@ -71,30 +71,32 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
-                <TextView
-                        android:id="@+id/monthname"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:orientation="horizontal"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
+                        android:gravity="center"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="4dp"
-                        android:paddingBottom="4dp"
-                        android:fontFamily="@font/googlesans_regular"
-                        android:text="June"
-                        android:textColor="#464646"
-                        android:textSize="20sp" />
-                    <ImageView
-                        android:id="@+id/arrowImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/ic_arrow_drop_up_black_24dp"
-                        app:layout_constraintLeft_toRightOf="@+id/monthname"
-                        android:translationX="-5dp"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        tools:ignore="ContentDescription,RtlHardcoded" />
-                                 </android.support.constraint.ConstraintLayout>
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/monthname"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/googlesans_regular"
+                            android:text="June"
+                            android:textColor="#464646"
+                            android:textSize="20sp" />
+                        <ImageView
+                            android:id="@+id/arrowImageView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_arrow_drop_up_black_24dp"
+                            tools:ignore="ContentDescription,RtlHardcoded" />
+
+                    </LinearLayout>
+
+                </android.support.constraint.ConstraintLayout>
 
             </android.support.v7.widget.Toolbar>
   </android.support.design.widget.CollapsingToolbarLayout>

@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -70,8 +71,21 @@ public class StickyRecyclerHeadersDecoration extends RecyclerView.ItemDecoration
   public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
     super.getItemOffsets(outRect, view, parent, state);
 //    int itemPosition = parent.getChildAdapterPosition(view);
-//    if (itemPosition == RecyclerView.NO_POSITION) {
+//    if (itemPosition <= 0) {
 //        return;
+//    }
+//    if (parent.getAdapter().getItemViewType(itemPosition)==3&&parent.getAdapter().getItemViewType(itemPosition-1)==0){
+//      outRect.top = 40;
+//
+//    }
+//    else {
+//      if (parent.getAdapter().getItemViewType(itemPosition)==0&&parent.getAdapter().getItemViewType(itemPosition-1)==0){
+//
+//        outRect.top=40;
+//      }
+//      else{
+//        outRect.top=0;
+//      }
 //    }
 //    if (mHeaderPositionCalculator.hasNewHeader(itemPosition, mOrientationProvider.isReverseLayout(parent))) {
 //      View header = getHeaderView(parent, itemPosition);
@@ -131,8 +145,8 @@ public class StickyRecyclerHeadersDecoration extends RecyclerView.ItemDecoration
         }
 
 
-        mHeaderPositionCalculator.initHeaderBounds(headerOffset, parent, header, itemView, hasStickyHeader);
-        mRenderer.drawHeader(parent, canvas, header, headerOffset);
+       mHeaderPositionCalculator.initHeaderBounds(headerOffset, parent, header, itemView, hasStickyHeader);
+       mRenderer.drawHeader(parent, canvas, header, headerOffset);
       }
     }
   }

@@ -34,7 +34,7 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
         }
         else{
             if (mAppBarTracking!!.isAppBarExpanded())
-            current=mLayoutManager!!.findFirstVisibleItemPosition();
+                current=mLayoutManager!!.findFirstVisibleItemPosition();
         }
         return super.dispatchTouchEvent(ev);
 //        if (mAppBarTracking!!.appbaroffset()!=0){
@@ -82,15 +82,18 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
                     return true
                 }
             } else {
+
                 mView = mLayoutManager!!.findViewByPosition(mAppBarTracking!!.appbaroffset())
-                if (mView!=null)consumed!![1] = dy - mView!!.top
+                if (mView!=null){
 
-                return true
+                    consumed!![1] = dy - mView!!.top+MainActivity.topspace
+                }
 
+              return true
 
             }
         }
-        if (dy < 0 && type == ViewCompat.TYPE_TOUCH && mAppBarTracking!!.isAppBarExpanded()) {
+         if (dy < 0 && type == ViewCompat.TYPE_TOUCH && mAppBarTracking!!.isAppBarExpanded()) {
             consumed!![1] = dy
             return true
         }
@@ -98,10 +101,11 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
         val returnValue = super.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow, type)
 
         if (offsetInWindow != null && !isNestedScrollingEnabled && offsetInWindow[1] != 0){
-
+            Log.e("end","null");
             offsetInWindow[1] = 0
 
         }
+        Log.e("end","end"+mAppBarTracking!!.isAppBarExpanded());
         return returnValue
     }
 
@@ -116,17 +120,17 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
         mAppBarTracking = appBarTracking
     }
 
-    override fun fling(velocityX: Int, velocityY: Int): Boolean {
-        stopScroll()
-
-        var velocityY = velocityY
-        if (!mAppBarTracking!!.isAppBarIdle()) {
-            val vc = ViewConfiguration.get(context)
-            velocityY = if (velocityY < 0) -vc.scaledMinimumFlingVelocity
-            else vc.scaledMinimumFlingVelocity
-        }
-
-        return super.fling(velocityX, velocityY)
-    }
+//    override fun fling(velocityX: Int, velocityY: Int): Boolean {
+//        stopScroll()
+//
+//        var velocityY = velocityY
+//        if (!mAppBarTracking!!.isAppBarIdle()) {
+//            val vc = ViewConfiguration.get(context)
+//            velocityY = if (velocityY < 0) -vc.scaledMinimumFlingVelocity
+//            else vc.scaledMinimumFlingVelocity
+//        }
+//
+//        return super.fling(velocityX, velocityY)
+//    }
 
 }

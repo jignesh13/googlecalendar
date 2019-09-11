@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
@@ -73,15 +74,21 @@ public class GooglecalenderView extends LinearLayout {
     }
     public void setCurrentmonth(LocalDate currentmonth){
         if (currentmonth==null)return;
+        Log.e("Call","callmonth");
         LocalDate mindateobj=mindate.toDateTimeAtStartOfDay().dayOfMonth().withMinimumValue().toLocalDate();
         LocalDate current=currentmonth.dayOfMonth().withMaximumValue();
         int months= Months.monthsBetween(mindateobj,current).getMonths();
-        viewPager.setCurrentItem(months,false);
+        if (viewPager.getCurrentItem()!=months){
+            viewPager.setCurrentItem(months,false);
+            viewPager.getAdapter().notifyDataSetChanged();
+        }
+
 
     }
    public void init(HashMap<LocalDate,String[]> eventhashmap,LocalDate mindate,LocalDate maxdate){
         eventuser=eventhashmap;
         viewPager=findViewById(R.id.viewpager);
+        viewPager.setOffscreenPageLimit(2);
         this.mindate=mindate;
         this.maxdate=maxdate;
         DateTime mindateobj=mindate.toDateTimeAtStartOfDay();
@@ -105,20 +112,22 @@ public class GooglecalenderView extends LinearLayout {
           int currentyear=new LocalDate().getYear();
           ArrayList<DayModel> dayModelArrayList=new ArrayList<>();
           DateTime startday=mindateobj.dayOfMonth().withMinimumValue().withTimeAtStartOfDay();
-          LocalDate minweek=startday.dayOfWeek().withMinimumValue().toLocalDate();
+          LocalDate minweek=startday.dayOfWeek().withMinimumValue().toLocalDate().minusDays(1);
           while (minweek.compareTo(startday.dayOfMonth().withMaximumValue().toLocalDate())<0){
-              if (minweek.getMonthOfYear()==minweek.dayOfWeek().withMaximumValue().getMonthOfYear()){
+              if (minweek.getMonthOfYear()==minweek.plusDays(6).getMonthOfYear()){
                   String lastpattern=minweek.getYear()==currentyear?"d MMM":"d MMM YYYY";
 
-                  String s[]={"tojigs"+minweek.toString("d").toUpperCase()+" - "+minweek.dayOfWeek().withMaximumValue().toString(lastpattern).toUpperCase()};
+                  String s[]={"tojigs"+minweek.toString("d").toUpperCase()+" - "+minweek.plusDays(6).toString(lastpattern).toUpperCase()};
 
                  if (!eventhash.containsKey(minweek))eventhash.put(minweek,s);
 
                   minweek=minweek.plusWeeks(1);
+
               }
               else {
+
                   String lastpattern=minweek.getYear()==currentyear?"d MMM":"d MMM YYYY";
-                  String s[]={"tojigs"+minweek.toString("d MMM").toUpperCase()+" - "+minweek.dayOfWeek().withMaximumValue().toString(lastpattern).toUpperCase()};
+                  String s[]={"tojigs"+minweek.toString("d MMM").toUpperCase()+" - "+minweek.plusDays(6).toString(lastpattern).toUpperCase()};
                   if (!eventhash.containsKey(minweek))eventhash.put(minweek,s);
 
                   minweek=minweek.plusWeeks(1);
@@ -217,12 +226,17 @@ public class GooglecalenderView extends LinearLayout {
             @Override
             public void onPageSelected(int position) {
                 MainActivity mainActivity= (MainActivity) context;
-                if (mainActivity.isAppBarExpanded())adjustheight();
-                if (monthChangeListner!=null)monthChangeListner.onmonthChange(myPagerAdapter.monthModels.get(position));
-                if (myPagerAdapter.getFirstFragments().get(position).isVisible()){
+                if (!mainActivity.isAppBarClosed()){
+                    adjustheight();
+                    EventBus.getDefault().post(new MessageEvent(new LocalDate(myPagerAdapter.monthModels.get(position).getYear(),myPagerAdapter.monthModels.get(position).getMonth(),1)));
+                    myPagerAdapter.getFirstFragments().get(position).updategrid();
+                    if (monthChangeListner!=null)monthChangeListner.onmonthChange(myPagerAdapter.monthModels.get(position));
 
-                    myPagerAdapter.getFirstFragments().get(position).updategrid(arrayList.get(position).getDayModelArrayList());
+
                 }
+//                if (myPagerAdapter.getFirstFragments().get(position).isVisible()){
+//                    myPagerAdapter.getFirstFragments().get(position).updategrid(arrayList.get(position).getDayModelArrayList());
+//                }
 
             }
 
@@ -233,20 +247,18 @@ public class GooglecalenderView extends LinearLayout {
         });
         LocalDate todaydate=LocalDate.now();
         if (!eventhash.containsKey(todaydate)){
+
             eventhash.put(todaydate,new String[]{"todaydate"});
         }
         else {
 
             List<String> list=Arrays.asList(eventhash.get(todaydate));
             list=new ArrayList<>(list);
+            Log.e("today",list.toString());
             boolean b=true;
-            for(String s:list){
-                if (!s.startsWith("start")||!s.startsWith("tojigs")){
-                    b=false;
-                    break;
-                }
-            }
-           if (b)list.add("todaydate");
+
+            list.add("todaydate");
+            Log.e("today",list.toString()+b);
             String[] mStringArray = new String[list.size()];
             eventhash.put(todaydate,list.toArray(mStringArray));
         }
@@ -261,15 +273,57 @@ public class GooglecalenderView extends LinearLayout {
                if (s.startsWith("todaydate"))type=2;
                else if (s.equals("start"))type=1;
                else if (s.contains("jigs"))type=3;
-               eventModelslist.add(new EventModel(s,localDateStringEntry.getKey(),type));
-               if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
-               i++;
+               if (type==2&&eventModelslist.get(eventModelslist.size()-1).getType()==0&&eventModelslist.get(eventModelslist.size()-1).getLocalDate().equals(localDateStringEntry.getKey())){
+
+               }
+               else {
+                   if (type==0&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==0&&!eventModelslist.get(eventModelslist.size()-1).getLocalDate().equals(localDateStringEntry.getKey())){
+
+                       eventModelslist.add(new EventModel("dup",localDateStringEntry.getKey(),100));
+                       if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                       i++;
+                   }
+                   else if ((type==3||type==1)&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==0){
+                       eventModelslist.add(new EventModel("dup",eventModelslist.get(eventModelslist.size()-1).getLocalDate(),100));
+                       if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                       i++;
+                   }
+                   else if (type==0&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==1){
+                       eventModelslist.add(new EventModel("dup",localDateStringEntry.getKey(),200));
+                       if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                       i++;
+                   }
+                   eventModelslist.add(new EventModel(s,localDateStringEntry.getKey(),type));
+                   if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                   i++;
+               }
+
+
+//               if (type==2){
+//                   if (eventModelslist.get(eventModelslist.size()-1).getType()!=0){
+//                       eventModelslist.add(new EventModel(s,localDateStringEntry.getKey(),type));
+//                       if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+//                       i++;
+//                   }
+//               }
+//               else {
+//                   eventModelslist.add(new EventModel(s,localDateStringEntry.getKey(),type));
+//                   if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+//                   i++;
+//               }
+
 
            }
         }
        EventBus.getDefault().post(new AddEvent(eventModelslist,indextrack));
     }
-
+    public void update(){
+        final MyPagerAdapter myPagerAdapter= (MyPagerAdapter) viewPager.getAdapter();
+        if (myPagerAdapter!=null) {
+            final int position = viewPager.getCurrentItem();
+            myPagerAdapter.getFirstFragments().get(position).updategrid();
+        }
+    }
     public void adjustheight(){
        final MyPagerAdapter myPagerAdapter= (MyPagerAdapter) viewPager.getAdapter();
         if (myPagerAdapter!=null){
@@ -279,14 +333,13 @@ public class GooglecalenderView extends LinearLayout {
             ViewGroup.LayoutParams params = getLayoutParams();
             params.height = (context.getResources().getDimensionPixelSize(R.dimen.itemheight)*numbercolumn)+80;
             setLayoutParams(params);
-            EventBus.getDefault().post(new MessageEvent(new LocalDate(myPagerAdapter.monthModels.get(position).getYear(),myPagerAdapter.monthModels.get(position).getMonth(),1)));
 
 
         }
 
     }
 
-    public  class MyPagerAdapter extends FragmentPagerAdapter {
+    public  class MyPagerAdapter extends FragmentStatePagerAdapter {
         private ArrayList<MonthModel> monthModels;
         private ArrayList<FirstFragment> firstFragments=new ArrayList<>();
 

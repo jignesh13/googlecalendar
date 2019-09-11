@@ -110,6 +110,7 @@ public class HeaderPositionCalculator {
     }
 
     private void initDefaultHeaderOffset(Rect headerMargins, RecyclerView recyclerView, View header, View firstView, int orientation) {
+
         int translationX, translationY;
         mDimensionCalculator.initMargins(mTempRect1, header);
 
@@ -130,9 +131,11 @@ public class HeaderPositionCalculator {
 //            }
 
             translationY = Math.max(
-                    firstView.getTop() - topMargin - headerHeight - mTempRect1.bottom,
+                    firstView.getTop()+0 - topMargin - headerHeight - mTempRect1.bottom,
                     getListTop(recyclerView) + mTempRect1.top);
+
         } else {
+
             translationY = firstView.getTop() - topMargin + mTempRect1.top;
             translationX = Math.max(
                     firstView.getLeft() - leftMargin - header.getWidth() - mTempRect1.right,
@@ -177,6 +180,7 @@ public class HeaderPositionCalculator {
 
     private void translateHeaderWithNextHeader(RecyclerView recyclerView, int orientation, Rect translation,
                                                View currentHeader, View viewAfterNextHeader, View nextHeader) {
+
         mDimensionCalculator.initMargins(mTempRect1, nextHeader);
         mDimensionCalculator.initMargins(mTempRect2, currentHeader);
         if (orientation == LinearLayoutManager.VERTICAL) {

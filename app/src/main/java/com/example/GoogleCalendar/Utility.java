@@ -20,6 +20,7 @@ import java.util.List;
 
 public class Utility {
 
+
     public static HashMap<LocalDate, String[]> localDateHashMap = new HashMap<>();
 
     public static HashMap<LocalDate, String[]> readCalendarEvent(Context context, LocalDate mintime, LocalDate maxtime) {

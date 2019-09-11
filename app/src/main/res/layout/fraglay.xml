@@ -108,8 +108,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:id="@+id/recyclerview"
-        android:stretchMode="columnWidth"
+        app:layoutManager="android.support.v7.widget.GridLayoutManager"
+        app:spanCount="7"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"></android.support.v7.widget.RecyclerView>
+        app:layout_constraintTop_toBottomOf="@+id/textView3">
+
+    </android.support.v7.widget.RecyclerView>
 </android.support.constraint.ConstraintLayout>
