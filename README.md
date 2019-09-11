@@ -1,5 +1,9 @@
 # GoogleCalendar
 
+Simple Google Calendar can connect your Google Accounts and can be synchronized to automatically display events, programs and appointments on it .
+
+Simple Google Calendar contains all the features that you could find in other apps in the stock, including Day , Week, Month Views , variety modifies,and connection across different accounts.Easy Google Calendar organises your agenda incredibly easily to increase performance and productivity.
+
 Make copy of the official Google Calendar app for your Android phone add some few feature
 
 • Different ways to view your calendar - Quickly switch between month, week and day view.
