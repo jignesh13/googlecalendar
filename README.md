@@ -10,7 +10,8 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 
 • Events from Gmail - Flight, hotel, concert, restaurant reservations and more are added to your calendar automatically.
 
-APK Downloads: https://github.com/amirzaidi/launcher3/releases
+APK Downloads:  [[here](https://github.com/jignesh13/googlecalendar/blob/master/app-debug.apk)
+
 
 
 <image src=/calendargi.gif
