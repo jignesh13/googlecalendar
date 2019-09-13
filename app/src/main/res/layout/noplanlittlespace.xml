@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/view_noplan_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:fontFamily="@font/googlesans_regular"
+        android:orientation="horizontal"
+        android:text="Nothing planned. Tap to Create."
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+</android.support.constraint.ConstraintLayout>

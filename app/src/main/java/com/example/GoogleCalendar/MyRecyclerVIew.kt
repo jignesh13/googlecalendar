@@ -101,11 +101,9 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
         val returnValue = super.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow, type)
 
         if (offsetInWindow != null && !isNestedScrollingEnabled && offsetInWindow[1] != 0){
-            Log.e("end","null");
             offsetInWindow[1] = 0
 
         }
-        Log.e("end","end"+mAppBarTracking!!.isAppBarExpanded());
         return returnValue
     }
 

@@ -1,10 +1,7 @@
 package com.example.GoogleCalendar;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,14 +12,12 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -41,25 +36,25 @@ import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
         implements MyRecyclerView.AppBarTracking {
 
     private MyRecyclerView mNestedView;
     private int mAppBarOffset = 0;
-    public static int imonth,iyear,iday;
     private boolean mAppBarIdle = true;
     private int mAppBarMaxOffset = 0;
-    MyLinearSmoothScroller smoothScroller;
+
     private AppBarLayout mAppBar;
     private boolean mIsExpanded = false;
-    private boolean isanimationend=true;
+
     long lasttime;
     private ImageView mArrowImageView;
     private TextView monthname;
-    private int lastdy;
-    private LinearLayout mSmallLayout;
-    private LinearLayout expandCollapse;
+
+
+    private int lastchangeindex=-1;
     private boolean isappbarclosed = true;
     private int month;
     public static LocalDate lastdate= LocalDate.now();
@@ -68,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     private GooglecalenderView calendarView;
     private ArrayList<EventModel> eventalllist = new ArrayList();
     private HashMap<LocalDate, Integer> indextrack = new HashMap<>();
+    private HashMap<LocalDate, Integer> dupindextrack = new HashMap<>();
     private String[] var = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN",};
     private int[] monthresource = {
             R.drawable.bkg_01_jan,
@@ -96,23 +92,18 @@ public class MainActivity extends AppCompatActivity
 
                if (isAppBarExpanded()){
                    calendarView.setCurrentmonth(new LocalDate());
-                   new Handler().postDelayed(new Runnable() {
-                       @Override
-                       public void run() {
-                           expandedfirst=val;
-                           topspace=0;
-                           linearLayoutManager.scrollToPositionWithOffset(val,0);
-                           EventBus.getDefault().post(new MonthChange(localDate,0));
-                           month=localDate.getDayOfMonth();
-                           lastdate=localDate;
-                       }
-                   },100);
+                   expandedfirst=val;
+                   topspace=20;
+                   linearLayoutManager.scrollToPositionWithOffset(val,20);
+                   EventBus.getDefault().post(new MonthChange(localDate,0));
+                   month=localDate.getDayOfMonth();
+                   lastdate=localDate;
                }
                else {
                    calendarView.setCurrentmonth(new LocalDate());
                    expandedfirst=val;
-                   topspace=0;
-                   linearLayoutManager.scrollToPositionWithOffset(val,0);
+                   topspace=20;
+                   linearLayoutManager.scrollToPositionWithOffset(val,20);
                    EventBus.getDefault().post(new MonthChange(localDate,0));
                    month=localDate.getDayOfMonth();
                    lastdate=localDate;
@@ -152,7 +143,7 @@ public class MainActivity extends AppCompatActivity
         calendarView.setMonthChangeListner(new MonthChangeListner() {
             @Override
             public void onmonthChange(MonthModel monthModel) {
-                Log.e("change","monthmodel");
+
                 LocalDate localDate=new LocalDate();
                 String year=monthModel.getYear()==localDate.getYear()?"":monthModel.getYear()+"";
                 monthname.setText(monthModel.getMonthnamestr()+" "+year);
@@ -199,7 +190,7 @@ public class MainActivity extends AppCompatActivity
            @Override
            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                if (isappbarclosed){
-                   Log.e("dy",dy+"");
+
                    int pos=llm.findFirstVisibleItemPosition();
                    View view=llm.findViewByPosition(pos);
 
@@ -265,7 +256,7 @@ public class MainActivity extends AppCompatActivity
                        lastdate=dateAdapter.geteventallList().get(pos).getLocalDate();
                        expandedfirst=pos;
                    }
-                   lastdy=pos;
+
                }
 
                super.onScrolled(recyclerView, dx, dy);
@@ -291,7 +282,7 @@ public class MainActivity extends AppCompatActivity
         mAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                Log.e("offset",verticalOffset+"");
+
                 if (mAppBarOffset!=verticalOffset){
                     mAppBarOffset = verticalOffset;
                     mAppBarMaxOffset = -mAppBar.getTotalScrollRange();
@@ -403,6 +394,7 @@ public class MainActivity extends AppCompatActivity
                lasttime=System.currentTimeMillis();
                monthname.animate().translationY(0).setDuration(200).start();
                mArrowImageView.animate().translationY(0).setDuration(200).start();
+
            }
            else if (check&&event.mdy<0){
 
@@ -421,35 +413,133 @@ public class MainActivity extends AppCompatActivity
     @Subscribe//use for scrolling
     public void onEvent(MessageEvent event) {
 
+        Log.e("remove","try"+eventalllist.size());
+        int previous=lastchangeindex;
+        if (previous!=-1){
+            int totalremove=0;
+            for (int k=1;k<=3;k++){
+
+                if (eventalllist.get(previous).getEventname().equals("dupli")||eventalllist.get(previous).getEventname().equals("click")){
+                    totalremove++;
+                    EventModel eventModel =eventalllist.remove(previous);
+                }
+        }
+           indextrack.clear();
+            indextrack.putAll(dupindextrack);
+            mNestedView.getAdapter().notifyDataSetChanged();
+            Log.e("remove","try"+eventalllist.size());
+        }
+
         LinearLayoutManager linearLayoutManager= (LinearLayoutManager) mNestedView.getLayoutManager();
         if (indextrack.containsKey(event.getMessage())){
+             int index=indextrack.get(event.getMessage());
+             int type=eventalllist.get(index).getType();
+             if (type==0||type==2){
+                 Log.e("index"+type+event.getMessage(),index+"");
+                 lastdate=event.getMessage();
+                 expandedfirst=index;
+                 topspace=20;
+                 linearLayoutManager.scrollToPositionWithOffset(expandedfirst,20);
+                 lastchangeindex=-1;
 
-            int index=indextrack.get(event.getMessage());
-                lastdate=event.getMessage();
-                expandedfirst=eventalllist.get(index).getType()==100||eventalllist.get(index).getType()==200?index+1:index;
-                topspace=0;
-               linearLayoutManager.scrollToPositionWithOffset(expandedfirst,0);
+             }
+             else {
+
+
+                 lastdate=event.getMessage();
+                 Log.e("call","nothappen"+type);
+
+
+                 Integer ind=indextrack.get(event.getMessage());
+                 ind++;
+                 for (int i=ind;i<eventalllist.size();i++){
+                     Log.e("space",eventalllist.get(i).getType()+"");
+
+                     if (event.getMessage().isBefore(eventalllist.get(i).getLocalDate())){
+                         ind=i;
+                         break;
+                     }
+                 }
+                 lastchangeindex=ind;
+                 int typeselect=eventalllist.get(ind+1).getType()==200?200:100;
+                 if (!eventalllist.get(ind-1).getEventname().startsWith("dup")){
+
+                     eventalllist.add(ind,new EventModel("dupli",event.getMessage(),typeselect));
+                     ind++;
+                 }
+                 expandedfirst=ind;
+                 eventalllist.add(ind,new EventModel("click",event.getMessage(),1000));
+                 ind++;
+                 if (!eventalllist.get(ind).getEventname().startsWith("dup")){
+                     Log.e("call","happen"+2);
+                     eventalllist.add(ind,new EventModel("dupli",event.getMessage(),typeselect));
+                 }
+                 mNestedView.getAdapter().notifyDataSetChanged();
+
+                 topspace=20;
+                 linearLayoutManager.scrollToPositionWithOffset(expandedfirst,20);
+
+                 for (int i=lastchangeindex;i<eventalllist.size();i++){
+                     if (!eventalllist.get(i).getEventname().startsWith("dup"))indextrack.put(eventalllist.get(i).getLocalDate(),i);
+                 }
+
+
+             }
+
           }
         else {
-            //lastdate=event.getMessage().dayOfWeek().withMinimumValue();
-           if (lastdate.getMonthOfYear()==event.getMessage().dayOfWeek().withMinimumValue().minusDays(1).getMonthOfYear()){
-               Integer ind=indextrack.get(event.getMessage().dayOfWeek().withMinimumValue().minusDays(1));
-               if (eventalllist.get(ind).getType()==100||eventalllist.get(ind).getType()==200)ind++;
-               expandedfirst=ind;
-               topspace=0;
-               linearLayoutManager.scrollToPositionWithOffset(expandedfirst,0);
+         Integer ind=indextrack.get(event.getMessage().dayOfWeek().withMinimumValue().minusDays(1));
+            ind++;
+            for (int i=ind;i<eventalllist.size();i++){
+                Log.e("space",eventalllist.get(i).getType()+"");
+                if (event.getMessage().isBefore(eventalllist.get(i).getLocalDate())){
+                    ind=i;
+                    break;
+                }
             }
+            lastchangeindex=ind;
+            int typeselect=eventalllist.get(ind+1).getType()==200?200:100;
+           if (!eventalllist.get(ind-1).getEventname().startsWith("dup")){
+               Log.e("call","happen");
+               eventalllist.add(ind,new EventModel("dupli",event.getMessage(),typeselect));
+               ind++;
+           }
+            expandedfirst=ind;
 
+            eventalllist.add(ind,new EventModel("click",event.getMessage(),1000));
+            ind++;
+          if (!eventalllist.get(ind).getEventname().startsWith("dup")){
+
+              eventalllist.add(ind,new EventModel("dupli",event.getMessage(),typeselect));
+          }
+
+            mNestedView.getAdapter().notifyDataSetChanged();
+            topspace=20;
+            linearLayoutManager.scrollToPositionWithOffset(expandedfirst,20);
+
+            for (int i=lastchangeindex;i<eventalllist.size();i++){
+                if (!eventalllist.get(i).getEventname().startsWith("dup"))indextrack.put(eventalllist.get(i).getLocalDate(),i);
+            }
 
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
     @Subscribe//use for add
     public void onEvent(AddEvent event) {
 
         eventalllist=event.getArrayList();
+
         indextrack=event.getIndextracker();
+        for (Map.Entry<LocalDate,Integer> entry:indextrack.entrySet()){
+            dupindextrack.put(entry.getKey(),entry.getValue());
+        }
       if (mNestedView.isAttachedToWindow()) {
 
           mNestedView.getAdapter().notifyDataSetChanged();
@@ -463,8 +553,8 @@ public class MainActivity extends AppCompatActivity
 
                   Integer val=indextrack.get(LocalDate.now());
                   expandedfirst=val;
-                  topspace=0;
-                  linearLayoutManager.scrollToPositionWithOffset(expandedfirst,0);
+                  topspace=20;
+                  linearLayoutManager.scrollToPositionWithOffset(expandedfirst,20);
                   EventBus.getDefault().post(new MonthChange(localDate,0));
                   month=localDate.getDayOfMonth();
                   lastdate=localDate;
@@ -503,7 +593,8 @@ public class MainActivity extends AppCompatActivity
         @Override
         public int getItemViewType(int position) {
             if (position>1&&eventalllist.get(position).getType()==0&&getHeaderId(position)==getHeaderId(position-1))return 5;
-
+            if (position>1&&eventalllist.get(position).getType()==3&&eventalllist.get(position-1).getType()==1)return 7;
+            if (position+1<eventalllist.size()&&eventalllist.get(position).getType()==3&&(eventalllist.get(position+1).getType()==1||eventalllist.get(position+1).getType()==0))return 6;
             return eventalllist.get(position).getType();
         }
         public int getHeaderItemViewType(int position) {
@@ -544,6 +635,22 @@ public class MainActivity extends AppCompatActivity
                         .inflate(R.layout.noplanlay, parent, false);
                 return new NoplanViewHolder(view);
             }
+            else if (viewType==1000){
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.noplanlittlespace, parent, false);
+                return new NoplanViewHolder(view);
+            }
+
+            else if (viewType==6){
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.rangelayextrabottomspace, parent, false);
+                return new RangeViewHolder(view);
+            }
+            else if (viewType==7){
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.rangelayextratopspace, parent, false);
+                return new RangeViewHolder(view);
+            }
             else{
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.rangelay, parent, false);
@@ -560,9 +667,10 @@ public class MainActivity extends AppCompatActivity
 
                 ItemViewHolder holder= (ItemViewHolder) viewHolder;
                 holder.eventtextview.setText(eventalllist.get(position).getEventname());
-                if (position+1<eventalllist.size()&&eventalllist.get(position).getLocalDate().equals(today)&&(!eventalllist.get(position+1).getLocalDate().equals(today)||eventalllist.get(position+1).getType()==100)||eventalllist.get(position+1).getType()==200){
+                if (position+1<eventalllist.size()&&eventalllist.get(position).getLocalDate().equals(today)&&(!eventalllist.get(position+1).getLocalDate().equals(today)||eventalllist.get(position+1).getType()==100||eventalllist.get(position+1).getType()==200)){
                     holder.circle.setVisibility(View.VISIBLE);
                     holder.line.setVisibility(View.VISIBLE);
+
                 }
                 else {
                     holder.circle.setVisibility(View.GONE);
@@ -575,7 +683,7 @@ public class MainActivity extends AppCompatActivity
                 holder.eventimageview.setImageResource(monthresource[eventalllist.get(position).getLocalDate().getMonthOfYear()-1]);
                 holder.monthname.setText(eventalllist.get(position).getLocalDate().toString("MMMM YYYY"));
             }
-            else if (viewtype==2||viewtype==100||viewtype==200){
+            else if (viewtype==2||viewtype==100||viewtype==200||viewtype==1000){
 
             }
             else {
@@ -593,7 +701,6 @@ public class MainActivity extends AppCompatActivity
             else if (eventalllist.get(position).getType()==3)return position;
            else if (eventalllist.get(position).getType()==100)return position;
             else if (eventalllist.get(position).getType()==200)return position;
-
             LocalDate localDate=eventalllist.get(position).getLocalDate();
             String uniquestr=""+localDate.getDayOfMonth()+localDate.getMonthOfYear()+localDate.getYear();
             return Long.parseLong(uniquestr);
@@ -634,7 +741,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position) {
             int viewtype=getHeaderItemViewType(position);
-            if (viewtype==0||viewtype==2){
+            if (viewtype==0||viewtype==2||viewtype==1000){
                 TextView vartextView=holder.itemView.findViewById(R.id.textView9);
                 TextView datetextView=holder.itemView.findViewById(R.id.textView10);
                 vartextView.setText(var[eventalllist.get(position).getLocalDate().getDayOfWeek()-1]);

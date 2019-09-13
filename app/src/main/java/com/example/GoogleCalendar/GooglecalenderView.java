@@ -74,7 +74,7 @@ public class GooglecalenderView extends LinearLayout {
     }
     public void setCurrentmonth(LocalDate currentmonth){
         if (currentmonth==null)return;
-        Log.e("Call","callmonth");
+
         LocalDate mindateobj=mindate.toDateTimeAtStartOfDay().dayOfMonth().withMinimumValue().toLocalDate();
         LocalDate current=currentmonth.dayOfMonth().withMaximumValue();
         int months= Months.monthsBetween(mindateobj,current).getMonths();
@@ -254,11 +254,11 @@ public class GooglecalenderView extends LinearLayout {
 
             List<String> list=Arrays.asList(eventhash.get(todaydate));
             list=new ArrayList<>(list);
-            Log.e("today",list.toString());
+
             boolean b=true;
 
             list.add("todaydate");
-            Log.e("today",list.toString()+b);
+
             String[] mStringArray = new String[list.size()];
             eventhash.put(todaydate,list.toArray(mStringArray));
         }
@@ -280,21 +280,34 @@ public class GooglecalenderView extends LinearLayout {
                    if (type==0&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==0&&!eventModelslist.get(eventModelslist.size()-1).getLocalDate().equals(localDateStringEntry.getKey())){
 
                        eventModelslist.add(new EventModel("dup",localDateStringEntry.getKey(),100));
-                       if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                      // if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
                        i++;
                    }
-                   else if ((type==3||type==1)&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==0){
+                   else if ((type==3)&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==0){
                        eventModelslist.add(new EventModel("dup",eventModelslist.get(eventModelslist.size()-1).getLocalDate(),100));
-                       if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                    //   if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
                        i++;
                    }
-                   else if (type==0&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==1){
+
+                   else if ((type==1)&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==0){
+                       eventModelslist.add(new EventModel("dup",eventModelslist.get(eventModelslist.size()-1).getLocalDate(),200));
+                      // if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                       i++;
+                   }
+                   else if (type==0&&eventModelslist.size()>0&&(eventModelslist.get(eventModelslist.size()-1).getType()==1)){
                        eventModelslist.add(new EventModel("dup",localDateStringEntry.getKey(),200));
-                       if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                       //if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
                        i++;
                    }
+
+                   else if (type==2&&eventModelslist.size()>0&&eventModelslist.get(eventModelslist.size()-1).getType()==0){
+                       eventModelslist.add(new EventModel("dup",eventModelslist.get(eventModelslist.size()-1).getLocalDate(),100));
+                     //  if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                       i++;
+                   }
+
                    eventModelslist.add(new EventModel(s,localDateStringEntry.getKey(),type));
-                   if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+                   indextrack.put(localDateStringEntry.getKey(),i);
                    i++;
                }
 
