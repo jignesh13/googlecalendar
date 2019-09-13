@@ -12,7 +12,8 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 
 <image src=/calendargi.gif
  width=225 height=400>
- [![Watch the video]](https://www.youtube.com/watch?v=rN4p_Jgr4UE)
+ 
+ [![Watch full video here]](https://www.youtube.com/watch?v=rN4p_Jgr4UE)
 
  ## feature
 (1) collapse toolbar with calendarview same like google calendar app
