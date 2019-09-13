@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId()==R.id.action_favorite){
             final LocalDate localDate=LocalDate.now();
+
            final LinearLayoutManager linearLayoutManager= (LinearLayoutManager) mNestedView.getLayoutManager();
            mNestedView.stopScroll();
             if (indextrack.containsKey(new LocalDate(localDate.getYear(),localDate.getMonthOfYear(),localDate.getDayOfMonth()))){
@@ -413,7 +414,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe//use for scrolling
     public void onEvent(MessageEvent event) {
 
-        Log.e("remove","try"+eventalllist.size());
+
         int previous=lastchangeindex;
         if (previous!=-1){
             int totalremove=0;
@@ -427,7 +428,7 @@ public class MainActivity extends AppCompatActivity
            indextrack.clear();
             indextrack.putAll(dupindextrack);
             mNestedView.getAdapter().notifyDataSetChanged();
-            Log.e("remove","try"+eventalllist.size());
+
         }
 
         LinearLayoutManager linearLayoutManager= (LinearLayoutManager) mNestedView.getLayoutManager();
@@ -435,7 +436,7 @@ public class MainActivity extends AppCompatActivity
              int index=indextrack.get(event.getMessage());
              int type=eventalllist.get(index).getType();
              if (type==0||type==2){
-                 Log.e("index"+type+event.getMessage(),index+"");
+
                  lastdate=event.getMessage();
                  expandedfirst=index;
                  topspace=20;
@@ -447,13 +448,13 @@ public class MainActivity extends AppCompatActivity
 
 
                  lastdate=event.getMessage();
-                 Log.e("call","nothappen"+type);
+
 
 
                  Integer ind=indextrack.get(event.getMessage());
                  ind++;
                  for (int i=ind;i<eventalllist.size();i++){
-                     Log.e("space",eventalllist.get(i).getType()+"");
+
 
                      if (event.getMessage().isBefore(eventalllist.get(i).getLocalDate())){
                          ind=i;
@@ -471,7 +472,7 @@ public class MainActivity extends AppCompatActivity
                  eventalllist.add(ind,new EventModel("click",event.getMessage(),1000));
                  ind++;
                  if (!eventalllist.get(ind).getEventname().startsWith("dup")){
-                     Log.e("call","happen"+2);
+
                      eventalllist.add(ind,new EventModel("dupli",event.getMessage(),typeselect));
                  }
                  mNestedView.getAdapter().notifyDataSetChanged();
@@ -491,7 +492,7 @@ public class MainActivity extends AppCompatActivity
          Integer ind=indextrack.get(event.getMessage().dayOfWeek().withMinimumValue().minusDays(1));
             ind++;
             for (int i=ind;i<eventalllist.size();i++){
-                Log.e("space",eventalllist.get(i).getType()+"");
+
                 if (event.getMessage().isBefore(eventalllist.get(i).getLocalDate())){
                     ind=i;
                     break;
@@ -500,7 +501,7 @@ public class MainActivity extends AppCompatActivity
             lastchangeindex=ind;
             int typeselect=eventalllist.get(ind+1).getType()==200?200:100;
            if (!eventalllist.get(ind-1).getEventname().startsWith("dup")){
-               Log.e("call","happen");
+
                eventalllist.add(ind,new EventModel("dupli",event.getMessage(),typeselect));
                ind++;
            }
