@@ -47,8 +47,6 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 
 ✔️ Fully customizable themes & calendar / event widgets
 
-✔️ CalDAV calendar sync supported to sync events across devices
-
 ✔️ Daily, weekly, monthly, yearly & event views on the calendar
 
 ✔️ Easily add holidays, birthdays, anniversaries & appointments
