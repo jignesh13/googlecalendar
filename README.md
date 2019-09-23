@@ -1,4 +1,4 @@
-# GoogleCalendar
+# Google-Calendar
 
 Sample Google Calendar project get all event information, birthday, appointment etc from google account which is sync with your device
 
