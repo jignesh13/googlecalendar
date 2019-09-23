@@ -3,7 +3,7 @@
 Sample Google Calendar project get all event information, birthday, appointment etc from google account which is sync with your device
 
 
-Simple Google Calendar contains all the features that you could find in other apps in the stock, including Day , Week, Month Views , variety modifies,and connection across different accounts.Easy Google Calendar organises your agenda incredibly easily to increase performance and productivity.
+Sample Google Calendar contains all the features that you find in other calendar app including Day view, Week view, Month Views, recent event, today event, easily navigation between monthview and calendarview and awesome design with all of this 
 
 Make copy of the official Google Calendar app for your Android phone add some few feature
 
@@ -11,7 +11,11 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 
 • Events from Gmail - Flight, hotel, concert, restaurant reservations and more are added to your calendar automatically.
 
+How set minimum and maximum date of project
+``java
 
+calendarview.
+``
 
 
 <image src=/calendargi.gif
