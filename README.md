@@ -11,8 +11,7 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 
 • Events from Gmail - Flight, hotel, concert, restaurant reservations and more are added to your calendar automatically.
 
-How set minimum and maximum date of project
-```java
+How set minimum and maximum date of project```java
 //first param: HashMap<LocalDate,String[]> second and third param:LocalDate
             calendarView.init(eventlist,mintime,maxtime);
             
