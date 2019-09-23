@@ -13,7 +13,7 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 
 How set minimum and maximum date of project
 ```java
-
+//first param: HashMap<LocalDate,String[]> second and third param:LocalDate
             calendarView.init(eventlist,mintime,maxtime);
             
 ```
