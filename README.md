@@ -1,6 +1,7 @@
 # GoogleCalendar
 
-Simple Google Calendar can connect your Google Accounts and can be synchronized to automatically display events, programs and appointments on it .
+Sample Google Calendar project get all event information, birthday, appointment etc from google account which is sync with your device
+
 
 Simple Google Calendar contains all the features that you could find in other apps in the stock, including Day , Week, Month Views , variety modifies,and connection across different accounts.Easy Google Calendar organises your agenda incredibly easily to increase performance and productivity.
 
