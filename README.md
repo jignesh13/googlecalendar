@@ -26,22 +26,39 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 
  ## feature
 ✔️ Collapse toolbar with calendarview same like google calendar app
+
 ✔️ Smooth scrolling with month change during scrolling
+
 ✔️ scrolling with parallexeffect in image of months
+
 ✔️ Left side event day animation same as google calendar app
+
 ✔️ When date select from top side smooth scroll accroding to him and many more
+
 ✔️ No ads or annoying popups
+
 ✔️ No internet access needed, giving you more privacy & security
+
 ✔️ Only the bare minimum permissions required
+
 ✔️ Emphasis on simplicity – does what a calendar needs to do!
+
 ✔️ Open source
+
 ✔️ Fully customizable themes & calendar / event widgets
+
 ✔️ CalDAV calendar sync supported to sync events across devices
+
 ✔️ Daily, weekly, monthly, yearly & event views on the calendar
+
 ✔️ Easily add holidays, birthdays, anniversaries & appointments
+
 ✔️ Customize events – start time, duration, reminders etc
+
 ✔️ Add event attendees to each event
+
 ✔️ Use as a personal calendar or a business calendar
+
 ✔️ Choose between reminders & email notifications to alert you about an event
 
 
