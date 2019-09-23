@@ -15,7 +15,7 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 ```java
 //first param: HashMap<LocalDate,String[]> second and third param:LocalDate
             calendarView.init(eventlist,mintime,maxtime);
-            
+//string[]  if same day contain  more than one event
 ```
 
 
