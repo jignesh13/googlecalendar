@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:stateListAnimator="@animator/ann"
         app:expanded="false"
+
         android:background="@android:color/white"
         app:layout_behavior=".MyAppBarBehavior"
         tools:targetApi="lollipop">
@@ -32,11 +33,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="500dp"
                 android:orientation="vertical"
-                app:layout_collapseMode="pin"
 
+                app:layout_collapseMode="pin"
                 android:layout_marginTop="?attr/actionBarSize"
               >
-
 
             </com.example.GoogleCalendar.GooglecalenderView>
 
@@ -49,13 +49,13 @@
                 app:contentInsetLeft="0dp"
                 app:contentInsetStart="0dp"
                 app:titleTextColor="@color/colorPrimaryDark"
-                android:background="@android:color/white"
+                android:background="#fff"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
+                   android:layout_height="?attr/actionBarSize"
                     android:clickable="true"
                     android:focusable="true">
 
@@ -110,6 +110,102 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:translationZ="10dp"
+        android:visibility="gone"
+        android:id="@+id/shadow"
+        android:background="#22000000"
+        >
+
+    </View>
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/redlay"
+        android:clickable="true"
+        android:focusable="true"
+        android:translationZ="@dimen/tendp"
+        android:background="@android:color/white"
+        >
+
+        <ImageButton
+            android:id="@+id/closebtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="45dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_close_black_24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/roundrect"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:background="@drawable/rround"
+            app:layout_constraintBottom_toBottomOf="@+id/textView12"
+            app:layout_constraintTop_toTopOf="@+id/textView12"
+            app:layout_constraintEnd_toEndOf="@+id/closebtn"
+            app:layout_constraintStart_toStartOf="@+id/closebtn"
+            />
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:paddingLeft="80dp"
+            android:fontFamily="@font/googlesans_regular"
+            android:text="Bhai Duj"
+            android:textColor="#505050"
+            android:paddingRight="24dp"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/closebtn"  />
+
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/latoregular"
+            android:paddingRight="36dp"
+            android:text=""
+            android:textColor="#3C3C3C"
+            android:textSize="16sp"
+            android:paddingLeft="80dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/calendar_badged_icon"
+            app:layout_constraintEnd_toEndOf="@+id/closebtn"
+            app:layout_constraintStart_toStartOf="@+id/closebtn"
+            app:layout_constraintTop_toBottomOf="@+id/textView13" />
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/latoregular"
+            android:text="Holidays in India"
+            android:textColor="#3C3C3C"
+            android:textSize="16sp"
+            android:paddingLeft="80dp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView2" />
+    </android.support.constraint.ConstraintLayout>
 </android.support.design.widget.CoordinatorLayout>
 
 

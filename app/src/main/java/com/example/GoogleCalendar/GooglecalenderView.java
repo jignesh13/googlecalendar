@@ -344,14 +344,21 @@ public class GooglecalenderView extends LinearLayout {
             int size=myPagerAdapter.monthModels.get(position).getDayModelArrayList().size()+myPagerAdapter.monthModels.get(position).getFirstday();
             int numbercolumn=size%7==0?size/7:(size/7)+1;
             ViewGroup.LayoutParams params = getLayoutParams();
-            params.height = (context.getResources().getDimensionPixelSize(R.dimen.itemheight)*numbercolumn)+80;
+            params.height = 65+(context.getResources().getDimensionPixelSize(R.dimen.itemheight)*numbercolumn)+context.getResources().getDimensionPixelSize(R.dimen.tendp)+getStatusBarHeight();
             setLayoutParams(params);
 
 
         }
 
     }
-
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
     public  class MyPagerAdapter extends FragmentStatePagerAdapter {
         private ArrayList<MonthModel> monthModels;
         private ArrayList<FirstFragment> firstFragments=new ArrayList<>();

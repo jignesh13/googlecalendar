@@ -14,6 +14,7 @@ import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,12 +38,14 @@ public class Utility {
             // for ActivityCompat#requestPermissions for more details.
             return null;
         }
+
         Cursor cursor = context.getContentResolver()
                 .query(
                         CalendarContract.Events.CONTENT_URI,
                         new String[]{"_id", "title", "description",
                                 "dtstart", "dtend", "eventLocation", "account_name"}, selection,
                         null, null);
+
         cursor.moveToFirst();
         // fetching calendars name
         String CNames[] = new String[cursor.getCount()];
@@ -50,10 +53,14 @@ public class Utility {
         // fetching calendars id
       String syncacc=null;
         while (cursor.moveToNext()){
+
             if (syncacc==null)syncacc=cursor.getString(6);
             if (cursor.getString(6).equals(syncacc)){
                 LocalDate localDate=getDate(Long.parseLong(cursor.getString(3)));
-                if (!localDateHashMap.containsKey(localDate))localDateHashMap.put(localDate,new String[]{cursor.getString(1)});
+                if (!localDateHashMap.containsKey(localDate)){
+                    Log.e("location",cursor.getString(5)+"f");
+                    localDateHashMap.put(localDate,new String[]{cursor.getString(1)});
+                }
                 else {
                     String[] s=localDateHashMap.get(localDate);
                     boolean isneed=true;
@@ -67,6 +74,7 @@ public class Utility {
                     if (isneed){
                         String ss[]= Arrays.copyOf(s,s.length+1);
                         ss[ss.length-1]=cursor.getString(1);
+                        Log.e("location",cursor.getString(5)+"f");
                         localDateHashMap.put(localDate,ss);
                     }
 

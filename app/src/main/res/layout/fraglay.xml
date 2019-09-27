@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/textView4"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="S"
         android:gravity="center"
         android:fontFamily="@font/googlesansmed"
@@ -22,7 +22,7 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="M"
         android:gravity="center"
         android:fontFamily="@font/googlesansmed"
@@ -36,7 +36,7 @@
     <TextView
         android:id="@+id/textView2"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="T"
         android:gravity="center"
         android:fontFamily="@font/googlesansmed"
@@ -50,7 +50,7 @@
     <TextView
         android:id="@+id/textView3"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="W"
         android:gravity="center"
         android:fontFamily="@font/googlesansmed"
@@ -64,7 +64,7 @@
     <TextView
         android:id="@+id/textView5"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="T"
         android:gravity="center"
         android:fontFamily="@font/googlesansmed"
@@ -78,7 +78,7 @@
     <TextView
         android:id="@+id/textView6"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="F"
         android:gravity="center"
         android:fontFamily="@font/googlesansmed"
@@ -92,7 +92,7 @@
     <TextView
         android:id="@+id/textView7"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="S"
         android:fontFamily="@font/googlesansmed"
         android:textSize="11sp"

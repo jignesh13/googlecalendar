@@ -85,7 +85,6 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
 
                 mView = mLayoutManager!!.findViewByPosition(mAppBarTracking!!.appbaroffset())
                 if (mView!=null){
-
                     consumed!![1] = dy - mView!!.top+MainActivity.topspace
                 }
 
