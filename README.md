@@ -22,7 +22,7 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 <image src=/calendargi.gif
  width=225 height=400>
  
- [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/rN4p_Jgr4UE/0.jpg)](http://www.youtube.com/watch?v=rN4p_Jgr4UE)
+ [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/OV6SHoLu6c4/0.jpg)](http://www.youtube.com/watch?v=OV6SHoLu6c4)
 
  
  [[Watch full video here]](https://www.youtube.com/watch?v=rN4p_Jgr4UE)
