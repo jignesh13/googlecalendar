@@ -19,7 +19,7 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 ```
 
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/0.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)
 
 
 
