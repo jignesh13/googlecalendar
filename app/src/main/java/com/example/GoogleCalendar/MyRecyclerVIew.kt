@@ -107,11 +107,14 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
 
-
-    override fun setLayoutManager(layout: RecyclerView.LayoutManager) {
+    override fun setLayoutManager(layout: LayoutManager?) {
         super.setLayoutManager(layout)
         mLayoutManager = layoutManager as LinearLayoutManager
     }
+//     fun setLayoutManager(layout: LayoutManager) {
+//        super.setLayoutManager(layout)
+//        mLayoutManager = layoutManager as LinearLayoutManager
+//    }
 
     fun setAppBarTracking(appBarTracking: AppBarTracking) {
         mAppBarTracking = appBarTracking
