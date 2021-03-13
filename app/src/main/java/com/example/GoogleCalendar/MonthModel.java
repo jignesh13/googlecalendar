@@ -8,16 +8,17 @@ public class MonthModel {
     private int year;
     private int noofday;
     private int noofweek;
-    private  ArrayList<DayModel> dayModelArrayList;
+    private ArrayList<DayModel> dayModelArrayList;
     private int firstday;
+
+    public int getFirstday() {
+        return firstday;
+    }
 
     public void setFirstday(int firstday) {
         this.firstday = firstday;
     }
 
-    public int getFirstday() {
-        return firstday;
-    }
     public ArrayList<DayModel> getDayModelArrayList() {
         return dayModelArrayList;
     }

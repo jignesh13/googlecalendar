@@ -5,18 +5,16 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.provider.CalendarContract;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
+
+import androidx.core.app.ActivityCompat;
 
 
 public class Utility {
@@ -51,36 +49,34 @@ public class Utility {
         String CNames[] = new String[cursor.getCount()];
 
         // fetching calendars id
-      String syncacc=null;
-        while (cursor.moveToNext()){
+        String syncacc = null;
+        while (cursor.moveToNext()) {
 
-            if (syncacc==null)syncacc=cursor.getString(6);
-            if (cursor.getString(6).equals(syncacc)){
-                LocalDate localDate=getDate(Long.parseLong(cursor.getString(3)));
-                if (!localDateHashMap.containsKey(localDate)){
-                    Log.e("location",cursor.getString(5)+"f");
-                    localDateHashMap.put(localDate,new String[]{cursor.getString(1)});
-                }
-                else {
-                    String[] s=localDateHashMap.get(localDate);
-                    boolean isneed=true;
-                    for (int i=0;i<s.length;i++){
-                        if (s[i].equals(cursor.getString(1))){
+            if (syncacc == null) syncacc = cursor.getString(6);
+            if (cursor.getString(6).equals(syncacc)) {
+                LocalDate localDate = getDate(Long.parseLong(cursor.getString(3)));
+                if (!localDateHashMap.containsKey(localDate)) {
+                    Log.e("location", cursor.getString(5) + "f");
+                    localDateHashMap.put(localDate, new String[]{cursor.getString(1)});
+                } else {
+                    String[] s = localDateHashMap.get(localDate);
+                    boolean isneed = true;
+                    for (int i = 0; i < s.length; i++) {
+                        if (s[i].equals(cursor.getString(1))) {
 
-                            isneed=false;
+                            isneed = false;
                             break;
                         }
                     }
-                    if (isneed){
-                        String ss[]= Arrays.copyOf(s,s.length+1);
-                        ss[ss.length-1]=cursor.getString(1);
-                        Log.e("location",cursor.getString(5)+"f");
-                        localDateHashMap.put(localDate,ss);
+                    if (isneed) {
+                        String ss[] = Arrays.copyOf(s, s.length + 1);
+                        ss[ss.length - 1] = cursor.getString(1);
+                        Log.e("location", cursor.getString(5) + "f");
+                        localDateHashMap.put(localDate, ss);
                     }
 
                 }
             }
-
 
 
         }

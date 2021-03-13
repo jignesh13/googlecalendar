@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="55dp"
-    android:layout_height="wrap_content"
-  >
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/googlesansmed"
-        android:text="THU"
         android:letterSpacing="0.08"
+        android:text="THU"
         android:textColor="#606368"
         android:textSize="11sp"
         app:layout_constraintBottom_toTopOf="@+id/textView10"
@@ -26,8 +24,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/latoregular"
-        android:text="5"
         android:gravity="center"
+        android:text="5"
         android:textColor="#000"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -35,4 +33,4 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/textView9"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

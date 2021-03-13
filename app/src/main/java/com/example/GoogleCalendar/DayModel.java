@@ -5,8 +5,11 @@ public class DayModel {
     private int day;
     private int year;
     private boolean today;
+    private String[] events;
+
     private boolean selected;
     private boolean eventlist;
+    private boolean isenable;
 
     public boolean getEventlist() {
         return eventlist;
@@ -14,6 +17,14 @@ public class DayModel {
 
     public void setEventlist(boolean event) {
         this.eventlist = event;
+    }
+
+    public String[] getEvents() {
+        return events;
+    }
+
+    public void setEvents(String[] events) {
+        this.events = events;
     }
 
     public boolean isSelected() {
@@ -31,15 +42,14 @@ public class DayModel {
     public void setToday(boolean today) {
         this.today = today;
     }
-    public boolean isIsenable() {
+
+    public boolean isenable() {
         return isenable;
     }
 
     public void setIsenable(boolean isenable) {
         this.isenable = isenable;
     }
-
-    private boolean isenable;
 
     public int getMonth() {
         return month;
@@ -65,4 +75,8 @@ public class DayModel {
         this.year = year;
     }
 
+    @Override
+    public String toString() {
+        return day + "/" + month + "/" + year;
+    }
 }

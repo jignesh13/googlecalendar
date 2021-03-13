@@ -1,20 +1,17 @@
 package com.example.GoogleCalendar;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
+
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MyRecycle extends RecyclerView {
     private LinearLayoutManager linearLayoutManager;
     private AppBarTracking appBarTracking;
-    interface AppBarTracking {
-        boolean  isAppBarIdle();
-        boolean isAppBarExpanded();
-    }
+
     public MyRecycle(Context context) {
         super(context);
     }
@@ -30,10 +27,11 @@ public class MyRecycle extends RecyclerView {
     @Override
     public void setLayoutManager(LayoutManager layout) {
         super.setLayoutManager(layout);
-        linearLayoutManager= (LinearLayoutManager) layout;
+        linearLayoutManager = (LinearLayoutManager) layout;
     }
-    public void setAppbartrackListner(AppBarTracking appbarListner){
-        appBarTracking=appbarListner;
+
+    public void setAppbartrackListner(AppBarTracking appbarListner) {
+        appBarTracking = appbarListner;
     }
 
     @Override
@@ -52,5 +50,11 @@ public class MyRecycle extends RecyclerView {
     @Override
     public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
         super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
+    }
+
+    interface AppBarTracking {
+        boolean isAppBarIdle();
+
+        boolean isAppBarExpanded();
     }
 }

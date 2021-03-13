@@ -1,12 +1,14 @@
 package com.example.GoogleCalendar;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+
+import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 /**
  * Attach this behavior to AppBarLayout to disable the bottom portion of a closed appBar
@@ -16,13 +18,14 @@ import android.view.MotionEvent;
  */
 public class MyAppBarBehavior extends AppBarLayout.Behavior {
 
+    private static final int TOP_CHILD_FLING_THRESHOLD = 3;
     // Touch above this y-axis value can open the appBar.
     private int mCanOpenBottom;
-
+    private boolean shouldScroll = false;
     // Determines if the appBar can be dragged open or not via direct touch on the appBar.
     private boolean mCanDrag = true;
-    private static final int TOP_CHILD_FLING_THRESHOLD = 3;
     private boolean isPositive;
+
     @SuppressWarnings("unused")
     public MyAppBarBehavior() {
         init();
@@ -34,6 +37,28 @@ public class MyAppBarBehavior extends AppBarLayout.Behavior {
         init();
     }
 
+    @Override
+    public boolean onStartNestedScroll(@NonNull CoordinatorLayout parent, @NonNull AppBarLayout child, @NonNull View directTargetChild, View target, int nestedScrollAxes, int type) {
+        return shouldScroll;
+    }
+
+    @Override
+    public boolean onTouchEvent(@NonNull CoordinatorLayout parent, @NonNull AppBarLayout child, @NonNull MotionEvent ev) {
+        if (shouldScroll) {
+            return super.onTouchEvent(parent, child, ev);
+        } else {
+            return false;
+        }
+    }
+
+    public void setScrollBehavior(boolean shouldScroll) {
+        this.shouldScroll = shouldScroll;
+    }
+
+    public boolean isShouldScroll() {
+        return shouldScroll;
+    }
+
     private void init() {
         setDragCallback(new AppBarLayout.Behavior.DragCallback() {
             @Override
@@ -42,7 +67,6 @@ public class MyAppBarBehavior extends AppBarLayout.Behavior {
             }
         });
     }
-
 
 
     @Override
@@ -57,11 +81,6 @@ public class MyAppBarBehavior extends AppBarLayout.Behavior {
         }
         return super.onInterceptTouchEvent(parent, child, event);
     }
-
-
-
-
-
 
 
     public void setCanOpenBottom(int bottom) {

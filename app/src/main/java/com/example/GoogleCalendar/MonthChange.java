@@ -6,9 +6,9 @@ public class MonthChange {
     public LocalDate mMessage;
     public int mdy;
 
-    public MonthChange(LocalDate message,int dy) {
+    public MonthChange(LocalDate message, int dy) {
         mMessage = message;
-        mdy=dy;
+        mdy = dy;
     }
 
     public int getMdy() {

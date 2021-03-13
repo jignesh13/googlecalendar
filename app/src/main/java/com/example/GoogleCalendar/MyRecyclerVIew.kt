@@ -1,23 +1,19 @@
 package com.example.GoogleCalendar
 
 import android.content.Context
-import android.support.v4.view.ViewCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewConfiguration
+import androidx.core.view.ViewCompat
 
 /**A RecyclerView that allows temporary pausing of casuing its scroll to affect appBarLayout, based on https://stackoverflow.com/a/45338791/878126 */
-class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : RecyclerView(context, attrs, defStyle) {
+class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) : androidx.recyclerview.widget.RecyclerView(context, attrs, defStyle) {
     private var mAppBarTracking: AppBarTracking? = null
     private var mView: View? = null
     private var mTopPos: Int = 0
     private var lastev: Float = 0f;
-    private var current: Int =0
-    private var mLayoutManager: LinearLayoutManager? = null
+    private var current: Int = 0
+    private var mLayoutManager: androidx.recyclerview.widget.LinearLayoutManager? = null
 
     interface AppBarTracking {
         fun isAppBarIdle(): Boolean
@@ -31,10 +27,9 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
 
         if (ev!!.action == MotionEvent.ACTION_MOVE) {
 
-        }
-        else{
+        } else {
             if (mAppBarTracking!!.isAppBarExpanded())
-                current=mLayoutManager!!.findFirstVisibleItemPosition();
+                current = mLayoutManager!!.findFirstVisibleItemPosition();
         }
         return super.dispatchTouchEvent(ev);
 //        if (mAppBarTracking!!.appbaroffset()!=0){
@@ -84,22 +79,22 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
             } else {
 
                 mView = mLayoutManager!!.findViewByPosition(mAppBarTracking!!.appbaroffset())
-                if (mView!=null){
-                    consumed!![1] = dy - mView!!.top+MainActivity.topspace
+                if (mView != null) {
+                    consumed!![1] = dy - mView!!.top + MainActivity.topspace
                 }
 
-              return true
+                return true
 
             }
         }
-         if (dy < 0 && type == ViewCompat.TYPE_TOUCH && mAppBarTracking!!.isAppBarExpanded()) {
+        if (dy < 0 && type == ViewCompat.TYPE_TOUCH && mAppBarTracking!!.isAppBarExpanded()) {
             consumed!![1] = dy
             return true
         }
 
         val returnValue = super.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow, type)
 
-        if (offsetInWindow != null && !isNestedScrollingEnabled && offsetInWindow[1] != 0){
+        if (offsetInWindow != null && !isNestedScrollingEnabled && offsetInWindow[1] != 0) {
             offsetInWindow[1] = 0
 
         }
@@ -109,7 +104,7 @@ class MyRecyclerView @JvmOverloads constructor(context: Context, attrs: Attribut
 
     override fun setLayoutManager(layout: LayoutManager?) {
         super.setLayoutManager(layout)
-        mLayoutManager = layoutManager as LinearLayoutManager
+        mLayoutManager = layoutManager as androidx.recyclerview.widget.LinearLayoutManager
     }
 //     fun setLayoutManager(layout: LayoutManager) {
 //        super.setLayoutManager(layout)

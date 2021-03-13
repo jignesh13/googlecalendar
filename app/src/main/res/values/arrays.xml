@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="com_google_android_gms_fonts_certs" />
 
     <string-array name="animals">

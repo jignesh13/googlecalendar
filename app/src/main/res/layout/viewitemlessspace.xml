@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="wrap_content">
+
     <TextView xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/view_item_textview"
         android:layout_width="match_parent"
@@ -18,9 +18,9 @@
         android:clickable="true"
         android:fontFamily="@font/googlesansmed"
         android:orientation="horizontal"
+        android:padding="9dp"
         android:textColor="@android:color/white"
         android:textSize="14sp"
-        android:padding="9dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -28,34 +28,33 @@
         tools:text="Aardvark" />
 
     <View
+        android:id="@+id/circle"
         android:layout_width="10dp"
         android:layout_height="10dp"
-        android:id="@+id/circle"
-        android:visibility="gone"
-        android:layout_marginTop="14dp"
         android:layout_marginStart="60dp"
-
+        android:layout_marginTop="14dp"
         android:background="@drawable/blackcircle"
+
+        android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view_item_textview"
 
         />
+
     <View
+        android:id="@+id/line"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#000000"
-        android:id="@+id/line"
-        android:visibility="gone"
         android:layout_marginStart="60dp"
+        android:background="#000000"
+        android:visibility="gone"
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/circle"
         app:layout_constraintBottom_toBottomOf="@+id/circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/circle"
 
         />
 
 
-
-
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,13 +18,14 @@ package com.example.GoogleCalendar;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
+
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * {@link RecyclerView.SmoothScroller} implementation which uses a {@link LinearInterpolator} until
@@ -38,14 +39,6 @@ import android.view.animation.LinearInterpolator;
  */
 public class MyLinearSmoothScroller extends RecyclerView.SmoothScroller {
 
-    private static final String TAG = "LinearSmoothScroller";
-
-    private static final boolean DEBUG = false;
-
-    private static final float MILLISECONDS_PER_INCH = 25f;
-
-    private static final int TARGET_SEEK_SCROLL_DISTANCE_PX = 10000;
-
     /**
      * Align child view's left or top with parent view's left or top
      *
@@ -54,7 +47,6 @@ public class MyLinearSmoothScroller extends RecyclerView.SmoothScroller {
      * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_START = -1;
-
     /**
      * Align child view's right or bottom with parent view's right or bottom
      *
@@ -63,7 +55,6 @@ public class MyLinearSmoothScroller extends RecyclerView.SmoothScroller {
      * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_END = 1;
-
     /**
      * <p>Decides if the child should be snapped from start or end, depending on where it
      * currently is in relation to its parent.</p>
@@ -75,7 +66,10 @@ public class MyLinearSmoothScroller extends RecyclerView.SmoothScroller {
      * @see #calculateDyToMakeVisible(android.view.View, int)
      */
     public static final int SNAP_TO_ANY = 0;
-
+    private static final String TAG = "LinearSmoothScroller";
+    private static final boolean DEBUG = false;
+    private static final float MILLISECONDS_PER_INCH = 25f;
+    private static final int TARGET_SEEK_SCROLL_DISTANCE_PX = 10000;
     // Trigger a scroll to a further distance than TARGET_SEEK_SCROLL_DISTANCE_PX so that if target
     // view is not laid out until interim target position is reached, we can detect the case before
     // scrolling slows down and reschedule another interim target scroll
@@ -84,11 +78,8 @@ public class MyLinearSmoothScroller extends RecyclerView.SmoothScroller {
     protected final LinearInterpolator mLinearInterpolator = new LinearInterpolator();
 
     protected final DecelerateInterpolator mDecelerateInterpolator = new DecelerateInterpolator();
-
-    protected PointF mTargetVector;
-
     private final float MILLISECONDS_PER_PX;
-
+    protected PointF mTargetVector;
     // Temporary variables to keep track of the interim scroll target. These values do not
     // point to a real item position, rather point to an estimated location pixels.
     protected int mInterimTargetDx = 0, mInterimTargetDy = 0;
@@ -177,7 +168,7 @@ public class MyLinearSmoothScroller extends RecyclerView.SmoothScroller {
         // area under curve (1-(1-x)^2) can be calculated as (1 - x/3) * x * x
         // which gives 0.100028 when x = .3356
         // this is why we divide linear scrolling time with .3356
-        return  (int) Math.ceil(calculateTimeForScrolling(dx) / .3356);
+        return (int) Math.ceil(calculateTimeForScrolling(dx) / .3356);
     }
 
     /**
@@ -345,7 +336,6 @@ public class MyLinearSmoothScroller extends RecyclerView.SmoothScroller {
      * for the given position (e.g. it has no current scroll position).
      *
      * @param targetPosition the position to which the scroller is scrolling
-     *
      * @return the scroll vector for a given target position
      */
     @Nullable
