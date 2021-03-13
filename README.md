@@ -17,7 +17,7 @@ Make copy of the official Google Calendar app for your Android phone add some fe
             calendarView.init(eventlist,mintime,maxtime);
 //string[]  if same day contain  more than one event
 ```
-<img src="untitled.gif" width="288" height="512" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="untitled.gif" width="288" height="512" />&nbsp;&nbsp;&nbsp;&nbsp;
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)
 
  <!---[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)-->
