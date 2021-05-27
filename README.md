@@ -17,7 +17,7 @@ Make copy of the official Google Calendar app design and implement monthview,day
             calendarView.init(eventlist,mintime,maxtime);
 //string[]  if same day contain  more than one event
 ```
-<img src="3_Dayscreen.jpg" width="284" height="600" />&nbsp;&nbsp;&nbsp;&nbsp;[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)
+<img src="mergeimage.jpg" width="1420" height="500" />&nbsp;&nbsp;&nbsp;&nbsp;[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)
 
  <!---[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)-->
 
