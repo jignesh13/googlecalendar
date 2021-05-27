@@ -26,6 +26,8 @@ Make copy of the official Google Calendar app design and implement monthview,day
 
 ✔️ Smooth scrolling with month change during scrolling
 
+✔️ Zoom in and Zoom out Calendar weekview,Dayview and 3-day view
+
 ✔️ scrolling with parallexeffect in image of months
 
 ✔️ Left side event day animation same as google calendar app
