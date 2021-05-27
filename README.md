@@ -5,7 +5,7 @@ Sample Google Calendar project get all event information, birthday, appointment 
 
 Sample Google Calendar contains all the features that you find in other calendar app including Day view, Week view, Month Views, recent event, today event, easily navigation between monthview and calendarview and awesome design with all of this 
 
-Make copy of the official Google Calendar app for your Android phone add some few feature
+Make copy of the official Google Calendar app design and implement monthview,dayview,schedule,weekview,3 dayview and much more
 
 • Different ways to view your calendar - Quickly switch between month, week and day view.
 
@@ -46,21 +46,18 @@ Make copy of the official Google Calendar app for your Android phone add some fe
 
 ✔️ Daily, weekly, monthly, yearly & event views on the calendar
 
-✔️ Easily add holidays, birthdays, anniversaries & appointments
+✔️ Easily Show holidays, birthdays, anniversaries & appointments
 
-✔️ Customize events – start time, duration, reminders etc
+✔️ Show Customize events – start time, duration, reminders etc
 
-✔️ Add event attendees to each event
+✔️ Use different color for event,holida,birthday
 
-✔️ Use as a personal calendar or a business calendar
-
-✔️ Choose between reminders & email notifications to alert you about an event
 
 
 
  
  # Special thanks to these contributors
-[AgendaCalendarView](https://github.com/Tibolte/AgendaCalendarView),[scrollparallaximageview](https://github.com/gjiazhe/ScrollParallaxImageView)
+[AgendaCalendarView](https://github.com/Tibolte/AgendaCalendarView),[scrollparallaximageview](https://github.com/gjiazhe/ScrollParallaxImageView),[Android-Week-View](https://github.com/alamkanak/Android-Week-View)
  
 ##  Developer
   jignesh khunt
