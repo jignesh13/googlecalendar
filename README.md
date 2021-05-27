@@ -1,6 +1,6 @@
 # Google-Calendar
 
-Sample Google Calendar project get all event information, birthday, appointment etc from google account which is sync with your device
+Sample Google Calendar project get all event information, holiday ,birthday, appointment etc from google account which is sync with your device and show different kind of layout
 
 
 Sample Google Calendar contains all the features that you find in other calendar app including Day view, Week view, Month Views, recent event, today event, easily navigation between monthview and calendarview and awesome design with all of this 
