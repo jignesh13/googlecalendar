@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.joda.time.LocalDate;
@@ -34,11 +35,12 @@ public class MonthFragment extends Fragment {
     private int index;
 
 
+
     public MonthFragment() {
         // Required empty public constructor
     }
 
-    public static MonthFragment newInstance(int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, String[]> alleventlist, int singleitemheight) {
+    public static MonthFragment newInstance(int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, EventInfo> alleventlist, int singleitemheight) {
         MonthFragment fragmentFirst = new MonthFragment();
         Bundle args = new Bundle();
         args.putInt("singleitemheight", singleitemheight);
@@ -60,7 +62,7 @@ public class MonthFragment extends Fragment {
                 dayModel.setMonth(localDate.getMonthOfYear());
                 dayModel.setYear(localDate.getYear());
                 if (alleventlist.containsKey(localDate)) {
-                    dayModel.setEvents(alleventlist.get(localDate));
+                    dayModel.setEvents(alleventlist.get(localDate).eventtitles);
                 }
 
                 dayModel.setIsenable(false);
@@ -78,7 +80,7 @@ public class MonthFragment extends Fragment {
                 dayModel.setYear(localDate.getYear());
                 dayModel.setIsenable(false);
                 if (alleventlist.containsKey(localDate)) {
-                    dayModel.setEvents(alleventlist.get(localDate));
+                    dayModel.setEvents(alleventlist.get(localDate).eventtitles);
                 }
                 adapterdata.add(dayModel);
             } else {
@@ -90,7 +92,7 @@ public class MonthFragment extends Fragment {
                 }
                 LocalDate mydate = new LocalDate(year, month, dayModel.getDay());
                 if (alleventlist.containsKey(mydate)) {
-                    dayModel.setEvents(alleventlist.get(mydate));
+                    dayModel.setEvents(alleventlist.get(mydate).eventtitles);
                 }
                 adapterdata.add(dayModels.get(i - page));
 
@@ -128,16 +130,7 @@ public class MonthFragment extends Fragment {
         }
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 7) {
 
-//            @Override
-//            public boolean canScrollVertically() {
-//                return false;
-//
-//            }
-//
-//            @Override
-//            public boolean canScrollHorizontally() {
-//                return false;
-//            }
+
         };
         gridView.setLayoutManager(gridLayoutManager);
         MiddleDividerItemDecoration vertecoration = new MiddleDividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
@@ -154,9 +147,34 @@ public class MonthFragment extends Fragment {
 
     class Myadapter extends RecyclerView.Adapter<Myadapter.MonthViewHolder> {
 
+
         @Override
         public MonthViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
+            Log.e("itemheight",singleitemheight+"");
+         //   RelativeLayout relativeLayout = new RelativeLayout(getActivity());
+
+            // Defining the RelativeLayout layout parameters.
+            // In this case I want to fill its parent
+//            RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
+//                    RelativeLayout.LayoutParams.MATCH_PARENT,
+//                    singleitemheight);
+//            relativeLayout.setMinimumHeight(singleitemheight);
+//
+//            TextView tv = new TextView(getActivity());
+//            tv.setText("Test");
+//
+//            // Defining the layout parameters of the TextView
+//            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+//                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+//                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+//            lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+//
+//            // Setting the parameters on the TextView
+//            tv.setLayoutParams(lp);
+//
+//            // Adding the TextView to the RelativeLayout as a child
+//            relativeLayout.addView(tv);
             View view = null;
             if (viewType == 0) {
                 view = getActivity().getLayoutInflater().inflate(R.layout.monthgriditemlspace, parent, false);

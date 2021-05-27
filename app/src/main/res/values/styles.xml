@@ -6,7 +6,7 @@
         <item name="colorPrimary">@color/colorAccent</item>
         <item name="colorPrimaryDark">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
+
         <item name="android:navigationBarColor">@color/navcolor</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/quantum_launchscreen_calendar</item>
@@ -15,7 +15,18 @@
 
     </style>
 
+    <style name="NewFontStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/googlesansmed</item>
+    </style>
+    <style name="ThemeOverlay.AppCompat.navTheme">
 
+        <!-- Color of text and icon when SELECTED -->
+        <item name="colorPrimary">@color/selectday</item>
+
+        <!-- Background color when SELECTED -->
+        <item name="colorControlHighlight">#3C1A73E8</item>
+
+    </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

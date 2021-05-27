@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.CalendarContract;
 import android.text.format.DateUtils;
 
 import java.util.Date;
@@ -20,22 +21,20 @@ public class ReadCalendar {
 
         // Fetch a list of all calendars synced with the device, their display names and whether the
 
-        cursor = contentResolver.query(Uri.parse("content://com.android.calendar/calendars"),
-                (new String[]{"_id", "displayName", "selected"}), null, null, null);
+        cursor = contentResolver.query(CalendarContract.Events.CONTENT_URI,
+                (new String[]{"_id"}), null, null, null);
 
         HashSet<String> calendarIds = new HashSet<String>();
 
         try {
-            System.out.println("Count=" + cursor.getCount());
+
             if (cursor.getCount() > 0) {
                 System.out.println("the control is just inside of the cursor.count loop");
                 while (cursor.moveToNext()) {
 
                     String _id = cursor.getString(0);
-                    String displayName = cursor.getString(1);
-                    Boolean selected = !cursor.getString(2).equals("0");
 
-                    System.out.println("Id: " + _id + " Display Name: " + displayName + " Selected: " + selected);
+                    System.out.println("Id: " + _id );
                     calendarIds.add(_id);
                 }
             }

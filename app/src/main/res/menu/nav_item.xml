@@ -6,14 +6,30 @@
                 Menu items with icon and Title
         -->
         <item
-            android:id="@+id/first"
-            android:checkable="true"
-            android:title="First Menu" />
+            android:id="@+id/Schedule"
+            android:checked="false"
+
+            android:icon="@drawable/ic_verticals"
+            android:title="Schedule" />
         <item
-            android:id="@+id/second"
-            android:title="Second Menu" />
+            android:id="@+id/Day"
+            android:checked="false"
+            android:icon="@drawable/ic_box"
+            android:title="Day" />
         <item
-            android:id="@+id/third"
-            android:title="Third Menu" />
+            android:id="@+id/threeday"
+            android:checked="true"
+            android:icon="@drawable/ic_columns"
+            android:title="3 days" />
+        <item
+            android:id="@+id/Week"
+            android:checked="false"
+            android:icon="@drawable/ic_blocks"
+            android:title="Week" />
+        <item
+            android:id="@+id/monthviewitem"
+            android:checked="false"
+            android:icon="@drawable/ic_bottom"
+            android:title="Month" />
     </group>
 </menu>

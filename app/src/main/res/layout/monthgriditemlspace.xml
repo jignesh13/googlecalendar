@@ -8,7 +8,7 @@
     android:layout_marginTop="@dimen/pluseightdp"
     android:layout_marginBottom="@dimen/minuseightdp"
     android:background="@drawable/backselector"
-    android:layout_height="200dp">
+    android:layout_height="100dp">
 
     <TextView
         android:id="@+id/textView8"
