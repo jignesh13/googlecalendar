@@ -66,8 +66,8 @@ public class Utility {
                 if (!localDateHashMap.containsKey(localDate)) {
                     EventInfo eventInfo=new EventInfo();
                     eventInfo.id=cursor.getInt(0);
-                    eventInfo.starttime=Long.parseLong(cursor.getString(3));
-                    eventInfo.endtime=Long.parseLong(cursor.getString(4));
+                    eventInfo.starttime=cursor.getLong(3);
+                    eventInfo.endtime=cursor.getLong(4);
                     eventInfo.isallday=cursor.getInt(7)==1?true:false;
                     eventInfo.eventtitles = new String[]{cursor.getString(1)};
                     eventInfo.title=cursor.getString(1);
