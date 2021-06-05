@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     public static LocalDate lastdate = LocalDate.now();
     public static int topspace = 0;
+    private View myshadow;
     long lasttime;
      MyRecyclerView mNestedView;
     private ViewPager monthviewpager;
@@ -426,6 +427,7 @@ public class MainActivity extends AppCompatActivity
 
                 }
                 else if (item.getItemId()==R.id.monthviewitem){
+                    mAppBar.setExpanded(false, false);
                     mNestedView.setVisibility(View.GONE);
                     weekviewcontainer.setVisibility(View.GONE);
                     monthviewpager.setVisibility(View.VISIBLE);
@@ -521,7 +523,6 @@ public class MainActivity extends AppCompatActivity
         monthviewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-
             }
 
             @Override
@@ -605,8 +606,8 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             isgivepermission=true;
-            LocalDate mintime = new LocalDate().minusYears(5);
-            LocalDate maxtime = new LocalDate().plusYears(5);
+            LocalDate mintime = new LocalDate().minusYears(2);
+            LocalDate maxtime = new LocalDate().plusYears(2);
             alleventlist = Utility.readCalendarEvent(this, mintime, maxtime);
             calendarView.init(alleventlist, mintime, maxtime);
             calendarView.setCurrentmonth(new LocalDate());
@@ -750,7 +751,17 @@ public class MainActivity extends AppCompatActivity
                     float progress = (float) (-verticalOffset) / (float) totalScrollRange;
                     Log.e("progress",progress+"");
                     if (monthviewpager.getVisibility()==View.GONE&&mNestedView.getVisibility()==View.VISIBLE)mAppBar.setElevation(20+(20*Math.abs(1-progress)));
-                    if (weekviewcontainer.getVisibility()==View.VISIBLE)mAppBar.setElevation(20-(20*Math.abs(progress)));
+                    if (weekviewcontainer.getVisibility()==View.VISIBLE){
+                        mAppBar.setElevation(20-(20*Math.abs(progress)));
+
+
+                    }
+                    if (Math.abs(progress)>0.45){
+                          ViewGroup.LayoutParams params = myshadow.getLayoutParams();
+                    params.height = (int) (getResources().getDimensionPixelSize(R.dimen.fourdp)*Math.abs(progress));
+                    myshadow.setLayoutParams(params);
+                    }
+
 
                     mArrowImageView.setRotation(progress * 180);
                     mIsExpanded = verticalOffset == 0;
@@ -792,7 +803,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
 //
-                        if (monthviewpager.getVisibility() == View.VISIBLE||weekviewcontainer.getVisibility()==View.VISIBLE) return;
+                        if (monthviewpager.getVisibility() == View.VISIBLE) return;
                         mIsExpanded = !mIsExpanded;
                         mNestedView.stopScroll();
 
@@ -803,7 +814,7 @@ public class MainActivity extends AppCompatActivity
                 });
 
         /////////////////weekview implemention/////
-        View myshadow=findViewById(R.id.myshadow);
+         myshadow=findViewById(R.id.myshadow);
 
         mWeekView.setBackgroundColor(Color.WHITE);
         mWeekView.setshadow(myshadow);
@@ -1068,7 +1079,7 @@ public class MainActivity extends AppCompatActivity
             monthviewpager.setVisibility(View.VISIBLE);
             CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mAppBar.getLayoutParams();
             ((MyAppBarBehavior) layoutParams.getBehavior()).setScrollBehavior(false);
-
+            mAppBar.setElevation(0);
             mArrowImageView.setVisibility(View.INVISIBLE);
         } else {
             EventBus.getDefault().unregister(this);
@@ -1233,7 +1244,6 @@ public class MainActivity extends AppCompatActivity
             super(fragmentManager);
             this.monthModels = monthModels;
             this.singleitemheight = singleitemheight;
-            LayoutInflater inflater = LayoutInflater.from(MainActivity.this); // or (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 //            for (int position=0;position<monthModels.size();position++){
 //                firstFragments.add(MonthFragment.newInstance(monthModels.get(position).getMonth(), monthModels.get(position).getYear(), monthModels.get(position).getFirstday(), monthModels.get(position).getDayModelArrayList(), alleventlist, singleitemheight));
@@ -1267,57 +1277,57 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    class MonthViewPagerAdapter extends RecyclerView.Adapter<MonthViewPagerAdapter.MonthHolder> {
-        private ArrayList<MonthModel> monthModels;
-        private int singleitemheight;
-        private Context context;
-
-        public MonthViewPagerAdapter(Context context, ArrayList<MonthModel> monthModels, int singleitemheight) {
-
-            this.monthModels = monthModels;
-            this.singleitemheight = singleitemheight;
-            this.context = context;
-        }
-
-        @NonNull
-        @Override
-        public MonthHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(context).inflate(R.layout.fragment_month, parent, false);
-            return new MonthHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull MonthHolder holder, int position) {
-
-            Myadapter myadapter = new Myadapter(context, monthModels.get(position).getMonth(), monthModels.get(position).getYear(), monthModels.get(position).getFirstday(), monthModels.get(position).getDayModelArrayList(), alleventlist, singleitemheight);
-            holder.gridView.setAdapter(myadapter);
-
-        }
-
-        @Override
-        public int getItemCount() {
-            return monthModels.size();
-
-        }
-
-        class MonthHolder extends RecyclerView.ViewHolder {
-            RecyclerView gridView;
-
-            public MonthHolder(@NonNull View itemView) {
-                super(itemView);
-                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 7);
-                gridView = itemView.findViewById(R.id.recyclerview);
-                gridView.setLayoutManager(gridLayoutManager);
-                MiddleDividerItemDecoration vertecoration = new MiddleDividerItemDecoration(context, DividerItemDecoration.VERTICAL);
-                //vertecoration.setDrawable(new ColorDrawable(Color.LTGRAY));
-                MiddleDividerItemDecoration hortdecoration = new MiddleDividerItemDecoration(context, DividerItemDecoration.HORIZONTAL);
-                // hortdecoration.setDrawable(new ColorDrawable(Color.LTGRAY));
-                gridView.addItemDecoration(vertecoration);
-                gridView.addItemDecoration(hortdecoration);
-
-            }
-        }
-    }
+//    class MonthViewPagerAdapter extends RecyclerView.Adapter<MonthViewPagerAdapter.MonthHolder> {
+//        private ArrayList<MonthModel> monthModels;
+//        private int singleitemheight;
+//        private Context context;
+//
+//        public MonthViewPagerAdapter(Context context, ArrayList<MonthModel> monthModels, int singleitemheight) {
+//
+//            this.monthModels = monthModels;
+//            this.singleitemheight = singleitemheight;
+//            this.context = context;
+//        }
+//
+//        @NonNull
+//        @Override
+//        public MonthHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+//            View view = LayoutInflater.from(context).inflate(R.layout.fragment_month, parent, false);
+//            return new MonthHolder(view);
+//        }
+//
+//        @Override
+//        public void onBindViewHolder(@NonNull MonthHolder holder, int position) {
+//
+//            Myadapter myadapter = new Myadapter(context, monthModels.get(position).getMonth(), monthModels.get(position).getYear(), monthModels.get(position).getFirstday(), monthModels.get(position).getDayModelArrayList(), alleventlist, singleitemheight);
+//            holder.gridView.setAdapter(myadapter);
+//
+//        }
+//
+//        @Override
+//        public int getItemCount() {
+//            return monthModels.size();
+//
+//        }
+//
+//        class MonthHolder extends RecyclerView.ViewHolder {
+//            RecyclerView gridView;
+//
+//            public MonthHolder(@NonNull View itemView) {
+//                super(itemView);
+//                GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 7);
+//                gridView = itemView.findViewById(R.id.recyclerview);
+//                gridView.setLayoutManager(gridLayoutManager);
+//                MiddleDividerItemDecoration vertecoration = new MiddleDividerItemDecoration(context, DividerItemDecoration.VERTICAL);
+//                //vertecoration.setDrawable(new ColorDrawable(Color.LTGRAY));
+//                MiddleDividerItemDecoration hortdecoration = new MiddleDividerItemDecoration(context, DividerItemDecoration.HORIZONTAL);
+//                // hortdecoration.setDrawable(new ColorDrawable(Color.LTGRAY));
+//                gridView.addItemDecoration(vertecoration);
+//                gridView.addItemDecoration(hortdecoration);
+//
+//            }
+//        }
+//    }
 
     class Myadapter extends RecyclerView.Adapter<Myadapter.MonthViewHolder> {
 

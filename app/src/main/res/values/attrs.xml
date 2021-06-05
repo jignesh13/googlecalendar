@@ -52,4 +52,18 @@
         <attr name="allDayEventHeight" format="dimension"/>
         <attr name="scrollDuration" format="integer"/>
     </declare-styleable>
+    <declare-styleable name="JCalendarMonthView">
+        <attr name="dayHeight" format="dimension"/>
+        <attr name="datetextsize" format="dimension"/>
+        <attr name="datetextcolor" format="color"/>
+        <attr name="daytextsize" format="dimension"/>
+        <attr name="daytextcolor" format="color"/>
+        <attr name="eventtextsize" format="dimension"/>
+
+
+        <attr name="datemargintop" format="dimension"/>
+        <attr name="linecolor" format="color"/>
+        <attr name="linewidth" format="dimension"/>
+
+    </declare-styleable>
 </resources>

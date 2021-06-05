@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="small_view_height">70dp</dimen>
-    <dimen name="itemheight">42dp</dimen>
+    <dimen name="itemheight">37.2dp</dimen>
     <dimen name="pluseightdp">8dp</dimen>
+    <dimen name="fourdp">4dp</dimen>
+    <dimen name="onedp">4dp</dimen>
+
     <dimen name="minuseightdp">-8dp</dimen>
+    <dimen name="circlesize">11dp</dimen>
 
     <dimen name="tendp">20dp</dimen>
     <dimen name="monthtopspace">17dp</dimen>

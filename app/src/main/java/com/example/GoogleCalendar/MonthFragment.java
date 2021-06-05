@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -118,32 +119,37 @@ public class MonthFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_month, container, false);
-        RecyclerView gridView = view.findViewById(R.id.recyclerview);
-        ConstraintLayout constraintLayout = view.findViewById(R.id.dd);
-        for (int i = 0; i < constraintLayout.getChildCount(); i++) {
-            TextView textView = (TextView) constraintLayout.getChildAt(i);
-            if (i == index) {
-                textView.setTextColor(getResources().getColor(R.color.selectday));
-            } else {
-                textView.setTextColor(getResources().getColor(R.color.unselectday));
-            }
-        }
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 7) {
+        JCalendarMonthView jCalendarMonthView=view.findViewById(R.id.jcalendarmonthview);
+        jCalendarMonthView.setDayModels(dayModels,index);
 
 
-        };
-        gridView.setLayoutManager(gridLayoutManager);
-        MiddleDividerItemDecoration vertecoration = new MiddleDividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
-        //vertecoration.setDrawable(new ColorDrawable(Color.LTGRAY));
-        MiddleDividerItemDecoration hortdecoration = new MiddleDividerItemDecoration(getActivity(), DividerItemDecoration.HORIZONTAL);
-        // hortdecoration.setDrawable(new ColorDrawable(Color.LTGRAY));
-        gridView.addItemDecoration(vertecoration);
-        gridView.addItemDecoration(hortdecoration);
-
-        gridView.setAdapter(new Myadapter());
+//        RecyclerView gridView = view.findViewById(R.id.recyclerview);
+//        ConstraintLayout constraintLayout = view.findViewById(R.id.dd);
+//        for (int i = 0; i < constraintLayout.getChildCount(); i++) {
+//            TextView textView = (TextView) constraintLayout.getChildAt(i);
+//            if (i == index) {
+//                textView.setTextColor(getResources().getColor(R.color.selectday));
+//            } else {
+//                textView.setTextColor(getResources().getColor(R.color.unselectday));
+//            }
+//        }
+//        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 7) {
+//
+//
+//        };
+//        gridView.setLayoutManager(gridLayoutManager);
+//        MiddleDividerItemDecoration vertecoration = new MiddleDividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
+//        //vertecoration.setDrawable(new ColorDrawable(Color.LTGRAY));
+//        MiddleDividerItemDecoration hortdecoration = new MiddleDividerItemDecoration(getActivity(), DividerItemDecoration.HORIZONTAL);
+//        // hortdecoration.setDrawable(new ColorDrawable(Color.LTGRAY));
+//        gridView.addItemDecoration(vertecoration);
+//        gridView.addItemDecoration(hortdecoration);
+//
+//        gridView.setAdapter(new Myadapter());
         return view;
 
     }
+
 
     class Myadapter extends RecyclerView.Adapter<Myadapter.MonthViewHolder> {
 
@@ -274,7 +280,6 @@ public class MonthFragment extends Fragment {
                         MainActivity mainActivity = (MainActivity) getActivity();
                         if (mainActivity != null) {
                             DayModel dayModel = dayModels.get(getAdapterPosition());
-
                             mainActivity.selectdateFromMonthPager(dayModel.getYear(), dayModel.getMonth(), dayModel.getDay());
                         }
                     }

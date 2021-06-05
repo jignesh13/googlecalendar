@@ -94,6 +94,7 @@ public class GooglecalenderView extends LinearLayout {
             viewPager.setCurrentItem(currentmonth, false);
             //  viewPager.getAdapter().notifyDataSetChanged();
         }
+        updategrid();
     }
 
     public void setCurrentmonth(int position) {
@@ -259,6 +260,9 @@ public class GooglecalenderView extends LinearLayout {
                     Log.e("onPageSelected", "Googlecalendaraview");
                     adjustheight();
                     if (mainActivity.mNestedView.getVisibility()==VISIBLE)EventBus.getDefault().post(new MessageEvent(new LocalDate(myPagerAdapter.monthModels.get(position).getYear(), myPagerAdapter.monthModels.get(position).getMonth(), 1)));
+                    else {
+                        MainActivity.lastdate=new LocalDate(myPagerAdapter.monthModels.get(position).getYear(), myPagerAdapter.monthModels.get(position).getMonth(), 1);
+                    }
 
                     updategrid();
                     //     myPagerAdapter.getFirstFragments().get(position).updategrid();
@@ -311,7 +315,7 @@ public class GooglecalenderView extends LinearLayout {
 
             boolean b = true;
 
-            list.add("todaydate");
+            //list.add("todaydate");
 
             String[] mStringArray = new String[list.size()];
             EventInfo eventInfo=eventhash.get(todaydate);
@@ -386,9 +390,14 @@ public class GooglecalenderView extends LinearLayout {
             final int position = viewPager.getCurrentItem();
             // myPagerAdapter.getFirstFragments().get(position).updategrid();
             RecyclerView recyclerView = (RecyclerView) viewPager.getChildAt(0);
+            Log.e("call","upgrade0");
+
             MonthPagerAdapter.MonthViewHolder monthViewHolder = (MonthPagerAdapter.MonthViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
-            if (monthViewHolder != null && monthViewHolder.gridview != null && monthViewHolder.gridview.getAdapter() != null) {
-                monthViewHolder.gridview.getAdapter().notifyDataSetChanged();
+            if (monthViewHolder != null && monthViewHolder.jCalendarMonthTopView != null ) {
+                Log.e("call","upgrade");
+                monthViewHolder.jCalendarMonthTopView.requestLayout();
+                monthViewHolder.jCalendarMonthTopView.invalidate();
+
             }
         }
     }
@@ -401,15 +410,12 @@ public class GooglecalenderView extends LinearLayout {
             int size = myPagerAdapter.monthModels.get(position).getDayModelArrayList().size() + myPagerAdapter.monthModels.get(position).getFirstday();
             int numbercolumn = size % 7 == 0 ? size / 7 : (size / 7) + 1;
             ViewGroup.LayoutParams params = getLayoutParams();
-            int setheight = 65 + (context.getResources().getDimensionPixelSize(R.dimen.itemheight) * numbercolumn) + context.getResources().getDimensionPixelSize(R.dimen.tendp) + getStatusBarHeight();
+            int setheight = 75 + (context.getResources().getDimensionPixelSize(R.dimen.itemheight) * numbercolumn) + context.getResources().getDimensionPixelSize(R.dimen.tendp) + getStatusBarHeight();
             if (params.height == setheight) return;
             params.height = setheight;
             // params.height=0;//jigs change
             setLayoutParams(params);
-            RecyclerView recyclerView = (RecyclerView) viewPager.getChildAt(0);
-            Log.e("adjust0", recyclerView.getHeight() + "");
-            Log.e("adjust1", viewPager.getHeight() + "");
-            Log.e("adjust2", params.height + "");
+
 
 
         }
@@ -425,42 +431,42 @@ public class GooglecalenderView extends LinearLayout {
         return result;
     }
 
-    public class MyPagerAdapter extends FragmentStatePagerAdapter {
-        private ArrayList<MonthModel> monthModels;
-        private ArrayList<FirstFragment> firstFragments = new ArrayList<>();
-
-        public MyPagerAdapter(FragmentManager fragmentManager, ArrayList<MonthModel> monthModels) {
-
-            super(fragmentManager);
-            this.monthModels = monthModels;
-            for (int i = 0; i < monthModels.size(); i++) {
-                firstFragments.add(FirstFragment.newInstance(monthModels.get(i).getMonth(), monthModels.get(i).getYear(), monthModels.get(i).getFirstday(), monthModels.get(i).getDayModelArrayList()));
-            }
-        }
-
-        public ArrayList<MonthModel> getMonthModels() {
-            return monthModels;
-        }
-
-        public ArrayList<FirstFragment> getFirstFragments() {
-            return firstFragments;
-        }
-
-        // Returns total number of pages
-        @Override
-        public int getCount() {
-            return monthModels.size();
-        }
-
-
-        // Returns the fragment to display for that page
-        @Override
-        public Fragment getItem(int position) {
-
-            return firstFragments.get(position);
-
-        }
-    }
+//    public class MyPagerAdapter extends FragmentStatePagerAdapter {
+//        private ArrayList<MonthModel> monthModels;
+//        private ArrayList<FirstFragment> firstFragments = new ArrayList<>();
+//
+//        public MyPagerAdapter(FragmentManager fragmentManager, ArrayList<MonthModel> monthModels) {
+//
+//            super(fragmentManager);
+//            this.monthModels = monthModels;
+//            for (int i = 0; i < monthModels.size(); i++) {
+//                firstFragments.add(FirstFragment.newInstance(monthModels.get(i).getMonth(), monthModels.get(i).getYear(), monthModels.get(i).getFirstday(), monthModels.get(i).getDayModelArrayList()));
+//            }
+//        }
+//
+//        public ArrayList<MonthModel> getMonthModels() {
+//            return monthModels;
+//        }
+//
+//        public ArrayList<FirstFragment> getFirstFragments() {
+//            return firstFragments;
+//        }
+//
+//        // Returns total number of pages
+//        @Override
+//        public int getCount() {
+//            return monthModels.size();
+//        }
+//
+//
+//        // Returns the fragment to display for that page
+//        @Override
+//        public Fragment getItem(int position) {
+//
+//            return firstFragments.get(position);
+//
+//        }
+//    }
 
     class MonthPagerAdapter extends RecyclerView.Adapter<MonthPagerAdapter.MonthViewHolder> {
 
@@ -486,9 +492,10 @@ public class GooglecalenderView extends LinearLayout {
 
             MonthModel monthtemp = monthModels.get(position);
 
-            Dayadapter dayadapter = new Dayadapter(context, monthtemp.getDayModelArrayList(), monthtemp.getFirstday(), monthtemp.getMonth(), monthtemp.getYear());
-            holder.gridview.setAdapter(dayadapter);
-            dayadapter.notifyDataSetChanged();
+            holder.jCalendarMonthTopView.initdata(monthtemp.getDayModelArrayList(), monthtemp.getFirstday(), monthtemp.getMonth(), monthtemp.getYear());
+//            Dayadapter dayadapter = new Dayadapter(context, monthtemp.getDayModelArrayList(), monthtemp.getFirstday(), monthtemp.getMonth(), monthtemp.getYear());
+//            holder.gridview.setAdapter(dayadapter);
+//            dayadapter.notifyDataSetChanged();
 
 
         }
@@ -501,11 +508,11 @@ public class GooglecalenderView extends LinearLayout {
 
         class MonthViewHolder extends RecyclerView.ViewHolder {
 
-            RecyclerView gridview;
-
+           // RecyclerView gridview;
+            JCalendarMonthTopView jCalendarMonthTopView;
             MonthViewHolder(View itemView) {
                 super(itemView);
-                gridview = itemView.findViewById(R.id.recyclerview);
+                jCalendarMonthTopView = itemView.findViewById(R.id.jcalendarmonthview);
 
 
             }

@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
@@ -599,14 +600,20 @@ private View shadow;
 
 
     }
-
+    private void canvasclipRect(Canvas mCanvas, float left, float top, float right, float bottom, Region.Op op) {
+        if (op == Region.Op.REPLACE) {
+            mCanvas.restore();
+            mCanvas.save();
+            mCanvas.clipRect(left, top, right, bottom);
+            return;
+        }
+    }
     private void drawTimeColumnAndAxes(Canvas canvas) {
         // Draw the background color for the header column.
         canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
 
         // Clip to paint in left column only.
-
-        canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
+canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
 
         for (int i = 0; i < 24; i++) {
             float top = mHeaderHeight + mHeaderRowPadding * 3 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
@@ -625,7 +632,7 @@ private View shadow;
 
         // Clip to paint in left column only.
 
-         canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
+        canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
 
         for (int i = 0; i < 24; i++) {
             float top = mHeaderHeight + mHeaderRowPadding * 3 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
@@ -636,7 +643,7 @@ private View shadow;
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             if (top < getHeight()) canvas.drawText(time, startx+mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
         }
-        canvas.clipRect(0, 0, getWidth(), getHeight(), Region.Op.REPLACE);
+        canvasclipRect(canvas,0, 0, getWidth(), getHeight(), Region.Op.REPLACE);
 
     }
 
@@ -723,7 +730,8 @@ private View shadow;
 
         // Clip to paint events only.
         float stary=0;
-        canvas.clipRect(0, stary, getWidth(), getHeight(), Region.Op.REPLACE);
+        canvasclipRect(canvas,0, stary, getWidth(), getHeight(), Region.Op.REPLACE);
+
         // Iterate through each day.
         Calendar oldFirstVisibleDay = mFirstVisibleDay;
         mFirstVisibleDay = (Calendar) today.clone();
@@ -786,7 +794,8 @@ private View shadow;
 //                }
 //            }
 
-            canvas.clipRect(0, stary, getWidth(), getHeight(), Region.Op.REPLACE);
+            canvasclipRect(canvas,0, stary, getWidth(), getHeight(), Region.Op.REPLACE);
+
 
             // Prepare the separator lines for hours.
             int i = 0;
@@ -816,7 +825,8 @@ private View shadow;
 
             // Draw the lines for hours.
             canvas.drawLines(hourLines, mHourSeparatorPaint);
-            if (mNumberOfVisibleDays!=1) canvas.clipRect(mHeaderColumnWidth, mHeaderHeight + (mHeaderRowPadding * 3)-70 , getWidth(), getHeight(), Region.Op.REPLACE);
+            if (mNumberOfVisibleDays!=1) canvasclipRect(canvas,mHeaderColumnWidth, mHeaderHeight + (mHeaderRowPadding * 3)-70 , getWidth(), getHeight(), Region.Op.REPLACE);
+
 
 
             // Draw the events.
@@ -835,7 +845,8 @@ private View shadow;
 //       float bottom = mHeaderHeight + mHeaderRowPadding * 3;
         // Clip to paint header row only.
 
-        if (mNumberOfVisibleDays!=1)canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), getHeight(), Region.Op.REPLACE);
+
+        if (mNumberOfVisibleDays!=1)  canvasclipRect(canvas,mHeaderColumnWidth, 0, getWidth(), getHeight(), Region.Op.REPLACE);
         // Draw the header background.
         canvas.drawRect(0, 0, getWidth(), mHeaderHeight-70 + mHeaderRowPadding * 3, mHeaderBackgroundPaint);
         mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight*2);
@@ -852,6 +863,14 @@ private View shadow;
             day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
             boolean sameDay = isSameDay(day, today);
+            int daycompare=day.compareTo(today);
+            if (daycompare<0){
+                jHeaderTextPaint.setColor(Color.parseColor("#606368"));
+            }
+            else {
+                jHeaderTextPaint.setColor(Color.BLACK);
+
+            }
 
             // Draw the day labels.
             String dayLabel1 = getDateTimeInterpreter().interpretDate(day);
@@ -890,19 +909,20 @@ private View shadow;
                 float wid=mWidthPerDay;
                 float per=20*(1.0f-(startat-startPixel)/wid);
                 if (mNumberOfVisibleDays!=1){
-                    if (mNumberOfVisibleDays!=1)canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
+                    if (mNumberOfVisibleDays!=1)canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
                     canvas.drawRoundRect(startat-per,startY+beforeNow-per,startat+per,startY+beforeNow+per,per,per,jNowbackPaint);
                     canvas.drawLine(startat, startY + beforeNow,  startPixel+wid, startY + beforeNow, mNowLinePaint);
-                    canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), getHeight(), Region.Op.REPLACE);
+
+                    canvasclipRect(canvas,mHeaderColumnWidth, 0, getWidth(), getHeight(), Region.Op.REPLACE);
 
                 }
                 else {
 
-                    canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
+                    canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
 
                     canvas.drawRoundRect(startPixel-20,startY+beforeNow-20,startPixel+20,startY+beforeNow+20,20,20,jNowbackPaint);
                     canvas.drawLine(startPixel, startY + beforeNow,  startPixel+wid-mHeaderColumnWidth, startY + beforeNow, mNowLinePaint);
-                    canvas.clipRect(0, 0, getWidth(), getHeight(), Region.Op.REPLACE);
+                   canvasclipRect(canvas,0, 0, getWidth(), getHeight(), Region.Op.REPLACE);
 
                 }
 
@@ -1421,7 +1441,7 @@ private View shadow;
     public void setfont (Typeface typeface,int type) {
      if (type==0){
          mTimeTextPaint.setTypeface(typeface);
-         jHeaderTextPaint.setTypeface(typeface);
+         jHeaderTextPaint.setTypeface(ResourcesCompat.getFont(mContext,R.font.latoregular));
 
 
      }

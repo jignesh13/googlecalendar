@@ -25,6 +25,7 @@ public class WeekViewUtil {
         return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
     }
 
+
     /**
      * Returns a calendar instance at the start of this day
      * @return the calendar instance
