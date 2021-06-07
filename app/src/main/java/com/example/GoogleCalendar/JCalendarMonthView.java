@@ -121,8 +121,6 @@ public class JCalendarMonthView extends View {
         } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
 
-            Log.e("actionmove",motionEvent.getX()-downx+"");
-            Log.e("actionmovey",motionEvent.getY()-downy+"");
 
 
                         if (xtouch == downx && ytouch == downy && System.currentTimeMillis() - lastsec >= 80) {
@@ -131,7 +129,6 @@ public class JCalendarMonthView extends View {
                             int cell = (row * 7) + column;
                             if (selectedcell != cell) {
                                 selectedcell = cell;
-                                Log.e("select" + row + "," + column, selectedcell + "");
                                 int reachxend = (int) (eachcellwidth * (column + 1));
                                 int reachxstart = (int) (eachcellwidth * (column));
                                 int reachyend = (int) (eachcellheight * (row + 1) + dayHeight);
@@ -152,7 +149,7 @@ public class JCalendarMonthView extends View {
                                         int topside = ytouch - ((top * progress) / 100);
                                         int bottomside = ytouch + ((bottom * progress) / 100);
                                         selectedrect = new Rect(start, topside, endside, bottomside);
-                                        Log.e("selecty", selectedrect.toString());
+
                                         invalidate();
                                     }
                                 });
@@ -208,7 +205,7 @@ public class JCalendarMonthView extends View {
                             int topside = ytouch - ((top * progress) / 100);
                             int bottomside = ytouch + ((bottom * progress) / 100);
                             selectedrect = new Rect(start, topside, endside, bottomside);
-                            Log.e("selecty", selectedrect.toString());
+
                             invalidate();
                             if (progress==100){
                                 MainActivity mainActivity = (MainActivity) mContext;

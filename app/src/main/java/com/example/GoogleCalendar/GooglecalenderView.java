@@ -327,7 +327,10 @@ public class GooglecalenderView extends LinearLayout {
         int i = 0;
         ArrayList<EventModel> eventModelslist = new ArrayList<>();
         for (HashMap.Entry<LocalDate, EventInfo> localDateStringEntry : treeMap.entrySet()) {
+
+            EventInfo tempinfo=localDateStringEntry.getValue();
             for (String s : localDateStringEntry.getValue().eventtitles) {
+
                 if (s == null) continue;
                 int type = 0;
                 if (s.startsWith("todaydate")) type = 2;
@@ -358,7 +361,6 @@ public class GooglecalenderView extends LinearLayout {
                         //  if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
                         i++;
                     }
-
                     eventModelslist.add(new EventModel(s, localDateStringEntry.getKey(), type));
                     indextrack.put(localDateStringEntry.getKey(), i);
                     i++;

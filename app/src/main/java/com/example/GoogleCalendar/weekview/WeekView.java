@@ -95,6 +95,8 @@ private View shadow;
     private Paint mHourSeparatorPaint;
     private float mHeaderMarginBottom;
     private Paint mTodayBackgroundPaint;
+    private Paint jheaderEventTextpaint;
+    private int jheaderEventheight;
     private Paint mFutureBackgroundPaint;
     private Paint mPastBackgroundPaint;
     private Paint mFutureWeekendBackgroundPaint;
@@ -418,6 +420,12 @@ private View shadow;
         mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mHeaderTextHeight = rect.height();
 
+        jheaderEventTextpaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        jheaderEventTextpaint.setColor(Color.WHITE);
+        jheaderEventTextpaint.setTextAlign(Paint.Align.LEFT);
+        jheaderEventTextpaint.setTextSize(mTextSize);
+        jheaderEventTextpaint.getTextBounds("a", 0, "a".length(), rect);
+        jheaderEventheight = rect.centerY();
 
         jtodayHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         jtodayHeaderTextPaint.setColor(Color.WHITE);
@@ -574,13 +582,13 @@ private View shadow;
                 float without=mHeaderTextHeight+jHeaderTextHeight+mHeaderMarginBottom+70+mHeaderRowPadding/3.0f;
                 float with=(mAllDayEventHeight*noofevent)+((noofevent-1)*5) + mHeaderMarginBottom;
                 mHeaderHeight=Math.max(without,with);
-                Log.e("hh",with+","+without);
+
                 shadow.setY(mHeaderHeight-70+mHeaderRowPadding*3);
 
             }
             else {
                 float without=mHeaderTextHeight+jHeaderTextHeight+mHeaderMarginBottom+70+mHeaderRowPadding/3.0f;
-                Log.e("hh",","+without);
+
                 mHeaderHeight=without;
                 shadow.setY(mHeaderHeight-70+mHeaderRowPadding*3);
             }
@@ -883,9 +891,11 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             float x=startPixel + mWidthPerDay / 2;
             float xx=startPixel-mHeaderColumnWidth/2.0f;
             float y=(mHeaderTextHeight + mHeaderRowPadding*1.76f+jHeaderTextHeight)-jHeaderTextHeight/2.0f;
-            Log.e("noof",startPixel+","+mCurrentOrigin.x+","+x+","+mWidthPerDay);
+
+            int size=getResources().getDimensionPixelSize(R.dimen.todaysize);
+
             if (mNumberOfVisibleDays==1){
-                if (sameDay)canvas.drawRoundRect(xx-50,y-50,xx+50,y+50,50,50,mTodayBackgroundPaint);
+                if (sameDay)canvas.drawRoundRect(xx-size,y-size,xx+size,y+size,size,size,mTodayBackgroundPaint);
 
                 canvas.drawText(dayLabel, startPixel-mHeaderColumnWidth/2.0f  , mHeaderTextHeight + mHeaderRowPadding/3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
                 canvas.drawText(dayLabel1,  startPixel -mHeaderColumnWidth/2.0f , mHeaderTextHeight + mHeaderRowPadding*1.76f+jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
@@ -894,7 +904,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
             }
             else {
-                if (sameDay)canvas.drawRoundRect(x-50,y-50,x+50,y+50,50,50,mTodayBackgroundPaint);
+                if (sameDay)canvas.drawRoundRect(x-size,y-size,x+size,y+size,size,size,mTodayBackgroundPaint);
                 canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding/3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
                 canvas.drawText(dayLabel1, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding*1.76f+jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
                 drawAllDayEvents(day, startPixel, canvas);
@@ -1039,7 +1049,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
                     // Calculate left and right.
 
                     float left = startFromPixel ;
-                    Log.e("date",left+"");
+
 
                     if (left < startFromPixel)
                         left += mOverlappingEventGap;
@@ -1057,7 +1067,15 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+//                        Paint text=new Paint(Paint.ANTI_ALIAS_FLAG);
+//                        text.setColor(mEventTextColor);
+//                        text.setTextSize(mEventTextSize);
+
+//                        Rect jrect=new Rect();
+//                        jheaderEventTextpaint.getTextBounds("a", 0, "a".length(), jrect);
+//                        jheaderEventheight = jrect.centerY();
+                        canvas.drawText(mEventRects.get(i).event.getName(),mEventRects.get(i).rectF.left+12,mEventRects.get(i).rectF.centerY()-jheaderEventheight,jheaderEventTextpaint);
+                       //drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }
                     else
                         mEventRects.get(i).rectF = null;
@@ -1325,7 +1343,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
                 collisionGroups.add(newGroup);
             }
         }
-        Log.e("group",collisionGroups.size()+"");
+
         for (List<EventRect> collisionGroup : collisionGroups) {
             expandEventsToMaxWidth(collisionGroup);
         }
@@ -1374,7 +1392,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             float j = 0;
             for (List<EventRect> column : columns) {
                 if (column.size() >= i+1) {
-                    Log.e("call","call"+columns.size());
+
                     EventRect eventRect = column.get(i);
                     eventRect.width = 1f / columns.size();
                     eventRect.left = j / columns.size();
@@ -1447,8 +1465,10 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      }
      else{
          mHeaderTextPaint.setTypeface(typeface);
+         jheaderEventTextpaint.setTypeface(typeface);
 
      }
+     invalidate();
 
     }
     public EventClickListener getEventClickListener() {
@@ -2066,7 +2086,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             }
             mCurrentScrollDirection = Direction.NONE;
         }
-Log.e("ontouch",val+"");
+
         return val;
     }
 

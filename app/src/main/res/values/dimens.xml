@@ -8,7 +8,7 @@
 
     <dimen name="minuseightdp">-8dp</dimen>
     <dimen name="circlesize">11dp</dimen>
-
+    <dimen name="todaysize">17dp</dimen>
     <dimen name="tendp">20dp</dimen>
     <dimen name="monthtopspace">17dp</dimen>
 </resources>

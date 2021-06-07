@@ -787,8 +787,6 @@ public class MainActivity extends AppCompatActivity
 
                             //linearLayoutManager.scrollToPositionWithOffset(expandedfirst,0);
                             calendarView.setCurrentmonth(lastdate);
-
-
                         }
                     }
 
@@ -816,7 +814,8 @@ public class MainActivity extends AppCompatActivity
         /////////////////weekview implemention/////
          myshadow=findViewById(R.id.myshadow);
 
-        mWeekView.setBackgroundColor(Color.WHITE);
+
+
         mWeekView.setshadow(myshadow);
         mWeekView.setfont( ResourcesCompat.getFont(this, R.font.googlesans_regular),0);
         mWeekView.setfont( ResourcesCompat.getFont(this, R.font.googlesansmed),1);
@@ -1505,8 +1504,6 @@ public class MainActivity extends AppCompatActivity
 
                 View view = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.view_item, parent, false);
-
-
                 return new ItemViewHolder(view);
             } else if (viewType == 5) {
                 View view = LayoutInflater.from(parent.getContext())
@@ -1557,11 +1554,13 @@ public class MainActivity extends AppCompatActivity
             if (viewtype == 0 || viewtype == 5) {
 
                 ItemViewHolder holder = (ItemViewHolder) viewHolder;
-                holder.eventtextview.setText(eventalllist.get(position).getEventname());
-                GradientDrawable drawable = (GradientDrawable) holder.eventtextview.getBackground();
+              //  GradientDrawable drawable = (GradientDrawable) holder.eventtextview.getBackground();
 
-                holder.eventtextview.setBackground(drawable);
-                Log.e("State",getDrawable(R.drawable.white_touch)+"");
+//               if (eventalllist.get(position).getType()==0)drawable.setColor(eventalllist.get(position).getColor());
+//               else drawable.setColor(Color.BLACK);
+                holder.eventtextview.setText(eventalllist.get(position).getEventname());
+
+
                 if (position + 1 < eventalllist.size() && eventalllist.get(position).getLocalDate().equals(today) && (!eventalllist.get(position + 1).getLocalDate().equals(today) || eventalllist.get(position + 1).getType() == 100 || eventalllist.get(position + 1).getType() == 200)) {
                     holder.circle.setVisibility(View.VISIBLE);
                     holder.line.setVisibility(View.VISIBLE);
@@ -1832,8 +1831,9 @@ public class MainActivity extends AppCompatActivity
                     WeekViewEvent event = new WeekViewEvent(eventInfo.id, eventInfo.title, startTime, endTime);
 
                     event.setAllDay(eventInfo.isallday);
-                    if (eventInfo.isallday)event.setColor(getResources().getColor(R.color.event_color_04));
-                    else event.setColor(getResources().getColor(R.color.event_color_02));
+                    event.setColor(eventInfo.eventcolor);
+//                    if (eventInfo.isallday)event.setColor(getResources().getColor(R.color.event_color_04));
+//                    else event.setColor(getResources().getColor(R.color.event_color_02));
                     events.add(event);
                     eventInfo=eventInfo.nextnode;
                 }
@@ -1907,8 +1907,11 @@ public class MainActivity extends AppCompatActivity
 
             String year = localDate.getYear() == LocalDate.now().getYear() ? "" : localDate.getYear() + "";
             if (!monthname.getText().equals(localDate.toString("MMM") + " " + year)){
-                calendarView.setCurrentmonth(localDate);
                 MainActivity.lastdate=localDate;
+                calendarView.setCurrentmonth(localDate);
+                calendarView.adjustheight();
+                mIsExpanded = false;
+                mAppBar.setExpanded(false, false);
                 monthname.setText(localDate.toString("MMM") + " " + year);
 
             }

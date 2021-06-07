@@ -88,7 +88,6 @@ public class MonthFragment extends Fragment {
                 DayModel dayModel = dayModels.get(i - page);
                 dayModel.setIsenable(true);
                 if (dayModel.isToday()) {
-                    Log.e("index", i % 7 + "");
                     args.putInt("index", i % 7);
                 }
                 LocalDate mydate = new LocalDate(year, month, dayModel.getDay());
@@ -157,7 +156,6 @@ public class MonthFragment extends Fragment {
         @Override
         public MonthViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
-            Log.e("itemheight",singleitemheight+"");
          //   RelativeLayout relativeLayout = new RelativeLayout(getActivity());
 
             // Defining the RelativeLayout layout parameters.

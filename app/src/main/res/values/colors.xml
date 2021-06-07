@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#ff1a73e8</color>
     <color name="navcolor">#f1f3f5</color>
+    <color name="navcolor1">#80F1F3F5</color>
     <color name="lightblack">#787878</color>
     <color name="unselectday">#787878</color>
     <color name="selectday">#1a73e8</color>

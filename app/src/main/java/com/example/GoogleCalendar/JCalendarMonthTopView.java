@@ -145,7 +145,6 @@ public class JCalendarMonthTopView extends View {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         int size =dayModels.size()+firstday;
         numberofrow = size % 7 == 0 ? size / 7 : (size / 7) + 1;
-        Log.e("initonmeasure",numberofrow+"");
         int setheight = (mContext.getResources().getDimensionPixelSize(R.dimen.itemheight) * numberofrow) + dayHeight+datemargintop;
 
         setMeasuredDimension(widthSize, setheight);
@@ -247,12 +246,10 @@ public class JCalendarMonthTopView extends View {
                 if (position>=firstday){
                     position = position - firstday;
                     if (position>=dayModels.size())continue;
-                    Log.e("initpos",position+"");
                     DayModel dayModel = dayModels.get(position);
                     boolean selected = dayModel.getDay() == MainActivity.lastdate.getDayOfMonth() && dayModel.getMonth() == MainActivity.lastdate.getMonthOfYear() && dayModel.getYear() == MainActivity.lastdate.getYear() ? true : false;
 
                     String ss=dayModels.get(position).getDay() + "";
-                    if (selected)Log.e("select",ss);
 
                     jDateTextPaint.getTextBounds(ss, 0, ss.length(), jDateTextPaintRect);
                     if (dayModel.isToday()||selected){//istoday

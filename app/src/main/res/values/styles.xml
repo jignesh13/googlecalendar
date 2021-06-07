@@ -4,9 +4,10 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorAccent</item>
-        <item name="colorPrimaryDark">@android:color/transparent</item>
+        <item name="colorPrimaryDark">@android:color/white</item>
         <item name="android:windowLightStatusBar">true</item>
 
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:navigationBarColor">@color/navcolor</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@drawable/quantum_launchscreen_calendar</item>
