@@ -336,6 +336,7 @@ public class GooglecalenderView extends LinearLayout {
                 if (s.startsWith("todaydate")) type = 2;
                 else if (s.equals("start")) type = 1;
                 else if (s.contains("jigs")) type = 3;
+                else Log.e("event1",eventhash.get(localDateStringEntry.getKey()).eventcolor+"");
                 if (type == 2 && eventModelslist.get(eventModelslist.size() - 1).getType() == 0 && eventModelslist.get(eventModelslist.size() - 1).getLocalDate().equals(localDateStringEntry.getKey())) {
 
                 } else {
@@ -361,6 +362,7 @@ public class GooglecalenderView extends LinearLayout {
                         //  if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
                         i++;
                     }
+                    Log.e("event",s);
                     eventModelslist.add(new EventModel(s, localDateStringEntry.getKey(), type));
                     indextrack.put(localDateStringEntry.getKey(), i);
                     i++;

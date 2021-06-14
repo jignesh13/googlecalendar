@@ -154,6 +154,7 @@
                     app:eventTextColor="@android:color/white"
                     app:textSize="12sp"
                     app:eventTextSize="12sp"
+
                     app:allDayEventHeight="20dp"
                     app:hourHeight="30dp"
                     app:showNowLine="true"

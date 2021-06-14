@@ -1,16 +1,20 @@
 package com.example.GoogleCalendar.weekview;
 
+import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Handler;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
@@ -30,10 +34,11 @@ import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
-import android.widget.ScrollView;
 
 import com.example.GoogleCalendar.MainActivity;
 import com.example.GoogleCalendar.R;
+
+import org.joda.time.LocalDate;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,7 +53,6 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
-import androidx.recyclerview.widget.RecyclerView;
 
 import static com.example.GoogleCalendar.weekview.WeekViewUtil.isSameDay;
 import static com.example.GoogleCalendar.weekview.WeekViewUtil.today;
@@ -57,33 +61,27 @@ import static com.example.GoogleCalendar.weekview.WeekViewUtil.today;
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://alamkanak.github.io/
  * and modify some code by jignesh khunt for https://github.com/jignesh13/googlecalendar
- *
  */
 public class WeekView extends View {
-
-    private enum Direction {
-        NONE, LEFT, RIGHT, VERTICAL
-    }
 
     @Deprecated
     public static final int LENGTH_SHORT = 1;
     @Deprecated
     public static final int LENGTH_LONG = 2;
     private final Context mContext;
+    int forward = 1080;
     private Paint shadowPaint;
+    private boolean stop;
 
     private Paint mTimeTextPaint;
     private float mTimeTextWidth;
     private float mTimeTextHeight;
     private Paint mHeaderTextPaint;
     private float mHeaderTextHeight;
-private View shadow;
+    private View shadow;
     private Paint jHeaderTextPaint;
     private Paint jtodayHeaderTextPaint;
-
     private float jHeaderTextHeight;
-
-
     private float mHeaderHeight;
     private GestureDetectorCompat mGestureDetector;
     private OverScroller mScroller;
@@ -154,7 +152,8 @@ private View shadow;
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private boolean mIsFirstDraw = true;
     private boolean mAreDimensionsInvalid = true;
-    @Deprecated private int mDayNameLength = LENGTH_LONG;
+    @Deprecated
+    private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMarginVertical = 0;
     private float mXScrollingSpeed = 1f;
@@ -167,21 +166,21 @@ private View shadow;
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
     private int mAllDayEventHeight = 100;
-    private int mScrollDuration = 250;
-
+    private int mScrollDuration = 150;
+    private float weekx;
     // Listeners.
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
     private WeekViewLoader mWeekViewLoader;
     private EmptyViewClickListener mEmptyViewClickListener;
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
-    private DateTimeInterpreter mDateTimeInterpreter;
-    private ScrollListener mScrollListener;
-
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
         @Override
         public boolean onDown(MotionEvent e) {
+
+            weekx = mCurrentOrigin.x;
+            Log.e("down", "down" + weekx);
             goToNearestOrigin();
             return true;
         }
@@ -189,6 +188,7 @@ private View shadow;
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             // Check if view is zoomed.
+
             if (mIsZooming)
                 return true;
             switch (mCurrentScrollDirection) {
@@ -239,29 +239,73 @@ private View shadow;
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
             if (mIsZooming)
                 return true;
 
-            if ((mCurrentFlingDirection == Direction.LEFT && !mHorizontalFlingEnabled) ||
-                    (mCurrentFlingDirection == Direction.RIGHT && !mHorizontalFlingEnabled) ||
-                    (mCurrentFlingDirection == Direction.VERTICAL && !mVerticalFlingEnabled)) {
-                return true;
-            }
+//            if ((mCurrentFlingDirection == Direction.LEFT && !mHorizontalFlingEnabled) ||
+//                    (mCurrentFlingDirection == Direction.RIGHT && !mHorizontalFlingEnabled) ||
+//                    (mCurrentFlingDirection == Direction.VERTICAL && !mVerticalFlingEnabled)) {
+//                return true;
+//            }
 
             mScroller.forceFinished(true);
 
             mCurrentFlingDirection = mCurrentScrollDirection;
+
+            Log.e("curre", mCurrentOrigin.x + "," + mWidthPerDay + "," + weekx);
+
+
+            float target = 0;
             switch (mCurrentFlingDirection) {
                 case LEFT:
-                case RIGHT:
-                    mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, (int) (velocityX * mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * 24 + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom + mTimeTextHeight / 2 - getHeight()), 0);
+
+                    target = weekx - (mWidthPerDay * getNumberOfVisibleDays());
+                    ValueAnimator va = ValueAnimator.ofFloat(mCurrentOrigin.x, target);
+
+
+                    va.setDuration(70);
+                    va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            mCurrentOrigin.x = (float) animation.getAnimatedValue();
+                            invalidate();
+                        }
+
+                    });
+                    va.start();
+
                     break;
+                case RIGHT:
+                    target = weekx + (mWidthPerDay * getNumberOfVisibleDays());
+                    ValueAnimator va1 = ValueAnimator.ofFloat(mCurrentOrigin.x, target);
+                    va1.setDuration(70);
+                    va1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            mCurrentOrigin.x = (float) animation.getAnimatedValue();
+                            invalidate();
+                        }
+
+                    });
+
+                    va1.start();
+                    //  forward= (int) (forward+mWidthPerDay);
+                    break;
+
                 case VERTICAL:
-                    mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * 24 + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom + mTimeTextHeight/2 - getHeight()), 0);
+                    mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * 24 + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom + mTimeTextHeight / 2 - getHeight()), 0);
+                    ViewCompat.postInvalidateOnAnimation(WeekView.this);
                     break;
             }
 
-            ViewCompat.postInvalidateOnAnimation(WeekView.this);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    invalidate();
+                }
+            },100);
+            Log.e("curre1", mCurrentOrigin.x + "," + mWidthPerDay + "," + mCurrentFlingDirection);
+
+
             return true;
         }
 
@@ -319,6 +363,8 @@ private View shadow;
             }
         }
     };
+    private DateTimeInterpreter mDateTimeInterpreter;
+    private ScrollListener mScrollListener;
 
     public WeekView(Context context) {
         this(context, null);
@@ -385,9 +431,6 @@ private View shadow;
         init();
     }
 
-
-
-
     private void init() {
         // Scrolling initialization.
         mGestureDetector = new GestureDetectorCompat(mContext, mGestureListener);
@@ -416,7 +459,7 @@ private View shadow;
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHeaderTextPaint.setColor(mHeaderColumnTextColor);
         mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        mHeaderTextPaint.setTextSize(mTextSize-1);
+        mHeaderTextPaint.setTextSize(mTextSize - 1);
         mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mHeaderTextHeight = rect.height();
 
@@ -430,12 +473,12 @@ private View shadow;
         jtodayHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         jtodayHeaderTextPaint.setColor(Color.WHITE);
         jtodayHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        jtodayHeaderTextPaint.setTextSize(mTextSize*1.6f);
+        jtodayHeaderTextPaint.setTextSize(mTextSize * 1.6f);
 
         jHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         jHeaderTextPaint.setColor(Color.DKGRAY);
         jHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        jHeaderTextPaint.setTextSize(mTextSize*1.6f);
+        jHeaderTextPaint.setTextSize(mTextSize * 1.6f);
         jHeaderTextPaint.getTextBounds("00", 0, "00".length(), rect);
         jHeaderTextHeight = rect.height();
 
@@ -550,14 +593,14 @@ private View shadow;
         drawHeaderRowAndEvents(canvas);
 
         // Draw the time column and all the axes/separators.
-      if (mNumberOfVisibleDays!=1)drawTimeColumnAndAxes(canvas);
+        if (mNumberOfVisibleDays != 1) drawTimeColumnAndAxes(canvas);
 
     }
 
-    public void calculateHeaderHeight(){
+    public void calculateHeaderHeight() {
         //Make sure the header is the right size (depends on AllDay events)
         boolean containsAllDayEvent = false;
-        int noofevent=1;
+        int noofevent = 1;
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int dayNumber = 0;
                  dayNumber < mNumberOfVisibleDays;
@@ -566,7 +609,8 @@ private View shadow;
                 day.add(Calendar.DATE, dayNumber);
                 for (int i = 0; i < mEventRects.size(); i++) {
                     if (isSameDay(mEventRects.get(i).event.getStartTime(), day) && mEventRects.get(i).event.isAllDay()) {
-                        if (mEventRects.get(i).noofevent>noofevent)noofevent=mEventRects.get(i).noofevent;
+                        if (mEventRects.get(i).noofevent > noofevent)
+                            noofevent = mEventRects.get(i).noofevent;
                         containsAllDayEvent = true;
                         break;
                     }
@@ -577,37 +621,35 @@ private View shadow;
             }
         }
         //((noofevent-1)*5) where is 5 padding between event
-        if (mNumberOfVisibleDays==1){
-            if (containsAllDayEvent){
-                float without=mHeaderTextHeight+jHeaderTextHeight+mHeaderMarginBottom+70+mHeaderRowPadding/3.0f;
-                float with=(mAllDayEventHeight*noofevent)+((noofevent-1)*5) + mHeaderMarginBottom;
-                mHeaderHeight=Math.max(without,with);
+        if (mNumberOfVisibleDays == 1) {
+            if (containsAllDayEvent) {
+                float without = mHeaderTextHeight + jHeaderTextHeight + mHeaderMarginBottom + 70 + mHeaderRowPadding / 3.0f;
+                float with = (mAllDayEventHeight * noofevent) + ((noofevent - 1) * 5) + mHeaderMarginBottom;
+                mHeaderHeight = Math.max(without, with);
 
-                shadow.setY(mHeaderHeight-70+mHeaderRowPadding*3);
+                shadow.setY(mHeaderHeight - 70 + mHeaderRowPadding * 3);
 
+            } else {
+                float without = mHeaderTextHeight + jHeaderTextHeight + mHeaderMarginBottom + 70 + mHeaderRowPadding / 3.0f;
+
+                mHeaderHeight = without;
+                shadow.setY(mHeaderHeight - 70 + mHeaderRowPadding * 3);
             }
-            else {
-                float without=mHeaderTextHeight+jHeaderTextHeight+mHeaderMarginBottom+70+mHeaderRowPadding/3.0f;
-
-                mHeaderHeight=without;
-                shadow.setY(mHeaderHeight-70+mHeaderRowPadding*3);
-            }
 
 
-        }
-        else {
-            if(containsAllDayEvent) {
-                mHeaderHeight = mHeaderTextHeight+jHeaderTextHeight + ((mAllDayEventHeight*noofevent)+((noofevent-1)*5) + mHeaderMarginBottom)+70;
-                shadow.setY(mHeaderHeight-70+mHeaderRowPadding*3);
-            }
-            else{
-                mHeaderHeight = mHeaderTextHeight+jHeaderTextHeight+mHeaderMarginBottom+70;
-                shadow.setY(mHeaderHeight-70+mHeaderRowPadding*3);
+        } else {
+            if (containsAllDayEvent) {
+                mHeaderHeight = mHeaderTextHeight + jHeaderTextHeight + ((mAllDayEventHeight * noofevent) + ((noofevent - 1) * 5) + mHeaderMarginBottom) + 70;
+                shadow.setY(mHeaderHeight - 70 + mHeaderRowPadding * 3);
+            } else {
+                mHeaderHeight = mHeaderTextHeight + jHeaderTextHeight + mHeaderMarginBottom + 70;
+                shadow.setY(mHeaderHeight - 70 + mHeaderRowPadding * 3);
             }
         }
 
 
     }
+
     private void canvasclipRect(Canvas mCanvas, float left, float top, float right, float bottom, Region.Op op) {
         if (op == Region.Op.REPLACE) {
             mCanvas.restore();
@@ -616,12 +658,13 @@ private View shadow;
             return;
         }
     }
+
     private void drawTimeColumnAndAxes(Canvas canvas) {
         // Draw the background color for the header column.
-        canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
+        canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 3 - 70, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
 
         // Clip to paint in left column only.
-canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
+        canvasclipRect(canvas, 0, mHeaderHeight + mHeaderRowPadding * 3 - 70, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
 
         for (int i = 0; i < 24; i++) {
             float top = mHeaderHeight + mHeaderRowPadding * 3 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
@@ -630,17 +673,19 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             String time = getDateTimeInterpreter().interpretTime(i);
             if (time == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
-            if (top < getHeight()) canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
+            if (top < getHeight())
+                canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
         }
 
     }
-    private void drawTimeColumnAndAxes1day(Canvas canvas,float startx) {
+
+    private void drawTimeColumnAndAxes1day(Canvas canvas, float startx) {
         // Draw the background color for the header column.
-       // canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), mHeaderColumnBackgroundPaint);
+        // canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), mHeaderColumnBackgroundPaint);
 
         // Clip to paint in left column only.
 
-        canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
+        canvasclipRect(canvas, 0, mHeaderHeight + mHeaderRowPadding * 3 - 70, getWidth(), getHeight(), Region.Op.REPLACE);
 
         for (int i = 0; i < 24; i++) {
             float top = mHeaderHeight + mHeaderRowPadding * 3 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
@@ -649,63 +694,64 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             String time = getDateTimeInterpreter().interpretTime(i);
             if (time == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
-            if (top < getHeight()) canvas.drawText(time, startx+mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
+            if (top < getHeight())
+                canvas.drawText(time, startx + mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
         }
-        canvasclipRect(canvas,0, 0, getWidth(), getHeight(), Region.Op.REPLACE);
+        canvasclipRect(canvas, 0, 0, getWidth(), getHeight(), Region.Op.REPLACE);
 
     }
 
     private void drawHeaderRowAndEvents(Canvas canvas) {
         // Calculate the available width for each day.
-        mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding *2;
+        mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding * 2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
-       if (mNumberOfVisibleDays==1)mWidthPerDay = getWidth();//mWidthPerDay/mNumberOfVisibleDays
-        else mWidthPerDay=mWidthPerDay/mNumberOfVisibleDays;
+        if (mNumberOfVisibleDays == 1) mWidthPerDay = getWidth();//mWidthPerDay/mNumberOfVisibleDays
+        else mWidthPerDay = mWidthPerDay / mNumberOfVisibleDays;
 
         calculateHeaderHeight(); //Make sure the header is the right size (depends on AllDay events)
 
         Calendar today = today();
 
         if (mAreDimensionsInvalid) {
-            mEffectiveMinHourHeight= Math.max(mMinHourHeight, (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 3 - mHeaderMarginBottom) / 24));
+            mEffectiveMinHourHeight = Math.max(mMinHourHeight, (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 3 - mHeaderMarginBottom) / 24));
 
             mAreDimensionsInvalid = false;
-            if(mScrollToDay != null)
+            if (mScrollToDay != null)
                 goToDate(mScrollToDay);
 
             mAreDimensionsInvalid = false;
-            if(mScrollToHour >= 0)
+            if (mScrollToHour >= 0)
                 goToHour(mScrollToHour);
 
             mScrollToDay = null;
             mScrollToHour = -1;
             mAreDimensionsInvalid = false;
         }
-        if (mIsFirstDraw){
+        if (mIsFirstDraw) {
             mIsFirstDraw = false;
 
             // If the week view is being drawn for the first time, then consider the first day of the week.
-            if(mNumberOfVisibleDays >= 7 && today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek && mShowFirstDayOfWeekFirst) {
+            if (mNumberOfVisibleDays >= 7 && today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek && mShowFirstDayOfWeekFirst) {
                 int difference = (today.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
                 mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
             }
         }
 
         // Calculate the new height due to the zooming.
-        if (mNewHourHeight > 0){
+        if (mNewHourHeight > 0) {
             if (mNewHourHeight < mEffectiveMinHourHeight)
                 mNewHourHeight = mEffectiveMinHourHeight;
             else if (mNewHourHeight > mMaxHourHeight)
                 mNewHourHeight = mMaxHourHeight;
 
-            mCurrentOrigin.y = (mCurrentOrigin.y/mHourHeight)*mNewHourHeight;
+            mCurrentOrigin.y = (mCurrentOrigin.y / mHourHeight) * mNewHourHeight;
             mHourHeight = mNewHourHeight;
             mNewHourHeight = -1;
         }
 
         // If the new mCurrentOrigin.y is invalid, make it valid.
-        if (mCurrentOrigin.y < getHeight() - mHourHeight * 24 - mHeaderHeight - mHeaderRowPadding * 3 - mHeaderMarginBottom - mTimeTextHeight/2)
-            mCurrentOrigin.y = getHeight() - mHourHeight * 24 - mHeaderHeight - mHeaderRowPadding * 3 - mHeaderMarginBottom - mTimeTextHeight/2;
+        if (mCurrentOrigin.y < getHeight() - mHourHeight * 24 - mHeaderHeight - mHeaderRowPadding * 3 - mHeaderMarginBottom - mTimeTextHeight / 2)
+            mCurrentOrigin.y = getHeight() - mHourHeight * 24 - mHeaderHeight - mHeaderRowPadding * 3 - mHeaderMarginBottom - mTimeTextHeight / 2;
 
         // Don't put an "else if" because it will trigger a glitch when completely zoomed out and
         // scrolling vertically.
@@ -724,27 +770,27 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         day.add(Calendar.HOUR, 6);
 
         // Prepare to iterate for each hour to draw the hour lines.
-        int lineCount = (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 3-
+        int lineCount = (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 3 -
                 mHeaderMarginBottom) / mHourHeight) + 1;
-        lineCount = (lineCount) * (mNumberOfVisibleDays+1);
+        lineCount = (lineCount) * (mNumberOfVisibleDays + 1);
         float[] hourLines = new float[lineCount * 4];
 
         // Clear the cache for event rectangles.
         if (mEventRects != null) {
-            for (EventRect eventRect: mEventRects) {
+            for (EventRect eventRect : mEventRects) {
                 eventRect.rectF = null;
             }
         }
 
         // Clip to paint events only.
-        float stary=0;
-        canvasclipRect(canvas,0, stary, getWidth(), getHeight(), Region.Op.REPLACE);
+        float stary = 0;
+        canvasclipRect(canvas, 0, stary, getWidth(), getHeight(), Region.Op.REPLACE);
 
         // Iterate through each day.
         Calendar oldFirstVisibleDay = mFirstVisibleDay;
         mFirstVisibleDay = (Calendar) today.clone();
         mFirstVisibleDay.add(Calendar.DATE, -(Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap))));
-        if(!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrollListener != null){
+        if (!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrollListener != null) {
             mScrollListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
         }
         for (int dayNumber = leftDaysWithGaps + 1;
@@ -769,7 +815,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             }
 
             // Draw background color for each day.
-            float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
+            float start = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
 //            if (mWidthPerDay + startPixel - start > 0){
 //                if (mShowDistinctPastFutureColor){
 //                    boolean isWeekend = day.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || day.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY;
@@ -802,27 +848,26 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 //                }
 //            }
 
-            canvasclipRect(canvas,0, stary, getWidth(), getHeight(), Region.Op.REPLACE);
+            canvasclipRect(canvas, 0, stary, getWidth(), getHeight(), Region.Op.REPLACE);
 
 
             // Prepare the separator lines for hours.
             int i = 0;
             for (int hourNumber = 0; hourNumber < 24; hourNumber++) {
-                float top = mHeaderHeight + mHeaderRowPadding * 3 + mCurrentOrigin.y + mHourHeight * hourNumber + mTimeTextHeight/2 + mHeaderMarginBottom;
-                if (top > mHeaderHeight-70 + mHeaderRowPadding * 3  && top < getHeight() && startPixel + mWidthPerDay - start > 0){
-                    if (mNumberOfVisibleDays!=1){
-                        if (dayNumber == leftDaysWithGaps + 1)hourLines[i * 4] = start-22;
+                float top = mHeaderHeight + mHeaderRowPadding * 3 + mCurrentOrigin.y + mHourHeight * hourNumber + mTimeTextHeight / 2 + mHeaderMarginBottom;
+                if (top > mHeaderHeight - 70 + mHeaderRowPadding * 3 && top < getHeight() && startPixel + mWidthPerDay - start > 0) {
+                    if (mNumberOfVisibleDays != 1) {
+                        if (dayNumber == leftDaysWithGaps + 1) hourLines[i * 4] = start - 22;
                         else hourLines[i * 4] = start;
                         hourLines[i * 4 + 1] = top;
                         hourLines[i * 4 + 2] = startPixel + mWidthPerDay;
 
                         hourLines[i * 4 + 3] = top;
                         i++;
-                    }
-                    else {
-                       hourLines[i * 4] = startPixel-22;
+                    } else {
+                        hourLines[i * 4] = startPixel - 22;
                         hourLines[i * 4 + 1] = top;
-                        hourLines[i * 4 + 2] = startPixel + mWidthPerDay-mHeaderColumnWidth;
+                        hourLines[i * 4 + 2] = startPixel + mWidthPerDay - mHeaderColumnWidth;
                         hourLines[i * 4 + 3] = top;
                         i++;
                     }
@@ -833,12 +878,12 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
             // Draw the lines for hours.
             canvas.drawLines(hourLines, mHourSeparatorPaint);
-            if (mNumberOfVisibleDays!=1) canvasclipRect(canvas,mHeaderColumnWidth, mHeaderHeight + (mHeaderRowPadding * 3)-70 , getWidth(), getHeight(), Region.Op.REPLACE);
-
+            if (mNumberOfVisibleDays != 1)
+                canvasclipRect(canvas, mHeaderColumnWidth, mHeaderHeight + (mHeaderRowPadding * 3) - 70, getWidth(), getHeight(), Region.Op.REPLACE);
 
 
             // Draw the events.
-            if (mNumberOfVisibleDays!=1)drawEvents(day, startPixel, canvas);
+            if (mNumberOfVisibleDays != 1) drawEvents(day, startPixel, canvas);
             else drawEvents(day, startPixel, canvas);
             // Draw the line at the current time.
 
@@ -854,28 +899,28 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         // Clip to paint header row only.
 
 
-        if (mNumberOfVisibleDays!=1)  canvasclipRect(canvas,mHeaderColumnWidth, 0, getWidth(), getHeight(), Region.Op.REPLACE);
+        if (mNumberOfVisibleDays != 1)
+            canvasclipRect(canvas, mHeaderColumnWidth, 0, getWidth(), getHeight(), Region.Op.REPLACE);
         // Draw the header background.
-        canvas.drawRect(0, 0, getWidth(), mHeaderHeight-70 + mHeaderRowPadding * 3, mHeaderBackgroundPaint);
-        mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight*2);
-        if (mNumberOfVisibleDays!=1)canvas.drawLine(mHeaderColumnWidth,mHeaderHeight+mHeaderRowPadding*3-105 ,mHeaderColumnWidth,getHeight(),mHourSeparatorPaint);
+        canvas.drawRect(0, 0, getWidth(), mHeaderHeight - 70 + mHeaderRowPadding * 3, mHeaderBackgroundPaint);
+        mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight * 2);
+        if (mNumberOfVisibleDays != 1)
+            canvas.drawLine(mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 3 - 105, mHeaderColumnWidth, getHeight(), mHourSeparatorPaint);
         mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight);
-
 
 
         startPixel = startFromPixel;
 
-        for (int dayNumber=leftDaysWithGaps+1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
+        for (int dayNumber = leftDaysWithGaps + 1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
             // Check if the day is today.
 
             day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
             boolean sameDay = isSameDay(day, today);
-            int daycompare=day.compareTo(today);
-            if (daycompare<0){
+            int daycompare = day.compareTo(today);
+            if (daycompare < 0) {
                 jHeaderTextPaint.setColor(Color.parseColor("#606368"));
-            }
-            else {
+            } else {
                 jHeaderTextPaint.setColor(Color.BLACK);
 
             }
@@ -885,59 +930,66 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             String dayLabel = getDateTimeInterpreter().interpretday(day);
             if (dayLabel == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null date");
-            if (mNumberOfVisibleDays!=1)canvas.drawLine(startPixel,mHeaderHeight+mHeaderRowPadding*3-105 ,startPixel,getHeight(),mHourSeparatorPaint);
-            else canvas.drawLine(startPixel,mHeaderRowPadding/3.0f ,startPixel,getHeight(),mHourSeparatorPaint);
+            if (mNumberOfVisibleDays != 1)
+                canvas.drawLine(startPixel, mHeaderHeight + mHeaderRowPadding * 3 - 105, startPixel, getHeight(), mHourSeparatorPaint);
+            else
+                canvas.drawLine(startPixel, mHeaderRowPadding / 3.0f, startPixel, getHeight(), mHourSeparatorPaint);
 
-            float x=startPixel + mWidthPerDay / 2;
-            float xx=startPixel-mHeaderColumnWidth/2.0f;
-            float y=(mHeaderTextHeight + mHeaderRowPadding*1.76f+jHeaderTextHeight)-jHeaderTextHeight/2.0f;
+            float x = startPixel + mWidthPerDay / 2;
+            float xx = startPixel - mHeaderColumnWidth / 2.0f;
+            float y = (mHeaderTextHeight + mHeaderRowPadding * 1.76f + jHeaderTextHeight) - jHeaderTextHeight / 2.0f;
 
-            int size=getResources().getDimensionPixelSize(R.dimen.todaysize);
+            int size = getResources().getDimensionPixelSize(R.dimen.todaysize);
 
-            if (mNumberOfVisibleDays==1){
-                if (sameDay)canvas.drawRoundRect(xx-size,y-size,xx+size,y+size,size,size,mTodayBackgroundPaint);
+            if (mNumberOfVisibleDays == 1) {
+                if (sameDay)
+                    canvas.drawRoundRect(xx - size, y - size, xx + size, y + size, size, size, mTodayBackgroundPaint);
 
-                canvas.drawText(dayLabel, startPixel-mHeaderColumnWidth/2.0f  , mHeaderTextHeight + mHeaderRowPadding/3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
-                canvas.drawText(dayLabel1,  startPixel -mHeaderColumnWidth/2.0f , mHeaderTextHeight + mHeaderRowPadding*1.76f+jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
-                drawAllDayEvents(day, startPixel, canvas);
+                canvas.drawText(dayLabel, startPixel - mHeaderColumnWidth / 2.0f, mHeaderTextHeight + mHeaderRowPadding / 3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+                canvas.drawText(dayLabel1, startPixel - mHeaderColumnWidth / 2.0f, mHeaderTextHeight + mHeaderRowPadding * 1.76f + jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
+                drawAllDayEvents(day, startPixel, canvas,dayNumber);
+
+
+            } else {
+                if (sameDay)
+                    canvas.drawRoundRect(x - size, y - size, x + size, y + size, size, size, mTodayBackgroundPaint);
+                canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding / 3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+                canvas.drawText(dayLabel1, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding * 1.76f + jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
+               drawAllDayEvents(day, startPixel, canvas,dayNumber);
+
 
 
             }
-            else {
-                if (sameDay)canvas.drawRoundRect(x-size,y-size,x+size,y+size,size,size,mTodayBackgroundPaint);
-                canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding/3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
-                canvas.drawText(dayLabel1, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding*1.76f+jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
-                drawAllDayEvents(day, startPixel, canvas);
-
-            }
-            if (mShowNowLine && sameDay){
-                float startY = mHeaderHeight + mHeaderRowPadding * 3+ mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
+            if (mShowNowLine && sameDay) {
+                float startY = mHeaderHeight + mHeaderRowPadding * 3 + mTimeTextHeight / 2 + mHeaderMarginBottom + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();
-                float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE)/60.0f) * mHourHeight;
+                float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE) / 60.0f) * mHourHeight;
 
-                float startat=startPixel<mHeaderColumnWidth?mHeaderColumnWidth:startPixel;
-                float wid=mWidthPerDay;
-                float per=20*(1.0f-(startat-startPixel)/wid);
-                if (mNumberOfVisibleDays!=1){
-                    if (mNumberOfVisibleDays!=1)canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
-                    canvas.drawRoundRect(startat-per,startY+beforeNow-per,startat+per,startY+beforeNow+per,per,per,jNowbackPaint);
-                    canvas.drawLine(startat, startY + beforeNow,  startPixel+wid, startY + beforeNow, mNowLinePaint);
+                float startat = startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel;
+                float wid = mWidthPerDay;
+                float per = 20 * (1.0f - (startat - startPixel) / wid);
+                if (mNumberOfVisibleDays != 1) {
+                    if (mNumberOfVisibleDays != 1)
+                        canvasclipRect(canvas, 0, mHeaderHeight + mHeaderRowPadding * 3 - 70, getWidth(), getHeight(), Region.Op.REPLACE);
+                    canvas.drawRoundRect(startat - per, startY + beforeNow - per, startat + per, startY + beforeNow + per, per, per, jNowbackPaint);
+                    canvas.drawLine(startat, startY + beforeNow, startPixel + wid, startY + beforeNow, mNowLinePaint);
 
-                    canvasclipRect(canvas,mHeaderColumnWidth, 0, getWidth(), getHeight(), Region.Op.REPLACE);
+                    canvasclipRect(canvas, mHeaderColumnWidth, 0, getWidth(), getHeight(), Region.Op.REPLACE);
 
-                }
-                else {
+                } else {
 
-                    canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, getWidth(), getHeight(), Region.Op.REPLACE);
+                    canvasclipRect(canvas, 0, mHeaderHeight + mHeaderRowPadding * 3 - 70, getWidth(), getHeight(), Region.Op.REPLACE);
 
-                    canvas.drawRoundRect(startPixel-20,startY+beforeNow-20,startPixel+20,startY+beforeNow+20,20,20,jNowbackPaint);
-                    canvas.drawLine(startPixel, startY + beforeNow,  startPixel+wid-mHeaderColumnWidth, startY + beforeNow, mNowLinePaint);
-                   canvasclipRect(canvas,0, 0, getWidth(), getHeight(), Region.Op.REPLACE);
+                    canvas.drawRoundRect(startPixel - 20, startY + beforeNow - 20, startPixel + 20, startY + beforeNow + 20, 20, 20, jNowbackPaint);
+                    canvas.drawLine(startPixel, startY + beforeNow, startPixel + wid - mHeaderColumnWidth, startY + beforeNow, mNowLinePaint);
+                    canvasclipRect(canvas, 0, 0, getWidth(), getHeight(), Region.Op.REPLACE);
 
                 }
 
             }
-           if (mNumberOfVisibleDays==1)drawTimeColumnAndAxes1day(canvas,startPixel-mHeaderColumnWidth);
+            if (mNumberOfVisibleDays == 1)
+                drawTimeColumnAndAxes1day(canvas, startPixel - mHeaderColumnWidth);
+
             startPixel += mWidthPerDay + mColumnGap;
 
         }
@@ -946,24 +998,25 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get the time and date where the user clicked on.
+     *
      * @param x The x position of the touch event.
      * @param y The y position of the touch event.
      * @return The time and date at the clicked position.
      */
-    private Calendar getTimeFromPoint(float x, float y){
+    private Calendar getTimeFromPoint(float x, float y) {
         int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
         float startPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps +
                 mHeaderColumnWidth;
         for (int dayNumber = leftDaysWithGaps + 1;
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
              dayNumber++) {
-            float start =  (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
-            if (mWidthPerDay + startPixel - start > 0 && x > start && x < startPixel + mWidthPerDay){
+            float start = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
+            if (mWidthPerDay + startPixel - start > 0 && x > start && x < startPixel + mWidthPerDay) {
                 Calendar day = today();
                 day.add(Calendar.DATE, dayNumber - 1);
                 float pixelsFromZero = y - mCurrentOrigin.y - mHeaderHeight
-                        - mHeaderRowPadding * 3 - mTimeTextHeight/2 - mHeaderMarginBottom;
-                int hour = (int)(pixelsFromZero / mHourHeight);
+                        - mHeaderRowPadding * 3 - mTimeTextHeight / 2 - mHeaderMarginBottom;
+                int hour = (int) (pixelsFromZero / mHourHeight);
                 int minute = (int) (60 * (pixelsFromZero - hour * mHourHeight) / mHourHeight);
                 day.add(Calendar.HOUR, hour);
                 day.set(Calendar.MINUTE, minute);
@@ -976,28 +1029,29 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Draw all the events of a particular day.
-     * @param date The day.
+     *
+     * @param date           The day.
      * @param startFromPixel The left position of the day area. The events will never go any left from this value.
-     * @param canvas The canvas to draw upon.
+     * @param canvas         The canvas to draw upon.
      */
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int i = 0; i < mEventRects.size(); i++) {
-                if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()){
+                if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()) {
 
                     // Calculate top.
-                    float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom + mTimeTextHeight/2 + mEventMarginVertical;
+                    float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMarginVertical;
 
                     // Calculate bottom.
                     float bottom = mEventRects.get(i).bottom;
-                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom + mTimeTextHeight/2 - mEventMarginVertical;
+                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMarginVertical;
 
                     // Calculate left and right.
-                    float left = startFromPixel + mEventRects.get(i).left * (mWidthPerDay-(mNumberOfVisibleDays==1?mHeaderColumnWidth:0));
+                    float left = startFromPixel + mEventRects.get(i).left * (mWidthPerDay - (mNumberOfVisibleDays == 1 ? mHeaderColumnWidth : 0));
                     if (left < startFromPixel)
                         left += mOverlappingEventGap;
-                    float right = left + mEventRects.get(i).width * (mWidthPerDay-(mNumberOfVisibleDays==1?mHeaderColumnWidth:0));
-                    if (right < startFromPixel + (mWidthPerDay-(mNumberOfVisibleDays==1?mHeaderColumnWidth:0)))
+                    float right = left + mEventRects.get(i).width * (mWidthPerDay - (mNumberOfVisibleDays == 1 ? mHeaderColumnWidth : 0));
+                    if (right < startFromPixel + (mWidthPerDay - (mNumberOfVisibleDays == 1 ? mHeaderColumnWidth : 0)))
                         right -= mOverlappingEventGap;
 
                     // Draw the event and the event name on top of it.
@@ -1006,13 +1060,12 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
                             top < getHeight() &&
                             right > mHeaderColumnWidth &&
                             bottom > mHeaderHeight + mHeaderRowPadding * 3 + mTimeTextHeight / 2 + mHeaderMarginBottom
-                            ) {
+                    ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                     drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
-                    }
-                    else
+                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+                    } else
                         mEventRects.get(i).rectF = null;
                 }
             }
@@ -1021,76 +1074,179 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Draw all the Allday-events of a particular day.
-     * @param date The day.
+     *
+     * @param date           The day.
      * @param startFromPixel The left position of the day area. The events will never go any left from this value.
-     * @param canvas The canvas to draw upon.
+     * @param canvas         The canvas to draw upon.
      */
-    private void drawAllDayEvents(Calendar date, float startFromPixel, Canvas canvas) {
+    private void drawAllDayEvents(Calendar date, float startFromPixel, Canvas canvas,int daynumber) {
+
         if (mEventRects != null && mEventRects.size() > 0) {
 
+
             for (int i = 0; i < mEventRects.size(); i++) {
+
                 SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 
 
-                if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && mEventRects.get(i).event.isAllDay()){
+                if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && mEventRects.get(i).event.isAllDay()) {
                     // Calculate top.
                     float top = 0;
                     // Calculate bottom.
-                    if (mNumberOfVisibleDays==1){
+                    if (mNumberOfVisibleDays == 1) {
 
-                        top=mHeaderRowPadding/3.0f+mEventMarginVertical+mEventRects.get(i).top;
-                    }
-                    else {
-                         top =  (3*mHeaderRowPadding)+mHeaderTextHeight+jHeaderTextHeight+mEventMarginVertical+mEventRects.get(i).top ;
+                        top = mHeaderRowPadding / 3.0f + mEventMarginVertical + mEventRects.get(i).top;
+                    } else {
+                        top = (3 * mHeaderRowPadding) + mHeaderTextHeight + jHeaderTextHeight + mEventMarginVertical + mEventRects.get(i).top;
 
                     }
                     float bottom = top + mEventRects.get(i).bottom;
 
                     // Calculate left and right.
 
-                    float left = startFromPixel ;
+                    float left = startFromPixel;
 
 
                     if (left < startFromPixel)
                         left += mOverlappingEventGap;
-                    float right = left +  (mWidthPerDay-(mNumberOfVisibleDays==1?mHeaderColumnWidth:0))-10;
-                    if (right < startFromPixel + (mWidthPerDay-(mNumberOfVisibleDays==1?mHeaderColumnWidth:0)))
+
+
+
+
+                    float right = left + (mWidthPerDay - (mNumberOfVisibleDays == 1 ? mHeaderColumnWidth : 0)) - 10;
+                    if (right < startFromPixel + (mWidthPerDay - (mNumberOfVisibleDays == 1 ? mHeaderColumnWidth : 0)))
                         right -= mOverlappingEventGap;
 
                     // Draw the event and the event name on top of it.
+
                     if (left < right &&
                             left < getWidth() &&
                             top < getHeight() &&
                             right > mHeaderColumnWidth &&
                             bottom > 0
-                            ) {
+                    ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
-                        canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-//                        Paint text=new Paint(Paint.ANTI_ALIAS_FLAG);
-//                        text.setColor(mEventTextColor);
-//                        text.setTextSize(mEventTextSize);
 
-//                        Rect jrect=new Rect();
-//                        jheaderEventTextpaint.getTextBounds("a", 0, "a".length(), jrect);
-//                        jheaderEventheight = jrect.centerY();
-                        canvas.drawText(mEventRects.get(i).event.getName(),mEventRects.get(i).rectF.left+12,mEventRects.get(i).rectF.centerY()-jheaderEventheight,jheaderEventTextpaint);
-                       //drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
-                    }
-                    else
+
+
+                        boolean mycheck=getNumberOfVisibleDays()!=1&&mEventRects.get(i).event.isIsmoreday();
+                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+
+                            if (mycheck){
+
+                                if (true){
+
+                                    float startat = startFromPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startFromPixel;
+                                    float wid = mWidthPerDay;
+                                    mEventRects.get(i).rectF.left=startat;
+                                    if (mEventRects.get(i).event.getDaytype()!=1&&startat>200){
+                                        mEventRects.get(i).rectF.left=startat-mEventCornerRadius*2;
+
+                                    }
+
+                                    mEventRects.get(i).rectF.right=startFromPixel+(wid);
+                                    RectF fd= mEventRects.get(i).rectF;
+                                    if (mEventRects.get(i).event.getDaytype()==mEventRects.get(i).event.getNoofday())    {
+                                      fd.right=fd.right-10;
+                                    }
+                                    canvas.drawRoundRect(fd, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
+
+                                    Log.e("ff"+daynumber,+startFromPixel+","+mEventRects.get(i).event.getDaytype()+","+mWidthPerDay+","+getWidth());
+                                    boolean cc=startFromPixel+mWidthPerDay>=getWidth();
+                                    if (mEventRects.get(i+1).event.isIsmoreday()==false)cc=true;
+
+
+                                        if (!cc){
+
+                                            canvas.drawText("", startat, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
+                                        }
+
+                                        else {
+                                            float ff=startat;
+                                            int k=i;
+
+                                            while (k>0&&mEventRects.get(k-1).event.isAllDay()&&mEventRects.get(k-1).event.getDaytype()==0){
+                                                k--;
+                                            }
+                                            while (k>0&&mEventRects.get(k-1).event.isIsmoreday()&&ff>196){
+                                                Log.e("ds",mEventRects.get(k-1).event.getName());
+
+                                                ff=ff-mWidthPerDay;
+                                                k--;
+                                                while (k>0&&mEventRects.get(k-1).event.isAllDay()&&mEventRects.get(k-1).event.getDaytype()==0){
+                                                    k--;
+                                                }
+
+
+                                            }
+
+                                            if (ff<196)ff=196;
+                                            canvas.drawText(mEventRects.get(i).event.getName(), ff+10, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
+
+
+                                        }
+
+
+
+
+
+                                }
+
+
+                            }
+                            else {
+
+                                canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
+                                canvas.drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF.left + 12, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
+
+                            }
+                    } else
                         mEventRects.get(i).rectF = null;
                 }
             }
         }
+
     }
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    static public Path RoundedRect(float left, float top, float right, float bottom, float rx, float ry, boolean conformToOriginalPost) {
+        Path path = new Path();
+        if (rx < 0) rx = 0;
+        if (ry < 0) ry = 0;
+        float width = right - left;
+        float height = bottom - top;
+        if (rx > width/2) rx = width/2;
+        if (ry > height/2) ry = height/2;
+        float widthMinusCorners = (width - (2 * rx));
+        float heightMinusCorners = (height - (2 * ry));
 
+        path.moveTo(right, top + ry);
+        path.arcTo(right - 2*rx, top, right, top + 2*ry, 0, -90, false); //top-right-corner
+        path.rLineTo(-widthMinusCorners, 0);
+        path.arcTo(left, top, left + 2*rx, top + 2*ry, 270, -90, false);//top-left corner.
+        path.rLineTo(0, heightMinusCorners);
+        if (conformToOriginalPost) {
+            path.rLineTo(0, ry);
+            path.rLineTo(width, 0);
+            path.rLineTo(0, -ry);
+        }
+        else {
+            path.arcTo(left, bottom - 2 * ry, left + 2 * rx, bottom, 180, -90, false); //bottom-left corner
+            path.rLineTo(widthMinusCorners, 0);
+            path.arcTo(right - 2 * rx, bottom - 2 * ry, right, bottom, 90, -90, false); //bottom-right corner
+        }
 
+        path.rLineTo(0, -heightMinusCorners);
+
+        path.close();//Given close, last lineto can be removed.
+        return path;
+    }
     /**
      * Draw the name of the event on top of the event rectangle.
-     * @param event The event of which the title (and location) should be drawn.
-     * @param rect The rectangle on which the text is to be drawn.
-     * @param canvas The canvas to draw upon.
-     * @param originalTop The original top position of the rectangle. The rectangle may have some of its portion outside of the visible area.
+     *
+     * @param event        The event of which the title (and location) should be drawn.
+     * @param rect         The rectangle on which the text is to be drawn.
+     * @param canvas       The canvas to draw upon.
+     * @param originalTop  The original top position of the rectangle. The rectangle may have some of its portion outside of the visible area.
      * @param originalLeft The original left position of the rectangle. The rectangle may have some of its portion outside of the visible area.
      */
     private void drawEventTitle(WeekViewEvent event, RectF rect, Canvas canvas, float originalTop, float originalLeft) {
@@ -1139,47 +1295,11 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         }
     }
 
-
-    /**
-     * A class to hold reference to the events and their visual representation. An EventRect is
-     * actually the rectangle that is drawn on the calendar for a given event. There may be more
-     * than one rectangle for a single event (an event that expands more than one day). In that
-     * case two instances of the EventRect will be used for a single event. The given event will be
-     * stored in "originalEvent". But the event that corresponds to rectangle the rectangle
-     * instance will be stored in "event".
-     */
-    private class EventRect {
-        public WeekViewEvent event;
-        public WeekViewEvent originalEvent;
-        public RectF rectF;
-        public float left;
-        public float width;
-        public float top;
-        public float bottom;
-        public int noofevent;
-        /**
-         * Create a new instance of event rect. An EventRect is actually the rectangle that is drawn
-         * on the calendar for a given event. There may be more than one rectangle for a single
-         * event (an event that expands more than one day). In that case two instances of the
-         * EventRect will be used for a single event. The given event will be stored in
-         * "originalEvent". But the event that corresponds to rectangle the rectangle instance will
-         * be stored in "event".
-         * @param event Represents the event which this instance of rectangle represents.
-         * @param originalEvent The original event that was passed by the user.
-         * @param rectF The rectangle.
-         */
-        public EventRect(WeekViewEvent event, WeekViewEvent originalEvent, RectF rectF) {
-            this.event = event;
-            this.rectF = rectF;
-            this.originalEvent = originalEvent;
-        }
-    }
-
-
     /**
      * Gets more events of one/more month(s) if necessary. This method is called when the user is
      * scrolling the week view. The week view stores the events of three months: the visible month,
      * the previous month, the next month.
+     *
      * @param day The day where the user is currently is.
      */
     private void getMoreEvents(Calendar day) {
@@ -1199,24 +1319,22 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             mFetchedPeriod = -1;
         }
 
-        if (mWeekViewLoader != null){
+        if (mWeekViewLoader != null) {
             int periodToFetch = (int) mWeekViewLoader.toWeekViewPeriodIndex(day);
             if (!isInEditMode() && (mFetchedPeriod < 0 || mFetchedPeriod != periodToFetch || mRefreshEvents)) {
                 List<? extends WeekViewEvent> previousPeriodEvents = null;
                 List<? extends WeekViewEvent> currentPeriodEvents = null;
                 List<? extends WeekViewEvent> nextPeriodEvents = null;
 
-                if (mPreviousPeriodEvents != null && mCurrentPeriodEvents != null && mNextPeriodEvents != null){
-                    if (periodToFetch == mFetchedPeriod-1){
+                if (mPreviousPeriodEvents != null && mCurrentPeriodEvents != null && mNextPeriodEvents != null) {
+                    if (periodToFetch == mFetchedPeriod - 1) {
                         currentPeriodEvents = mPreviousPeriodEvents;
                         nextPeriodEvents = mCurrentPeriodEvents;
-                    }
-                    else if (periodToFetch == mFetchedPeriod){
+                    } else if (periodToFetch == mFetchedPeriod) {
                         previousPeriodEvents = mPreviousPeriodEvents;
                         currentPeriodEvents = mCurrentPeriodEvents;
                         nextPeriodEvents = mNextPeriodEvents;
-                    }
-                    else if (periodToFetch == mFetchedPeriod+1){
+                    } else if (periodToFetch == mFetchedPeriod + 1) {
                         previousPeriodEvents = mCurrentPeriodEvents;
                         currentPeriodEvents = mNextPeriodEvents;
                     }
@@ -1224,9 +1342,9 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
                 if (currentPeriodEvents == null)
                     currentPeriodEvents = mWeekViewLoader.onLoad(periodToFetch);
                 if (previousPeriodEvents == null)
-                    previousPeriodEvents = mWeekViewLoader.onLoad(periodToFetch-1);
+                    previousPeriodEvents = mWeekViewLoader.onLoad(periodToFetch - 1);
                 if (nextPeriodEvents == null)
-                    nextPeriodEvents = mWeekViewLoader.onLoad(periodToFetch+1);
+                    nextPeriodEvents = mWeekViewLoader.onLoad(periodToFetch + 1);
 
 
                 // Clear events.
@@ -1272,19 +1390,21 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Cache the event for smooth scrolling functionality.
+     *
      * @param event The event to cache.
      */
     private void cacheEvent(WeekViewEvent event) {
-        if(event.getStartTime().compareTo(event.getEndTime()) >= 0)
+        if (event.getStartTime().compareTo(event.getEndTime()) >= 0)
             return;
         List<WeekViewEvent> splitedEvents = event.splitWeekViewEvents();
-        for(WeekViewEvent splitedEvent: splitedEvents){
+        for (WeekViewEvent splitedEvent : splitedEvents) {
             mEventRects.add(new EventRect(splitedEvent, event, null));
         }
     }
 
     /**
      * Sort and cache events.
+     *
      * @param events The events to be sorted and cached.
      */
     private void sortAndCacheEvents(List<? extends WeekViewEvent> events) {
@@ -1296,6 +1416,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Sorts the events in ascending order.
+     *
      * @param events The events to be sorted.
      */
     private void sortEvents(List<? extends WeekViewEvent> events) {
@@ -1318,6 +1439,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     /**
      * Calculates the left and right positions of each events. This comes handy specially if events
      * are overlapping.
+     *
      * @param eventRects The events along with their wrapper class.
      */
     private void computePositionOfEvents(List<EventRect> eventRects) {
@@ -1352,6 +1474,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     /**
      * Expands all the events to maximum possible width. The events will try to occupy maximum
      * space available horizontally.
+     *
      * @param collisionGroup The group of events which overlap with each other.
      */
     private void expandEventsToMaxWidth(List<EventRect> collisionGroup) {
@@ -1365,8 +1488,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
                 if (column.size() == 0) {
                     column.add(eventRect);
                     isPlaced = true;
-                }
-                else if (!isEventsCollide(eventRect.event, column.get(column.size()-1).event)) {
+                } else if (!isEventsCollide(eventRect.event, column.get(column.size() - 1).event)) {
                     column.add(eventRect);
                     isPlaced = true;
                     break;
@@ -1383,7 +1505,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         // Calculate left and right position for all the events.
         // Get the maxRowCount by looking in all columns.
         int maxRowCount = 0;
-        for (List<EventRect> column : columns){
+        for (List<EventRect> column : columns) {
             maxRowCount = Math.max(maxRowCount, column.size());
         }
 
@@ -1391,19 +1513,18 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             // Set the left and right values of the event.
             float j = 0;
             for (List<EventRect> column : columns) {
-                if (column.size() >= i+1) {
+                if (column.size() >= i + 1) {
 
                     EventRect eventRect = column.get(i);
                     eventRect.width = 1f / columns.size();
                     eventRect.left = j / columns.size();
-                    if(!eventRect.event.isAllDay()) {
+                    if (!eventRect.event.isAllDay()) {
                         eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getStartTime().get(Calendar.MINUTE);
                         eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);
-                    }
-                    else{
-                        eventRect.top =  j*mAllDayEventHeight+j*5;
+                    } else {
+                        eventRect.top = j * mAllDayEventHeight + j * 5;
                         eventRect.bottom = mAllDayEventHeight;
-                        eventRect.noofevent=columns.size();
+                        eventRect.noofevent = columns.size();
                     }
                     mEventRects.add(eventRect);
                 }
@@ -1412,9 +1533,9 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         }
     }
 
-
     /**
      * Checks if two events overlap.
+     *
      * @param event1 The first event.
      * @param event2 The second event.
      * @return true if the events overlap.
@@ -1427,9 +1548,9 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         return !((start1 >= end2) || (end1 <= start2));
     }
 
-
     /**
      * Checks if time1 occurs after (or at the same time) time2.
+     *
      * @param time1 The time to check.
      * @param time2 The time to check against.
      * @return true if time1 and time2 are equal or if time1 is after time2. Otherwise false.
@@ -1444,38 +1565,41 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         mAreDimensionsInvalid = true;
     }
 
+    public void setOnEventClickListener(EventClickListener listener) {
+        this.mEventClickListener = listener;
+    }
+
+    public void setshadow(View shadow) {
+        this.shadow = shadow;
+    }
+
     /////////////////////////////////////////////////////////////////
     //
     //      Functions related to setting and getting the properties.
     //
     /////////////////////////////////////////////////////////////////
 
-    public void setOnEventClickListener (EventClickListener listener) {
-        this.mEventClickListener = listener;
-    }
-    public void setshadow (View shadow) {
-        this.shadow = shadow;
-    }
-    public void setfont (Typeface typeface,int type) {
-     if (type==0){
-         mTimeTextPaint.setTypeface(typeface);
-         jHeaderTextPaint.setTypeface(ResourcesCompat.getFont(mContext,R.font.latoregular));
+    public void setfont(Typeface typeface, int type) {
+        if (type == 0) {
+            mTimeTextPaint.setTypeface(typeface);
+            jHeaderTextPaint.setTypeface(ResourcesCompat.getFont(mContext, R.font.latoregular));
 
 
-     }
-     else{
-         mHeaderTextPaint.setTypeface(typeface);
-         jheaderEventTextpaint.setTypeface(typeface);
+        } else {
+            mHeaderTextPaint.setTypeface(typeface);
+            jheaderEventTextpaint.setTypeface(typeface);
 
-     }
-     invalidate();
+        }
+        invalidate();
 
     }
+
     public EventClickListener getEventClickListener() {
         return mEventClickListener;
     }
 
-    public @Nullable MonthLoader.MonthChangeListener getMonthChangeListener() {
+    public @Nullable
+    MonthLoader.MonthChangeListener getMonthChangeListener() {
         if (mWeekViewLoader instanceof MonthLoader)
             return ((MonthLoader) mWeekViewLoader).getOnMonthChangeListener();
         return null;
@@ -1489,9 +1613,10 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      * Get event loader in the week view. Event loaders define the  interval after which the events
      * are loaded in week view. For a MonthLoader events are loaded for every month. You can define
      * your custom event loader by extending WeekViewLoader.
+     *
      * @return The event loader.
      */
-    public WeekViewLoader getWeekViewLoader(){
+    public WeekViewLoader getWeekViewLoader() {
         return mWeekViewLoader;
     }
 
@@ -1499,9 +1624,10 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      * Set event loader in the week view. For example, a MonthLoader. Event loaders define the
      * interval after which the events are loaded in week view. For a MonthLoader events are loaded
      * for every month. You can define your custom event loader by extending WeekViewLoader.
+     *
      * @param loader The event loader.
      */
-    public void setWeekViewLoader(WeekViewLoader loader){
+    public void setWeekViewLoader(WeekViewLoader loader) {
         this.mWeekViewLoader = loader;
     }
 
@@ -1513,32 +1639,33 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         this.mEventLongPressListener = eventLongPressListener;
     }
 
-    public void setEmptyViewClickListener(EmptyViewClickListener emptyViewClickListener){
-        this.mEmptyViewClickListener = emptyViewClickListener;
-    }
-
-    public EmptyViewClickListener getEmptyViewClickListener(){
+    public EmptyViewClickListener getEmptyViewClickListener() {
         return mEmptyViewClickListener;
     }
 
-    public void setEmptyViewLongPressListener(EmptyViewLongPressListener emptyViewLongPressListener){
-        this.mEmptyViewLongPressListener = emptyViewLongPressListener;
+    public void setEmptyViewClickListener(EmptyViewClickListener emptyViewClickListener) {
+        this.mEmptyViewClickListener = emptyViewClickListener;
     }
 
-    public EmptyViewLongPressListener getEmptyViewLongPressListener(){
+    public EmptyViewLongPressListener getEmptyViewLongPressListener() {
         return mEmptyViewLongPressListener;
     }
 
-    public void setScrollListener(ScrollListener scrolledListener){
-        this.mScrollListener = scrolledListener;
+    public void setEmptyViewLongPressListener(EmptyViewLongPressListener emptyViewLongPressListener) {
+        this.mEmptyViewLongPressListener = emptyViewLongPressListener;
     }
 
-    public ScrollListener getScrollListener(){
+    public ScrollListener getScrollListener() {
         return mScrollListener;
+    }
+
+    public void setScrollListener(ScrollListener scrolledListener) {
+        this.mScrollListener = scrolledListener;
     }
 
     /**
      * Get the interpreter which provides the text to show in the header column and the header row.
+     *
      * @return The date, time interpreter.
      */
     public DateTimeInterpreter getDateTimeInterpreter() {
@@ -1556,12 +1683,13 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
                         return "";
                     }
                 }
+
                 @Override
                 public String interpretDate(Calendar date) {
                     int dayOfMonth = date.get(Calendar.DAY_OF_MONTH);
 
 
-                    return dayOfMonth+"" ;
+                    return dayOfMonth + "";
                 }
 
                 @Override
@@ -1585,18 +1713,19 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Set the interpreter which provides the text to show in the header column and the header row.
+     *
      * @param dateTimeInterpreter The date, time interpreter.
      */
-    public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter){
+    public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter) {
         this.mDateTimeInterpreter = dateTimeInterpreter;
 
         // Refresh time column width.
         initTextTimeWidth();
     }
 
-
     /**
      * Get the number of visible days in a week.
+     *
      * @return The number of visible days in a week.
      */
     public int getNumberOfVisibleDays() {
@@ -1605,6 +1734,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Set the number of visible days in a week.
+     *
      * @param numberOfVisibleDays The number of visible days in a week.
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
@@ -1640,13 +1770,14 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      * Set the first day of the week. First day of the week is used only when the week view is first
      * drawn. It does not of any effect after user starts scrolling horizontally.
      * <p>
-     *     <b>Note:</b> This method will only work if the week view is set to display more than 6 days at
-     *     once.
+     * <b>Note:</b> This method will only work if the week view is set to display more than 6 days at
+     * once.
      * </p>
+     *
      * @param firstDayOfWeek The supported values are {@link java.util.Calendar#SUNDAY},
-     * {@link java.util.Calendar#MONDAY}, {@link java.util.Calendar#TUESDAY},
-     * {@link java.util.Calendar#WEDNESDAY}, {@link java.util.Calendar#THURSDAY},
-     * {@link java.util.Calendar#FRIDAY}.
+     *                       {@link java.util.Calendar#MONDAY}, {@link java.util.Calendar#TUESDAY},
+     *                       {@link java.util.Calendar#WEDNESDAY}, {@link java.util.Calendar#THURSDAY},
+     *                       {@link java.util.Calendar#FRIDAY}.
      */
     public void setFirstDayOfWeek(int firstDayOfWeek) {
         mFirstDayOfWeek = firstDayOfWeek;
@@ -1813,6 +1944,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     /**
      * <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} and
      * {@link #getDateTimeInterpreter()} instead.
+     *
      * @return Either long or short day name is being used.
      */
     @Deprecated
@@ -1824,9 +1956,8 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      * Set the length of the day name displayed in the header row. Example of short day names is
      * 'M' for 'Monday' and example of long day names is 'Mon' for 'Monday'.
      * <p>
-     *     <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} instead.
+     * <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} instead.
      * </p>
-
      */
     @Deprecated
     public void setDayNameLength(int length) {
@@ -1842,6 +1973,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Set the gap between overlapping events.
+     *
      * @param overlappingEventGap The gap between overlapping events.
      */
     public void setOverlappingEventGap(int overlappingEventGap) {
@@ -1869,6 +2001,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     /**
      * Set the top and bottom margin of the event. The event will release this margin from the top
      * and bottom edge. This margin is useful for differentiation consecutive events.
+     *
      * @param eventMarginVertical The top and bottom margin.
      */
     public void setEventMarginVertical(int eventMarginVertical) {
@@ -1878,6 +2011,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Returns the first visible day in the week view.
+     *
      * @return The first visible day in the week view.
      */
     public Calendar getFirstVisibleDay() {
@@ -1886,6 +2020,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Returns the last visible day in the week view.
+     *
      * @return The last visible day in the week view.
      */
     public Calendar getLastVisibleDay() {
@@ -1894,6 +2029,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get the scrolling speed factor in horizontal direction.
+     *
      * @return The speed factor in horizontal direction.
      */
     public float getXScrollingSpeed() {
@@ -1902,6 +2038,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Sets the speed for horizontal scrolling.
+     *
      * @param xScrollingSpeed The new horizontal scrolling speed.
      */
     public void setXScrollingSpeed(float xScrollingSpeed) {
@@ -1912,6 +2049,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      * Whether weekends should have a background color different from the normal day background
      * color. The weekend background colors are defined by the attributes
      * `futureWeekendBackgroundColor` and `pastWeekendBackgroundColor`.
+     *
      * @return True if weekends should have different background colors.
      */
     public boolean isShowDistinctWeekendColor() {
@@ -1922,6 +2060,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      * Set whether weekends should have a background color different from the normal day background
      * color. The weekend background colors are defined by the attributes
      * `futureWeekendBackgroundColor` and `pastWeekendBackgroundColor`.
+     *
      * @param showDistinctWeekendColor True if weekends should have different background colors.
      */
     public void setShowDistinctWeekendColor(boolean showDistinctWeekendColor) {
@@ -1933,6 +2072,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      * Whether past and future days should have two different background colors. The past and
      * future day colors are defined by the attributes `futureBackgroundColor` and
      * `pastBackgroundColor`.
+     *
      * @return True if past and future days should have two different background colors.
      */
     public boolean isShowDistinctPastFutureColor() {
@@ -1943,6 +2083,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
      * Set whether weekends should have a background color different from the normal day background
      * color. The past and future day colors are defined by the attributes `futureBackgroundColor`
      * and `pastBackgroundColor`.
+     *
      * @param showDistinctPastFutureColor True if past and future should have two different
      *                                    background colors.
      */
@@ -1954,6 +2095,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     /**
      * Get whether "now" line should be displayed. "Now" line is defined by the attributes
      * `nowLineColor` and `nowLineThickness`.
+     *
      * @return True if "now" line should be displayed.
      */
     public boolean isShowNowLine() {
@@ -1963,6 +2105,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     /**
      * Set whether "now" line should be displayed. "Now" line is defined by the attributes
      * `nowLineColor` and `nowLineThickness`.
+     *
      * @param showNowLine True if "now" line should be displayed.
      */
     public void setShowNowLine(boolean showNowLine) {
@@ -1972,6 +2115,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get the "now" line color.
+     *
      * @return The color of the "now" line.
      */
     public int getNowLineColor() {
@@ -1980,6 +2124,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Set the "now" line color.
+     *
      * @param nowLineColor The color of the "now" line.
      */
     public void setNowLineColor(int nowLineColor) {
@@ -1989,6 +2134,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get the "now" line thickness.
+     *
      * @return The thickness of the "now" line.
      */
     public int getNowLineThickness() {
@@ -1997,6 +2143,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Set the "now" line thickness.
+     *
      * @param nowLineThickness The thickness of the "now" line.
      */
     public void setNowLineThickness(int nowLineThickness) {
@@ -2006,6 +2153,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get whether the week view should fling horizontally.
+     *
      * @return True if the week view has horizontal fling enabled.
      */
     public boolean isHorizontalFlingEnabled() {
@@ -2014,6 +2162,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Set whether the week view should fling horizontally.
+     *
      * @return True if it should have horizontal fling enabled.
      */
     public void setHorizontalFlingEnabled(boolean enabled) {
@@ -2022,6 +2171,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get whether the week view should fling vertically.
+     *
      * @return True if the week view has vertical fling enabled.
      */
     public boolean isVerticalFlingEnabled() {
@@ -2030,6 +2180,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Set whether the week view should fling vertically.
+     *
      * @return True if it should have vertical fling enabled.
      */
     public void setVerticalFlingEnabled(boolean enabled) {
@@ -2038,6 +2189,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get the height of AllDay-events.
+     *
      * @return Height of AllDay-events.
      */
     public int getAllDayEventHeight() {
@@ -2053,6 +2205,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get scroll duration
+     *
      * @return scroll duration
      */
     public int getScrollDuration() {
@@ -2066,23 +2219,83 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         mScrollDuration = scrollDuration;
     }
 
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Functions related to scrolling.
-    //
-    /////////////////////////////////////////////////////////////////
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-      if (isclosed())return false;
+        if (isclosed()) return false;
 
         mScaleDetector.onTouchEvent(event);
         boolean val = mGestureDetector.onTouchEvent(event);
 
         // Check after call of mGestureDetector, so mCurrentFlingDirection and mCurrentScrollDirection are set.
         if (event.getAction() == MotionEvent.ACTION_UP && !mIsZooming && mCurrentFlingDirection == Direction.NONE) {
+
             if (mCurrentScrollDirection == Direction.RIGHT || mCurrentScrollDirection == Direction.LEFT) {
-                goToNearestOrigin();
+                Log.e("up", mCurrentOrigin.x + "");
+                if (true) {
+
+                    float k = 0;
+                    if (mCurrentScrollDirection == Direction.RIGHT && getNumberOfVisibleDays() == 1)
+                        k = mHeaderColumnWidth;
+                    int next = 0;
+
+                    if (getNumberOfVisibleDays()==7){
+                        if (mCurrentScrollDirection == Direction.LEFT) {
+                            next = (int) (weekx - mWidthPerDay*7);
+                        } else {
+                            next = (int) (weekx + mWidthPerDay*7);
+                        }
+                    }
+                    else {
+                        if (mCurrentScrollDirection == Direction.LEFT) {
+                            next = (int) (weekx - mWidthPerDay);
+                        } else {
+                            next = (int) (weekx + mWidthPerDay);
+                        }
+                    }
+
+                    int previous = (int) weekx;
+//                    if (mCurrentOrigin.x<0){
+//                        next*=-1;
+//                        previous*=-1;
+//                    }
+                    if (Math.abs(Math.abs(mCurrentOrigin.x + k) - Math.abs(next)) < Math.abs(Math.abs(mCurrentOrigin.x + k) - Math.abs(previous))) {
+                        Log.e("realnext", previous + "," + mCurrentOrigin.x + "," + next + "");
+
+
+                        mCurrentOrigin.x = next;
+
+                        ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                invalidate();
+                            }
+                        },100);
+
+                    } else {
+                        Log.e("realprev", previous + "," + mCurrentOrigin.x + "," + next + "");
+
+                        mCurrentOrigin.x = previous;
+
+                        ViewCompat.postInvalidateOnAnimation(WeekView.this);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                invalidate();
+                            }
+                        },100);
+
+                    }
+
+//                    float small=Math.min(Math.abs(next-mCurrentOrigin.x),Math.abs(previous-mCurrentOrigin.x));
+//                    int j=1;
+//                    if (mCurrentOrigin.x<0)j=-1;
+//                    mCurrentOrigin.x=(small-mCurrentOrigin.x)*j;
+//                    invalidate();
+
+
+                }
+                //goToNearestOrigin();
             }
             mCurrentScrollDirection = Direction.NONE;
         }
@@ -2090,8 +2303,13 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         return val;
     }
 
-    private void goToNearestOrigin(){
+    private void goToNearestOrigin() {
+
         double leftDays = mCurrentOrigin.x / (mWidthPerDay + mColumnGap);
+        if (getNumberOfVisibleDays() == 1 && mCurrentScrollDirection == Direction.RIGHT) {
+            leftDays = (mCurrentOrigin.x + mHeaderColumnWidth) / (mWidthPerDay + mColumnGap);
+
+        }
 
         if (mCurrentFlingDirection != Direction.NONE) {
             // snap to nearest day
@@ -2106,7 +2324,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             // snap to nearest day
             leftDays = Math.round(leftDays);
         }
-
+        Log.e("xpos", mCurrentOrigin.x + "," + mHeaderColumnWidth + "," + leftDays + "," + mCurrentScrollDirection);
         int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay + mColumnGap));
 
         if (nearestOrigin != 0) {
@@ -2120,29 +2338,75 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         mCurrentScrollDirection = mCurrentFlingDirection = Direction.NONE;
     }
 
+    /////////////////////////////////////////////////////////////////
+    //
+    //      Functions related to scrolling.
+    //
+    /////////////////////////////////////////////////////////////////
+
+    private void goToNearestOrigin1() {
+
+        double leftDays = mCurrentOrigin.x / (mWidthPerDay + mColumnGap);
+        if (getNumberOfVisibleDays() == 1 && mCurrentScrollDirection == Direction.RIGHT) {
+            leftDays = (mCurrentOrigin.x + mHeaderColumnWidth) / (mWidthPerDay + mColumnGap);
+
+        }
+
+        if (mCurrentFlingDirection != Direction.NONE) {
+            // snap to nearest day
+            leftDays = Math.round(leftDays);
+        } else if (mCurrentScrollDirection == Direction.LEFT) {
+            // snap to last day
+            leftDays = Math.ceil(leftDays);
+        } else if (mCurrentScrollDirection == Direction.RIGHT) {
+            // snap to next day
+            leftDays = Math.floor(leftDays);
+        } else {
+            // snap to nearest day
+            leftDays = Math.round(leftDays);
+        }
+        Log.e("xpos", mCurrentOrigin.x + "," + mHeaderColumnWidth + "," + leftDays + "," + mCurrentScrollDirection);
+        int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay + mColumnGap));
+
+        if (nearestOrigin != 0) {
+            // Stop current animation.
+            mScroller.forceFinished(true);
+            // Snap to date.
+            mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / mWidthPerDay * mScrollDuration));
+            ViewCompat.postInvalidateOnAnimation(WeekView.this);
+        }
+        // Reset scrolling and fling direction.
+        mCurrentScrollDirection = mCurrentFlingDirection = Direction.NONE;
+    }
 
     @Override
     public void computeScroll() {
         super.computeScroll();
-
-        if (mScroller.isFinished()) {
-            if (mCurrentFlingDirection != Direction.NONE) {
-                // Snap to day after fling is finished.
-                goToNearestOrigin();
-            }
-        } else {
-            if (mCurrentFlingDirection != Direction.NONE && forceFinishScroll()) {
-                goToNearestOrigin();
-            } else if (mScroller.computeScrollOffset()) {
-                mCurrentOrigin.y = mScroller.getCurrY();
-                mCurrentOrigin.x = mScroller.getCurrX();
-                ViewCompat.postInvalidateOnAnimation(this);
-            }
-        }
+//        if (mScroller.isFinished()) {
+//            if (mCurrentFlingDirection != Direction.NONE) {
+//                // Snap to day after fling is finished.
+//                Log.e("flingcall","flh"+mScroller.getCurrVelocity());
+//               goToNearestOrigin();
+//            }
+//        } else {
+//
+//            if (mCurrentFlingDirection != Direction.NONE && forceFinishScroll()) {
+//                Log.e("flingcall","finish"+mScroller.getStartX()+","+mMinimumFlingVelocity);
+//
+//               goToNearestOrigin();
+//            }
+//            else if (mScroller.computeScrollOffset()) {
+//                Log.e("flingcall","main"+mScroller.getStartX()+","+mMinimumFlingVelocity);
+//                mCurrentOrigin.y = mScroller.getCurrY();
+//                mCurrentOrigin.x = mScroller.getCurrX();
+//                ViewCompat.postInvalidateOnAnimation(this);
+//            }
+//        }
     }
 
     /**
      * Check if scrolling should be stopped.
+     *
      * @return true if scrolling should be stopped before reaching the end of animation.
      */
     private boolean forceFinishScroll() {
@@ -2153,18 +2417,12 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             return false;
         }
     }
-    public boolean isclosed(){
 
-        MainActivity mainActivity= (MainActivity) mContext;
+    public boolean isclosed() {
+
+        MainActivity mainActivity = (MainActivity) mContext;
         return mainActivity.isAppBarExpanded();
     }
-
-
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Public methods.
-    //
-    /////////////////////////////////////////////////////////////////
 
     /**
      * Show today on the week view.
@@ -2176,6 +2434,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Show a specific day on the week view.
+     *
      * @param date The date to show.
      */
     public void goToDate(Calendar date) {
@@ -2187,7 +2446,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         date.set(Calendar.SECOND, 0);
         date.set(Calendar.MILLISECOND, 0);
 
-        if(mAreDimensionsInvalid) {
+        if (mAreDimensionsInvalid) {
             mScrollToDay = date;
             return;
         }
@@ -2203,24 +2462,32 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
         long day = 1000L * 60L * 60L * 24L;
         long dateInMillis = date.getTimeInMillis() + date.getTimeZone().getOffset(date.getTimeInMillis());
         long todayInMillis = today.getTimeInMillis() + today.getTimeZone().getOffset(today.getTimeInMillis());
-        long dateDifference = (dateInMillis/day) - (todayInMillis/day);
-        mCurrentOrigin.x = - dateDifference * (mWidthPerDay + mColumnGap);
+        long dateDifference = (dateInMillis / day) - (todayInMillis / day);
+        mCurrentOrigin.x = -dateDifference * (mWidthPerDay + mColumnGap);
         invalidate();
     }
+
+
+    /////////////////////////////////////////////////////////////////
+    //
+    //      Public methods.
+    //
+    /////////////////////////////////////////////////////////////////
 
     /**
      * Refreshes the view and loads the events again.
      */
-    public void notifyDatasetChanged(){
+    public void notifyDatasetChanged() {
         mRefreshEvents = true;
         invalidate();
     }
 
     /**
      * Vertically scroll to a specific hour in the week view.
+     *
      * @param hour The hour to scroll to in 24-hour format. Supported values are 0-24.
      */
-    public void goToHour(double hour){
+    public void goToHour(double hour) {
         if (mAreDimensionsInvalid) {
             mScrollToHour = hour;
             return;
@@ -2233,7 +2500,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
             verticalOffset = (int) (mHourHeight * hour);
 
         if (verticalOffset > mHourHeight * 24 - getHeight() + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom)
-            verticalOffset = (int)(mHourHeight * 24 - getHeight() + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom);
+            verticalOffset = (int) (mHourHeight * 24 - getHeight() + mHeaderHeight + mHeaderRowPadding * 3 + mHeaderMarginBottom);
 
         mCurrentOrigin.y = -verticalOffset;
         invalidate();
@@ -2241,12 +2508,26 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
 
     /**
      * Get the first hour that is visible on the screen.
+     *
      * @return The first hour that is visible.
      */
-    public double getFirstVisibleHour(){
+    public double getFirstVisibleHour() {
         return -mCurrentOrigin.y / mHourHeight;
     }
 
+    private enum Direction {
+        NONE, LEFT, RIGHT, VERTICAL
+    }
+
+    public interface EventClickListener {
+        /**
+         * Triggered when clicked on one existing event
+         *
+         * @param event:     event clicked.
+         * @param eventRect: view containing the clicked event.
+         */
+        void onEventClick(WeekViewEvent event, RectF eventRect);
+    }
 
 
     /////////////////////////////////////////////////////////////////
@@ -2255,18 +2536,9 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     //
     /////////////////////////////////////////////////////////////////
 
-    public interface EventClickListener {
-        /**
-         * Triggered when clicked on one existing event
-         * @param event: event clicked.
-         * @param eventRect: view containing the clicked event.
-         */
-        void onEventClick(WeekViewEvent event, RectF eventRect);
-    }
-
     public interface EventLongPressListener {
         /**
-         * @param event: event clicked.
+         * @param event:     event clicked.
          * @param eventRect: view containing the clicked event.
          */
         void onEventLongPress(WeekViewEvent event, RectF eventRect);
@@ -2275,6 +2547,7 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     public interface EmptyViewClickListener {
         /**
          * Triggered when the users clicks on a empty space of the calendar.
+         *
          * @param time: {@link Calendar} object set with the date and time of the clicked position on the view.
          */
         void onEmptyViewClicked(Calendar time);
@@ -2290,11 +2563,49 @@ canvasclipRect(canvas,0, mHeaderHeight + mHeaderRowPadding * 3-70, mHeaderColumn
     public interface ScrollListener {
         /**
          * Called when the first visible day has changed.
-         *
+         * <p>
          * (this will also be called during the first draw of the weekview)
+         *
          * @param newFirstVisibleDay The new first visible day
          * @param oldFirstVisibleDay The old first visible day (is null on the first call).
          */
         void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
+    }
+
+    /**
+     * A class to hold reference to the events and their visual representation. An EventRect is
+     * actually the rectangle that is drawn on the calendar for a given event. There may be more
+     * than one rectangle for a single event (an event that expands more than one day). In that
+     * case two instances of the EventRect will be used for a single event. The given event will be
+     * stored in "originalEvent". But the event that corresponds to rectangle the rectangle
+     * instance will be stored in "event".
+     */
+    private class EventRect {
+        public WeekViewEvent event;
+        public WeekViewEvent originalEvent;
+        public RectF rectF;
+        public float left;
+        public float width;
+        public float top;
+        public float bottom;
+        public int noofevent;
+
+        /**
+         * Create a new instance of event rect. An EventRect is actually the rectangle that is drawn
+         * on the calendar for a given event. There may be more than one rectangle for a single
+         * event (an event that expands more than one day). In that case two instances of the
+         * EventRect will be used for a single event. The given event will be stored in
+         * "originalEvent". But the event that corresponds to rectangle the rectangle instance will
+         * be stored in "event".
+         *
+         * @param event         Represents the event which this instance of rectangle represents.
+         * @param originalEvent The original event that was passed by the user.
+         * @param rectF         The rectangle.
+         */
+        public EventRect(WeekViewEvent event, WeekViewEvent originalEvent, RectF rectF) {
+            this.event = event;
+            this.rectF = rectF;
+            this.originalEvent = originalEvent;
+        }
     }
 }

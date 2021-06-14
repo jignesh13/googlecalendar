@@ -1,5 +1,7 @@
 package com.example.GoogleCalendar.weekview;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -19,10 +21,39 @@ public class WeekViewEvent {
     private String mLocation;
     private int mColor;
     private boolean mAllDay;
+    private int  daytype;
+    private boolean ismoreday;
+    private long noofday;
+
+    public void setNoofday(long noofday) {
+        this.noofday = noofday;
+    }
+
+    public long getNoofday() {
+        return noofday;
+    }
+
+    public boolean isIsmoreday() {
+        return ismoreday;
+    }
+
+    public void setDaytype(int daytype) {
+        this.daytype = daytype;
+    }
+
+    public int getDaytype() {
+        return daytype;
+    }
+
+    public void setIsmoreday(boolean ismoreday) {
+        this.ismoreday = ismoreday;
+    }
 
     public WeekViewEvent(){
 
     }
+
+
 
     /**
      * Initializes the event for week view.
@@ -180,13 +211,18 @@ public class WeekViewEvent {
         Calendar endTime = (Calendar) this.getEndTime().clone();
         endTime.add(Calendar.MILLISECOND, -1);
         if (!isSameDay(this.getStartTime(), endTime)) {
+            long remainingDays = Math.round((float) (endTime.getTimeInMillis() - getStartTime().getTimeInMillis()) / (24 * 60 * 60 * 1000));
             endTime = (Calendar) this.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
+            int k=1;
             WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay());
+            event1.setIsmoreday(true);
+            event1.setDaytype(k);
+            event1.setNoofday(remainingDays);
             event1.setColor(this.getColor());
             events.add(event1);
-
+            Log.e("testname1",this.getName());
             // Add other days.
             Calendar otherDay = (Calendar) this.getStartTime().clone();
             otherDay.add(Calendar.DATE, 1);
@@ -197,21 +233,31 @@ public class WeekViewEvent {
                 Calendar endOfOverDay = (Calendar) overDay.clone();
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
+
                 WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(), null, overDay, endOfOverDay, this.isAllDay());
                 eventMore.setColor(this.getColor());
+                eventMore.setIsmoreday(true);
+                k++;
+                eventMore.setDaytype(k);
+                eventMore.setNoofday(remainingDays);
                 events.add(eventMore);
 
                 // Add next day.
                 otherDay.add(Calendar.DATE, 1);
             }
-
+//
             // Add last day.
-            Calendar startTime = (Calendar) this.getEndTime().clone();
-            startTime.set(Calendar.HOUR_OF_DAY, 0);
-            startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event2 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), startTime, this.getEndTime(), this.isAllDay());
-            event2.setColor(this.getColor());
-            events.add(event2);
+//            Calendar startTime = (Calendar) this.getEndTime().clone();
+//            startTime.set(Calendar.HOUR_OF_DAY, 0);
+//            startTime.set(Calendar.MINUTE, 0);
+//
+//            WeekViewEvent event2 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), startTime, this.getEndTime(), this.isAllDay());
+//            event2.setColor(this.getColor());
+//            event2.setIsmoreday(true);
+//            event2.setNoofday(remainingDays);
+//            k++;
+//            event2.setDaytype(k);
+//            events.add(event2);
         }
         else{
             events.add(this);

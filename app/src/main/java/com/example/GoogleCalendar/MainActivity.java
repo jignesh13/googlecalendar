@@ -55,6 +55,7 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
 import java.text.SimpleDateFormat;
@@ -606,8 +607,8 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             isgivepermission=true;
-            LocalDate mintime = new LocalDate().minusYears(2);
-            LocalDate maxtime = new LocalDate().plusYears(2);
+            LocalDate mintime = new LocalDate().minusYears(5);
+            LocalDate maxtime = new LocalDate().plusYears(5);
             alleventlist = Utility.readCalendarEvent(this, mintime, maxtime);
             calendarView.init(alleventlist, mintime, maxtime);
             calendarView.setCurrentmonth(new LocalDate());
@@ -853,7 +854,7 @@ public class MainActivity extends AppCompatActivity
             LocalDate mintime = new LocalDate().minusYears(5);
             LocalDate maxtime = new LocalDate().plusYears(5);
             alleventlist = Utility.readCalendarEvent(this, mintime, maxtime);
-            calendarView.init(alleventlist, mintime.minusYears(10), maxtime.plusYears(10));
+            calendarView.init(alleventlist,mintime, maxtime);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -1828,6 +1829,9 @@ public class MainActivity extends AppCompatActivity
                     startTime.setTimeInMillis(eventInfo.starttime);
                     Calendar endTime = (Calendar) Calendar.getInstance(TimeZone.getTimeZone(eventInfo.timezone));
                     endTime.setTimeInMillis(eventInfo.endtime);
+                   int dau= Days.daysBetween(new LocalDate(eventInfo.endtime), new LocalDate(eventInfo.starttime)).getDays();
+                    Log.e("name",eventInfo.title+","+new LocalDate(eventInfo.endtime)+","+dau);
+
                     WeekViewEvent event = new WeekViewEvent(eventInfo.id, eventInfo.title, startTime, endTime);
 
                     event.setAllDay(eventInfo.isallday);

@@ -21,11 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import androidx.core.app.ActivityCompat;
-import me.everything.providers.android.calendar.Calendar;
-import me.everything.providers.android.calendar.CalendarProvider;
-import me.everything.providers.android.calendar.Event;
-import me.everything.providers.android.calendar.Instance;
-import me.everything.providers.core.Data;
 
 
 public class Utility {
@@ -90,6 +85,7 @@ public class Utility {
                     eventInfo.starttime = cursor.getLong(3);
                     eventInfo.endtime = cursor.getLong(4);
                     eventInfo.isallday = cursor.getInt(7) == 1 ? true : false;
+                    if (eventInfo.endtime-eventInfo.starttime>86400000)eventInfo.isallday=true;
                     eventInfo.eventtitles = new String[]{cursor.getString(1)};
                     eventInfo.title = cursor.getString(1);
                     eventInfo.timezone = cursor.getString(10);
@@ -126,6 +122,8 @@ public class Utility {
                         nextnode.starttime = Long.parseLong(cursor.getString(3));
                         nextnode.endtime = Long.parseLong(cursor.getString(4));
                         nextnode.isallday = cursor.getInt(7) == 1 ? true : false;
+                        if (eventInfo.endtime-eventInfo.starttime>86400000)eventInfo.isallday=true;
+
                         nextnode.title = cursor.getString(1);
                         nextnode.timezone = cursor.getString(10);
                         nextnode.eventcolor = cursor.getInt(8)==0? Color.parseColor("#009688"):cursor.getInt(8);
