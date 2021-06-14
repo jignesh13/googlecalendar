@@ -15,15 +15,40 @@ import static com.example.GoogleCalendar.weekview.WeekViewUtil.*;
  */
 public class WeekViewEvent {
     private long mId;
-    private Calendar mStartTime;
-    private Calendar mEndTime;
+    private Calendar mStartTime,actualstart;
+    private Calendar mEndTime,actualend;
     private String mName;
     private String mLocation;
+    private String accountname;
     private int mColor;
     private boolean mAllDay;
     private int  daytype;
     private boolean ismoreday;
     private long noofday;
+
+    public void setAccountname(String accountname) {
+        this.accountname = accountname;
+    }
+
+    public void setActualend(Calendar actualend) {
+        this.actualend = actualend;
+    }
+
+    public void setActualstart(Calendar actualstart) {
+        this.actualstart = actualstart;
+    }
+
+    public Calendar getActualend() {
+        return actualend;
+    }
+
+    public Calendar getActualstart() {
+        return actualstart;
+    }
+
+    public String getAccountname() {
+        return accountname;
+    }
 
     public void setNoofday(long noofday) {
         this.noofday = noofday;
@@ -99,13 +124,14 @@ public class WeekViewEvent {
      * @param endTime The time when the event ends.
      * @param allDay Is the event an all day event.
      */
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay) {
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay,String accountname) {
         this.mId = id;
         this.mName = name;
         this.mLocation = location;
         this.mStartTime = startTime;
         this.mEndTime = endTime;
         this.mAllDay = allDay;
+        this.accountname=accountname;
     }
 
     /**
@@ -116,8 +142,8 @@ public class WeekViewEvent {
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime) {
-        this(id, name, location, startTime, endTime, false);
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime,String accountname) {
+        this(id, name, location, startTime, endTime, false,accountname);
     }
 
     /**
@@ -127,8 +153,8 @@ public class WeekViewEvent {
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
-    public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime) {
-        this(id, name, null, startTime, endTime);
+    public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime,String accountname) {
+        this(id, name, null, startTime, endTime,accountname);
     }
 
 
@@ -216,9 +242,11 @@ public class WeekViewEvent {
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
             int k=1;
-            WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay());
+            WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay(),this.accountname);
             event1.setIsmoreday(true);
             event1.setDaytype(k);
+            event1.setActualstart(this.getStartTime());
+            event1.setActualend(this.getEndTime());
             event1.setNoofday(remainingDays);
             event1.setColor(this.getColor());
             events.add(event1);
@@ -234,9 +262,11 @@ public class WeekViewEvent {
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
 
-                WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(), null, overDay, endOfOverDay, this.isAllDay());
+                WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(), null, overDay, endOfOverDay, this.isAllDay(),this.accountname);
                 eventMore.setColor(this.getColor());
                 eventMore.setIsmoreday(true);
+                eventMore.setActualstart(this.getStartTime());
+                eventMore.setActualend(this.getEndTime());
                 k++;
                 eventMore.setDaytype(k);
                 eventMore.setNoofday(remainingDays);

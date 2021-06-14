@@ -227,12 +227,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
-                android:paddingLeft="80dp"
+                android:paddingLeft="64dp"
                 android:fontFamily="@font/googlesans_regular"
                 android:text="Bhai Duj"
-                android:textColor="#505050"
+                android:textColor="#000"
                 android:paddingRight="24dp"
-                android:textSize="24sp"
+                android:textSize="23sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/closebtn"  />
 
@@ -241,12 +241,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:fontFamily="@font/latoregular"
-                android:paddingRight="36dp"
+                android:fontFamily="@font/googlesans_regular"
+                android:paddingRight="8dp"
                 android:text=""
-                android:textColor="#3C3C3C"
+                android:textColor="#000"
                 android:textSize="16sp"
-                android:paddingLeft="80dp"
+                android:paddingLeft="64dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView12" />
@@ -263,17 +263,32 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView13" />
 
             <TextView
+                android:id="@+id/textView014"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/googlesans_regular"
+                android:paddingLeft="64dp"
+                android:text="Events"
+                android:textColor="#000"
+                android:textSize="15.5sp"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView13"
+                />
+
+            <TextView
                 android:id="@+id/textView14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/latoregular"
+                android:fontFamily="@font/googlesans_regular"
+                android:paddingLeft="64dp"
                 android:text="Holidays in India"
-                android:textColor="#3C3C3C"
-                android:textSize="16sp"
-                android:paddingLeft="80dp"
-                app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+                android:textColor="#787878"
+                android:textSize="13.6sp"
+                android:layout_marginTop="4dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/imageView2" />
+                app:layout_constraintTop_toBottomOf="@+id/textView014"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

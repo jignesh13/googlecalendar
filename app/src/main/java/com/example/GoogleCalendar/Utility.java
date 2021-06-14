@@ -62,7 +62,7 @@ public class Utility {
         Cursor cursor = context.getContentResolver().query(
                 CalendarContract.Events.CONTENT_URI,
                 new String[]{"_id", "title", "description",
-                        "dtstart", "dtend", "eventLocation", "account_name", CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_COLOR, CalendarContract.Events.CALENDAR_COLOR, CalendarContract.Events.EVENT_TIMEZONE}, null,
+                        "dtstart", "dtend", "eventLocation", "calendar_displayName", CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_COLOR, CalendarContract.Events.CALENDAR_COLOR, CalendarContract.Events.EVENT_TIMEZONE}, null,
                 null, null);
 
 
@@ -78,12 +78,13 @@ public class Utility {
 
             if (true) {
                 LocalDate localDate = getDate(Long.parseLong(cursor.getString(3)));
-                Log.e("Acc", cursor.getString(1) + "," + syncacc + "," + cursor.getInt(8) + "," + localDate);
+               // Log.e("Acc", cursor.getString(6) + "," + syncacc + "," + cursor.getInt(8) + "," + localDate);
                 if (!localDateHashMap.containsKey(localDate)) {
                     EventInfo eventInfo = new EventInfo();
                     eventInfo.id = cursor.getInt(0);
                     eventInfo.starttime = cursor.getLong(3);
                     eventInfo.endtime = cursor.getLong(4);
+                    eventInfo.accountname=cursor.getString(6);
                     eventInfo.isallday = cursor.getInt(7) == 1 ? true : false;
                     if (eventInfo.endtime-eventInfo.starttime>86400000)eventInfo.isallday=true;
                     eventInfo.eventtitles = new String[]{cursor.getString(1)};
@@ -125,6 +126,7 @@ public class Utility {
                         if (eventInfo.endtime-eventInfo.starttime>86400000)eventInfo.isallday=true;
 
                         nextnode.title = cursor.getString(1);
+                        nextnode.accountname=cursor.getString(6);
                         nextnode.timezone = cursor.getString(10);
                         nextnode.eventcolor = cursor.getInt(8)==0? Color.parseColor("#009688"):cursor.getInt(8);
                         prev.nextnode = nextnode;

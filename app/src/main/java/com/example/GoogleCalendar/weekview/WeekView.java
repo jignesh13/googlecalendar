@@ -315,10 +315,10 @@ public class WeekView extends View {
             // If the tap was on an event then trigger the callback.
             if (mEventRects != null && mEventClickListener != null) {
                 List<EventRect> reversedEventRects = mEventRects;
-                Collections.reverse(reversedEventRects);
+               // Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
-                        mEventClickListener.onEventClick(event.originalEvent, event.rectF);
+                        mEventClickListener.onEventClick(event.event, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
                         return super.onSingleTapConfirmed(e);
                     }
@@ -343,7 +343,7 @@ public class WeekView extends View {
 
             if (mEventLongPressListener != null && mEventRects != null) {
                 List<EventRect> reversedEventRects = mEventRects;
-                Collections.reverse(reversedEventRects);
+             //   Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
@@ -1168,7 +1168,7 @@ public class WeekView extends View {
                                             while (k>0&&mEventRects.get(k-1).event.isAllDay()&&mEventRects.get(k-1).event.getDaytype()==0){
                                                 k--;
                                             }
-                                            while (k>0&&mEventRects.get(k-1).event.isIsmoreday()&&ff>196){
+                                            while (k>0&&mEventRects.get(k-1).event.isIsmoreday()&&ff>mHeaderColumnWidth){
                                                 Log.e("ds",mEventRects.get(k-1).event.getName());
 
                                                 ff=ff-mWidthPerDay;
@@ -1180,7 +1180,7 @@ public class WeekView extends View {
 
                                             }
 
-                                            if (ff<196)ff=196;
+                                            if (ff<mHeaderColumnWidth)ff=mHeaderColumnWidth;
                                             canvas.drawText(mEventRects.get(i).event.getName(), ff+10, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
 
 

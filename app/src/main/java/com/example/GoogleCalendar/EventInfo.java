@@ -4,6 +4,7 @@ public class EventInfo {
     public String[] eventtitles;
     public boolean isallday;
     public int id;
+    public String accountname;
     public long starttime;
     public long endtime;
     public EventInfo nextnode;
