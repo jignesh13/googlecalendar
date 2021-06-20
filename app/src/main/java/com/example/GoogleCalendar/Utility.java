@@ -12,9 +12,12 @@ import android.provider.CalendarContract;
 import android.util.Log;
 
 import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 import java.util.HashMap;
@@ -85,11 +88,25 @@ public class Utility {
                     eventInfo.starttime = cursor.getLong(3);
                     eventInfo.endtime = cursor.getLong(4);
                     eventInfo.accountname=cursor.getString(6);
-                    eventInfo.isallday = cursor.getInt(7) == 1 ? true : false;
-                    if (eventInfo.endtime-eventInfo.starttime>86400000)eventInfo.isallday=true;
-                    eventInfo.eventtitles = new String[]{cursor.getString(1)};
-                    eventInfo.title = cursor.getString(1);
                     eventInfo.timezone = cursor.getString(10);
+                    eventInfo.eventtitles = new String[]{cursor.getString(1)};
+                    eventInfo.isallday = cursor.getInt(7) == 1 ? true : false;
+
+                    if (eventInfo.endtime-eventInfo.starttime>86400000){
+                        if (cursor.getInt(7)==0){
+                            eventInfo.endtime=eventInfo.endtime+86400000l;
+                        }
+
+                        LocalDateTime localDate1=new LocalDateTime( eventInfo.starttime, DateTimeZone.forID(eventInfo.timezone)).withTime(0,0,0,0);
+                        LocalDateTime localDate2=new LocalDateTime( eventInfo.endtime, DateTimeZone.forID(eventInfo.timezone)).withTime(23, 59, 59, 999);
+
+                        int day = Days.daysBetween(localDate1,localDate2).getDays();
+                        Log.e("tt",cursor.getString(1)+","+localDate1+","+localDate2+","+day);
+                        eventInfo.noofdayevent=day;
+                        eventInfo.isallday=true;
+                    }
+
+                    eventInfo.title = cursor.getString(1);
                     eventInfo.eventcolor = cursor.getInt(8)==0? Color.parseColor("#009688"):cursor.getInt(8);
 
                     localDateHashMap.put(localDate, eventInfo);
@@ -123,11 +140,26 @@ public class Utility {
                         nextnode.starttime = Long.parseLong(cursor.getString(3));
                         nextnode.endtime = Long.parseLong(cursor.getString(4));
                         nextnode.isallday = cursor.getInt(7) == 1 ? true : false;
-                        if (eventInfo.endtime-eventInfo.starttime>86400000)eventInfo.isallday=true;
+                        nextnode.timezone = cursor.getString(10);
+
+                        if (nextnode.endtime-nextnode.starttime>86400000){
+                            if (cursor.getInt(7)==0){
+                                nextnode.endtime=nextnode.endtime+86400000l;
+                            }
+                            nextnode.isallday=true;
+                            LocalDateTime localDate1=new LocalDateTime( nextnode.starttime, DateTimeZone.forID(nextnode.timezone)).withTime(0,0,0,0);
+                            LocalDateTime localDate2=new LocalDateTime( nextnode.endtime, DateTimeZone.forID(nextnode.timezone)).withTime(23, 59, 59, 999);
+
+
+                            int day = Days.daysBetween(localDate1,localDate2).getDays();
+                            Log.e("tt",cursor.getString(1)+","+localDate1+","+localDate2+","+ day);
+
+                            nextnode.noofdayevent=day;
+
+                        }
 
                         nextnode.title = cursor.getString(1);
                         nextnode.accountname=cursor.getString(6);
-                        nextnode.timezone = cursor.getString(10);
                         nextnode.eventcolor = cursor.getInt(8)==0? Color.parseColor("#009688"):cursor.getInt(8);
                         prev.nextnode = nextnode;
 

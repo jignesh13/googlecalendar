@@ -319,7 +319,6 @@ public class MainActivity extends AppCompatActivity
                     shape.setCornerRadius( getResources().getDimensionPixelSize(R.dimen.fourdp) );
                     shape.setColor(mycolor);
                     redlay.setBackground(shape);
-
                     redlay.setTranslationZ(0);
                     shadow.setVisibility(View.GONE);
                 }
@@ -945,7 +944,6 @@ public class MainActivity extends AppCompatActivity
     public void onEvent(MessageEvent event) {
 
         Log.e("call", "onEvent(MessageEvent event)");
-
         int previous = lastchangeindex;
         if (previous != -1) {
             int totalremove = 0;
@@ -1113,6 +1111,9 @@ public class MainActivity extends AppCompatActivity
     public void onEvent(final AddEvent event) {
         Log.e("call", "onEvent(final AddEvent event)");
         eventalllist = event.getArrayList();
+        for (EventModel eventModel:eventalllist){
+            Log.e("ffs",eventModel.getEventname());
+        }
 
 
         final TypedValue tv = new TypedValue();
@@ -1345,152 +1346,152 @@ public class MainActivity extends AppCompatActivity
 //        }
 //    }
 
-    class Myadapter extends RecyclerView.Adapter<Myadapter.MonthViewHolder> {
-
-        private Context context;
-        private int singleitemheight;
-        private int month;
-        private int year;
-        private int firstday;
-        private ArrayList<DayModel> dayModels;
-
-        public Myadapter(Context context, int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, EventInfo> alleventlist, int singleitemheight) {
-            this.context = context;
-            this.singleitemheight = singleitemheight;
-            this.month = month;
-            this.year = year;
-            this.firstday = page;
-            LocalDate prevmonth = new LocalDate(year, month, 1);
-
-            ArrayList<DayModel> adapterdata = new ArrayList<>(43);
-            for (int i = 0; i < 42; i++) {
-                if (i < page) {
-                    LocalDate localDate = prevmonth.minusDays(page - i);
-                    DayModel dayModel = new DayModel();
-                    dayModel.setDay(localDate.getDayOfMonth());
-                    dayModel.setMonth(localDate.getMonthOfYear());
-                    dayModel.setYear(localDate.getYear());
-                    if (alleventlist.containsKey(localDate)) {
-                        dayModel.setEvents(alleventlist.get(localDate).eventtitles);
-                    }
-
-                    dayModel.setIsenable(false);
-                    adapterdata.add(dayModel);
-
-                } else if (i >= dayModels.size() + page) {
-
-                    LocalDate localDate = prevmonth.plusDays(i - (page));
-                    DayModel dayModel = new DayModel();
-                    dayModel.setDay(localDate.getDayOfMonth());
-                    dayModel.setMonth(localDate.getMonthOfYear());
-                    dayModel.setYear(localDate.getYear());
-                    dayModel.setIsenable(false);
-                    if (alleventlist.containsKey(localDate)) {
-                        dayModel.setEvents(alleventlist.get(localDate).eventtitles);
-                    }
-                    adapterdata.add(dayModel);
-                } else {
-                    DayModel dayModel = dayModels.get(i - page);
-                    dayModel.setIsenable(true);
-                    LocalDate mydate = new LocalDate(year, month, dayModel.getDay());
-                    if (alleventlist.containsKey(mydate)) {
-                        dayModel.setEvents(alleventlist.get(mydate).eventtitles);
-                    }
-                    adapterdata.add(dayModels.get(i - page));
-
-                }
-            }
-            this.dayModels = adapterdata;
-        }
-
-        @Override
-        public Myadapter.MonthViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
-
-            View view = LayoutInflater.from(context).inflate(R.layout.monthgriditem, parent, false);
-            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-            layoutParams.height = singleitemheight;
-            view.setLayoutParams(layoutParams);
-            return new Myadapter.MonthViewHolder(view);
-
-        }
-
-
-        @Override
-        public void onBindViewHolder(Myadapter.MonthViewHolder holder, int position) {
-
-
-            holder.textView.setText(dayModels.get(position).getDay() + "");
-            if (dayModels.get(position).isenable()) {
-                holder.textView.setTextColor(Color.BLACK);
-            } else {
-                holder.textView.setTextColor(getResources().getColor(R.color.lightblack));
-
-            }
-
-            String names[] = dayModels.get(position).getEvents();
-            if (names != null) {
-                if (names.length == 1) {
-                    holder.event1.setVisibility(View.VISIBLE);
-                    holder.event2.setVisibility(View.GONE);
-                    holder.event3.setVisibility(View.GONE);
-                    holder.event2.setText("");
-                    holder.event3.setText("");
-                } else if (names.length == 2) {
-                    holder.event1.setVisibility(View.VISIBLE);
-                    holder.event2.setVisibility(View.VISIBLE);
-                    holder.event3.setVisibility(View.GONE);
-                    holder.event3.setText("");
-
-                } else {
-                    holder.event1.setVisibility(View.VISIBLE);
-                    holder.event2.setVisibility(View.VISIBLE);
-                    holder.event3.setVisibility(View.VISIBLE);
-                }
-                for (int i = 0; i < dayModels.get(position).getEvents().length; i++) {
-                    if (i == 0) holder.event1.setText(names[0]);
-                    else if (i == 1) holder.event2.setText(names[1]);
-                    else holder.event3.setText(names[2]);
-
-                }
-            } else {
-                holder.event1.setVisibility(View.GONE);
-                holder.event2.setVisibility(View.GONE);
-                holder.event3.setVisibility(View.GONE);
-
-            }
-
-
-        }
-
-        @Override
-        public int getItemCount() {
-
-            return 42;
-        }
-
-        class MonthViewHolder extends RecyclerView.ViewHolder {
-
-            private TextView textView;
-            private TextView event1;
-            private TextView event2;
-            private TextView event3;
-
-            public MonthViewHolder(View itemView) {
-                super(itemView);
-                textView = itemView.findViewById(R.id.textView8);
-                event1 = itemView.findViewById(R.id.event1);
-                event2 = itemView.findViewById(R.id.event2);
-                event3 = itemView.findViewById(R.id.event3);
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                });
-
-            }
-        }
-    }
+//    class Myadapter extends RecyclerView.Adapter<Myadapter.MonthViewHolder> {
+//
+//        private Context context;
+//        private int singleitemheight;
+//        private int month;
+//        private int year;
+//        private int firstday;
+//        private ArrayList<DayModel> dayModels;
+//
+//        public Myadapter(Context context, int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, EventInfo> alleventlist, int singleitemheight) {
+//            this.context = context;
+//            this.singleitemheight = singleitemheight;
+//            this.month = month;
+//            this.year = year;
+//            this.firstday = page;
+//            LocalDate prevmonth = new LocalDate(year, month, 1);
+//
+//            ArrayList<DayModel> adapterdata = new ArrayList<>(43);
+//            for (int i = 0; i < 42; i++) {
+//                if (i < page) {
+//                    LocalDate localDate = prevmonth.minusDays(page - i);
+//                    DayModel dayModel = new DayModel();
+//                    dayModel.setDay(localDate.getDayOfMonth());
+//                    dayModel.setMonth(localDate.getMonthOfYear());
+//                    dayModel.setYear(localDate.getYear());
+//                    if (alleventlist.containsKey(localDate)) {
+//                        dayModel.setEvents(alleventlist.get(localDate).eventtitles);
+//                    }
+//
+//                    dayModel.setIsenable(false);
+//                    adapterdata.add(dayModel);
+//
+//                } else if (i >= dayModels.size() + page) {
+//
+//                    LocalDate localDate = prevmonth.plusDays(i - (page));
+//                    DayModel dayModel = new DayModel();
+//                    dayModel.setDay(localDate.getDayOfMonth());
+//                    dayModel.setMonth(localDate.getMonthOfYear());
+//                    dayModel.setYear(localDate.getYear());
+//                    dayModel.setIsenable(false);
+//                    if (alleventlist.containsKey(localDate)) {
+//                        dayModel.setEvents(alleventlist.get(localDate).eventtitles);
+//                    }
+//                    adapterdata.add(dayModel);
+//                } else {
+//                    DayModel dayModel = dayModels.get(i - page);
+//                    dayModel.setIsenable(true);
+//                    LocalDate mydate = new LocalDate(year, month, dayModel.getDay());
+//                    if (alleventlist.containsKey(mydate)) {
+//                        dayModel.setEvents(alleventlist.get(mydate).eventtitles);
+//                    }
+//                    adapterdata.add(dayModels.get(i - page));
+//
+//                }
+//            }
+//            this.dayModels = adapterdata;
+//        }
+//
+//        @Override
+//        public Myadapter.MonthViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
+//
+//            View view = LayoutInflater.from(context).inflate(R.layout.monthgriditem, parent, false);
+//            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+//            layoutParams.height = singleitemheight;
+//            view.setLayoutParams(layoutParams);
+//            return new Myadapter.MonthViewHolder(view);
+//
+//        }
+//
+//
+//        @Override
+//        public void onBindViewHolder(Myadapter.MonthViewHolder holder, int position) {
+//
+//
+//            holder.textView.setText(dayModels.get(position).getDay() + "");
+//            if (dayModels.get(position).isenable()) {
+//                holder.textView.setTextColor(Color.BLACK);
+//            } else {
+//                holder.textView.setTextColor(getResources().getColor(R.color.lightblack));
+//
+//            }
+//
+//            String names[] = dayModels.get(position).getEvents();
+//            if (names != null) {
+//                if (names.length == 1) {
+//                    holder.event1.setVisibility(View.VISIBLE);
+//                    holder.event2.setVisibility(View.GONE);
+//                    holder.event3.setVisibility(View.GONE);
+//                    holder.event2.setText("");
+//                    holder.event3.setText("");
+//                } else if (names.length == 2) {
+//                    holder.event1.setVisibility(View.VISIBLE);
+//                    holder.event2.setVisibility(View.VISIBLE);
+//                    holder.event3.setVisibility(View.GONE);
+//                    holder.event3.setText("");
+//
+//                } else {
+//                    holder.event1.setVisibility(View.VISIBLE);
+//                    holder.event2.setVisibility(View.VISIBLE);
+//                    holder.event3.setVisibility(View.VISIBLE);
+//                }
+//                for (int i = 0; i < dayModels.get(position).getEvents().length; i++) {
+//                    if (i == 0) holder.event1.setText(names[0]);
+//                    else if (i == 1) holder.event2.setText(names[1]);
+//                    else holder.event3.setText(names[2]);
+//
+//                }
+//            } else {
+//                holder.event1.setVisibility(View.GONE);
+//                holder.event2.setVisibility(View.GONE);
+//                holder.event3.setVisibility(View.GONE);
+//
+//            }
+//
+//
+//        }
+//
+//        @Override
+//        public int getItemCount() {
+//
+//            return 42;
+//        }
+//
+//        class MonthViewHolder extends RecyclerView.ViewHolder {
+//
+//            private TextView textView;
+//            private TextView event1;
+//            private TextView event2;
+//            private TextView event3;
+//
+//            public MonthViewHolder(View itemView) {
+//                super(itemView);
+//                textView = itemView.findViewById(R.id.textView8);
+//                event1 = itemView.findViewById(R.id.event1);
+//                event2 = itemView.findViewById(R.id.event2);
+//                event3 = itemView.findViewById(R.id.event3);
+//                itemView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//
+//                    }
+//                });
+//
+//            }
+//        }
+//    }
 
     public class DateAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
 
@@ -1571,10 +1572,14 @@ public class MainActivity extends AppCompatActivity
             if (viewtype == 0 || viewtype == 5) {
 
                 ItemViewHolder holder = (ItemViewHolder) viewHolder;
+                GradientDrawable shape =  new GradientDrawable();
+                shape.setCornerRadius( getResources().getDimensionPixelSize(R.dimen.fourdp) );
+                shape.setColor(eventalllist.get(position).getColor());
               //  GradientDrawable drawable = (GradientDrawable) holder.eventtextview.getBackground();
 
 //               if (eventalllist.get(position).getType()==0)drawable.setColor(eventalllist.get(position).getColor());
 //               else drawable.setColor(Color.BLACK);
+                holder.eventtextview.setBackground(shape);
                 holder.eventtextview.setText(eventalllist.get(position).getEventname());
 
 
@@ -1681,24 +1686,54 @@ public class MainActivity extends AppCompatActivity
                             mAppBar.setExpanded(mIsExpanded, true);
                             return;
                         }
-                        eventnametextview.setText(eventalllist.get(getAdapterPosition()).getEventname());
-                        LocalDate localDate = eventalllist.get(getAdapterPosition()).getLocalDate();
-                        LocalDate todaydate = LocalDate.now();
-                        LocalDate nextday = localDate.plusDays(1);
-                        if (localDate.getYear() == todaydate.getYear()) {
-                            String rangetext = daysList[localDate.getDayOfWeek()] + ", " + localDate.toString("d MMM") ;
-                            eventrangetextview.setText(rangetext);
-                        } else {
-                            String rangetext = daysList[localDate.getDayOfWeek()] + ", " + localDate.toString("d MMM, YYYY") ;
+                       EventInfo eventInfo= alleventlist.get(eventalllist.get(getAdapterPosition()).getLocalDate());
+                        String sfs=eventalllist.get(getAdapterPosition()).getEventname();
+                        while (eventInfo!=null&&!sfs.startsWith(eventInfo.title)){
+                            eventInfo=eventInfo.nextnode;
+                        }
+
+                        eventnametextview.setText(eventInfo.title);
+
+                        if (eventInfo.isallday==false){
+                            LocalDateTime start=new LocalDateTime(eventInfo.starttime, DateTimeZone.forID(eventInfo.timezone));
+                            LocalDateTime end=new LocalDateTime(eventInfo.endtime, DateTimeZone.forID(eventInfo.timezone));
+                            String sf=start.toString("a").equals(end.toString("a"))?"":"a";
+                            String rangetext = daysList[start.getDayOfWeek()] + ", " + start.toString("d MMM") + " · " + start.toString("h:mm "+sf+"") + " - " + end.toString("h:mm a");
                             eventrangetextview.setText(rangetext);
                         }
-                        closebtn.setVisibility(View.GONE);
+                        else if (eventInfo.noofdayevent>1){
+                            LocalDate localDate=new LocalDate(eventInfo.starttime, DateTimeZone.forID(eventInfo.timezone));
+                            LocalDate todaydate = LocalDate.now();
+                            LocalDate nextday = localDate.plusDays(eventInfo.noofdayevent-1);
+                            if (localDate.getYear() == todaydate.getYear()) {
+                                String rangetext = daysList[localDate.getDayOfWeek()] + ", " + localDate.toString("d MMM") + " - " + daysList[nextday.getDayOfWeek()] + ", " + nextday.toString("d MMM");
+                                eventrangetextview.setText(rangetext);
+                            } else {
+                                String rangetext = daysList[localDate.getDayOfWeek()] + ", " + localDate.toString("d MMM, YYYY") + " - " + daysList[nextday.getDayOfWeek()] + ", " + nextday.toString("d MMM, YYYY");
+                                eventrangetextview.setText(rangetext);
+                            }
+                        }
+                        else {
+                            LocalDate localDate = new LocalDate(eventInfo.starttime);
+                            LocalDate todaydate = LocalDate.now();
+                            if (localDate.getYear() == todaydate.getYear()) {
+                                String rangetext = daysList[localDate.getDayOfWeek()] + ", " + localDate.toString("d MMM") ;
+                                eventrangetextview.setText(rangetext);
+                            } else {
+                                String rangetext = daysList[localDate.getDayOfWeek()] + ", " + localDate.toString("d MMM, YYYY") ;
+                                eventrangetextview.setText(rangetext);
+                            }
+                        }
+
+                        holidaytextview.setText(eventInfo.accountname);
+                        closebtn.setVisibility(View.VISIBLE);
                         eventnametextview.setVisibility(View.GONE);
                         roundrect.setVisibility(View.GONE);
                         eventrangetextview.setVisibility(View.GONE);
                         calendaricon.setVisibility(View.GONE);
                         holidaytextview.setVisibility(View.GONE);
                         eventfixstextview.setVisibility(View.GONE);
+
                         final View view = mNestedView.getLayoutManager().findViewByPosition(getAdapterPosition());
                         ViewGroup.LayoutParams layoutParams = redlay.getLayoutParams();
                         layoutParams.height = v.getHeight();
@@ -1710,7 +1745,7 @@ public class MainActivity extends AppCompatActivity
 
                             GradientDrawable shape =  new GradientDrawable();
                             shape.setCornerRadius( getResources().getDimensionPixelSize(R.dimen.fourdp) );
-                            mycolor=Color.parseColor("#009688");
+                            mycolor=eventalllist.get(getAdapterPosition()).getColor();
                             shape.setColor(mycolor);
                             redlay.setBackground(shape);
                             roundrect.setBackground(shape);

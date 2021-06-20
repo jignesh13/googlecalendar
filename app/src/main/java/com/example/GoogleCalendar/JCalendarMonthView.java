@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -26,7 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.widget.AutoScrollHelper;
 
-public class JCalendarMonthView extends View {
+public class JCalendarMonthView extends View  {
     float eachcellheight, eachcellwidth;
     long lastsec;
     int selectedcell;
@@ -39,10 +40,11 @@ public class JCalendarMonthView extends View {
     private Rect selectedrect;
     private boolean isup = false;
     private ArrayList<DayModel> dayModels;
+    private int mDefaultEventColor = Color.parseColor("#9fc6e7");
     private Rect mHeaderTextPaintRect;
     private Rect jDateTextPaintRect,jeventtextpaintRect;
     private int currentdaynameindex;
-
+    private GestureDetector mDetector;
     public JCalendarMonthView(Context context) {
         this(context, null);
     }
@@ -82,6 +84,7 @@ public class JCalendarMonthView extends View {
             linecolor = a.getColor(R.styleable.JCalendarMonthView_linecolor, Color.GRAY);
             linewidth = a.getDimensionPixelSize(R.styleable.JCalendarMonthView_linewidth, 2);
 
+            mDetector = new GestureDetector(context, new MyGestureListener());
 
 
 
@@ -93,6 +96,50 @@ public class JCalendarMonthView extends View {
         }
 
     }
+    // In the SimpleOnGestureListener subclass you should override
+    // onDown and any other gesture that you want to detect.
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d("TAG","onDown: ");
+
+            // don't return false here or else none of the other
+            // gestures will work
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            Log.i("TAG", "onSingleTapConfirmed: ");
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            Log.i("TAG", "onLongPress: ");
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            Log.i("TAG", "onDoubleTap: ");
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                float distanceX, float distanceY) {
+            Log.i("TAG", "onScroll: ");
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d("TAG", "onFling: ");
+            return true;
+        }
+    }
 
 //    @Override
 //    public boolean dispatchTouchEvent(MotionEvent event) {
@@ -102,8 +149,11 @@ public class JCalendarMonthView extends View {
 //        return super.dispatchTouchEvent(event);
 //    }
 
+
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
+
+
         final int xtouch = (int) motionEvent.getX();
         final int ytouch = (int) motionEvent.getY();
         if (ytouch < dayHeight) return true;
@@ -333,6 +383,7 @@ public class JCalendarMonthView extends View {
             begining = begining + eachcellheight;
 
         }
+        int[] topspace=new int[42];
         for (int i = 0; i < 7&&dayModels!=null&&dayModels.size()==42; i++) {
             for (int j = 0; j < 7 && i < 6; j++) {
 
@@ -341,6 +392,7 @@ public class JCalendarMonthView extends View {
                     else mHeaderTextPaint.setColor(daytextcolor);
                     canvas.drawText(dayname[j], (eachcellwidth * j + eachcellwidth / 2.0f) - mHeaderTextPaintRect.right / 2.0f, 5 + mHeaderTextPaintRect.height(), mHeaderTextPaint);
                 }
+
 
                 DayModel mydayModel=dayModels.get((i * 7) + j);
                 String ss =mydayModel.getDay()+"";
@@ -357,29 +409,112 @@ public class JCalendarMonthView extends View {
                 }
 
                 canvas.drawText(ss, ((eachcellwidth * j) + eachcellwidth / 2.0f), datemargintop + dayHeight + (i * eachcellheight) + jDateTextPaintRect.height(), jDateTextPaint);
-                if (mydayModel.getEvents()!=null) {
-                    RectF rect1 = new RectF();
-                    rect1.left = (eachcellwidth * j) - linewidth;
-                    rect1.right = (eachcellwidth * (j + 1));
-                    rect1.top = dayHeight + (i * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height());
-                    rect1.bottom = dayHeight + ((i + 1) * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height() + 50);
-                    canvas.save();
-                    canvas.clipRect(rect1);
-                    float constant = (2 * datemargintop) + dayHeight + (i * eachcellheight) + jDateTextPaintRect.height();
-                    for (int k = 0; k < mydayModel.getEvents().length; k++) {
-                        RectF colorrect = new RectF();
-                        if (j > 0) colorrect.left = rect1.left;
-                        else colorrect.left = rect1.left + 8;//0th column left padding
-                        colorrect.right = rect1.right - 12;
-                        colorrect.top = constant + (42 * k) + (3 * k);
+               EventInfo eventInfo=mydayModel.getEventInfo();
+                float constant = (2 * datemargintop) + dayHeight + (i * eachcellheight) + jDateTextPaintRect.height();
+                int k=topspace[(i*7)+j];
 
-                        colorrect.bottom = colorrect.top + 42;
-                        canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
+                while (eventInfo!=null) {
+                    Log.e("noofday",eventInfo.noofdayevent+","+eventInfo.title+","+k);
+                    int row=i;
+                    int col=j;
+                    int jnoofday=eventInfo.noofdayevent;
+                    if (jnoofday==0)jnoofday=1;
+                    if (jnoofday>1){
+                        boolean b=true;
+                        int myrow=row+1;
+                        if ((row*7)+col+jnoofday>=(myrow*7)){
+                            while (b&&myrow<6){
+                                if ((row*7)+col+jnoofday<((myrow+1)*7)){
+                                    int diff=(row*7)+j+jnoofday-(myrow)*7;
+                                    RectF rect1 = new RectF();
+                                    rect1.left = (eachcellwidth * 0) - linewidth;
+                                    rect1.right = (eachcellwidth * diff);
+                                    rect1.top = dayHeight + (myrow * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height());
+                                    rect1.bottom = dayHeight + ((myrow + 1) * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height() + 50);
+                                    canvas.save();
+                                    canvas.clipRect(rect1);
+                                    RectF colorrect = new RectF();
+                                    colorrect.left = rect1.left + 8;//0th column left padding
+                                    colorrect.right = rect1.right - 12;
+                                    float myconstant = (2 * datemargintop) + dayHeight + (myrow * eachcellheight) + jDateTextPaintRect.height();
+                                    int newk=topspace[(myrow*7)+0];
 
-                        canvas.drawText(mydayModel.getEvents()[k], colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
+                                    colorrect.top = myconstant + (42 * newk) + (3 * newk);
+                                    colorrect.bottom = colorrect.top + 42;
+                                    int color=eventInfo.eventcolor==0?mDefaultEventColor:eventInfo.eventcolor;
+                                    jeventRectPaint.setColor(color);
+                                    canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
+                                    canvas.drawText(eventInfo.title, colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
+                                    canvas.restore();
+
+                                    b=false;
+
+
+                                }
+                                else {
+                                    RectF rect1 = new RectF();
+                                    rect1.left = (eachcellwidth * 0) - linewidth;
+                                    rect1.right = (eachcellwidth * (0 + 7));
+                                    rect1.top = dayHeight + (myrow * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height());
+                                    rect1.bottom = dayHeight + ((myrow + 1) * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height() + 50);
+                                    canvas.save();
+                                    canvas.clipRect(rect1);
+                                    RectF colorrect = new RectF();
+                                    colorrect.left = rect1.left + 8;//0th column left padding
+                                    colorrect.right = rect1.right - 12;
+                                    float myconstant = (2 * datemargintop) + dayHeight + (myrow * eachcellheight) + jDateTextPaintRect.height();
+                                    int newk=topspace[(myrow*7)+0];
+
+                                    colorrect.top = myconstant + (42 * newk) + (3 * newk);
+                                    colorrect.bottom = colorrect.top + 42;
+                                    int color=eventInfo.eventcolor==0?mDefaultEventColor:eventInfo.eventcolor;
+                                    jeventRectPaint.setColor(color);
+                                    canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
+                                    canvas.drawText(eventInfo.title, colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
+                                    canvas.restore();
+
+                                }
+                                myrow++;
+                            }
+                        }
+
+                            int begin=(i*7)+j;
+
+                            for (int ia=1;ia<jnoofday;ia++){
+                                if (begin+ia>41)continue;
+                                topspace[begin+ia]= k+1;
+                                Log.e("update",eventInfo.title+","+ topspace[begin+ia]+","+(begin+ia));
+
+                            }
+
+
+
+
+
 
                     }
+
+
+                    RectF rect1 = new RectF();
+                    rect1.left = (eachcellwidth * col) - linewidth;
+                    rect1.right = (eachcellwidth * (col + jnoofday));
+                    rect1.top = dayHeight + (row * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height());
+                    rect1.bottom = dayHeight + ((row + 1) * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height() + 50);
+                    canvas.save();
+                    canvas.clipRect(rect1);
+                    RectF colorrect = new RectF();
+                    if (j > 0) colorrect.left = rect1.left;
+                    else colorrect.left = rect1.left + 8;//0th column left padding
+                    colorrect.right = rect1.right - 12;
+                    colorrect.top = constant + (42 * k) + (3 * k);
+                    colorrect.bottom = colorrect.top + 42;
+                    int color=eventInfo.eventcolor==0?mDefaultEventColor:eventInfo.eventcolor;
+                    jeventRectPaint.setColor(color);
+                    canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
+                    canvas.drawText(eventInfo.title, colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
                     canvas.restore();
+                    k++;
+                    eventInfo=eventInfo.nextnode;
                 }
             }
 

@@ -6,10 +6,27 @@ public class DayModel {
     private int year;
     private boolean today;
     private String[] events;
-
+    private int noofdayevent;
+    private EventInfo eventInfo;
     private boolean selected;
     private boolean eventlist;
     private boolean isenable;
+
+    public void setEventInfo(EventInfo eventInfo) {
+        this.eventInfo = eventInfo;
+    }
+
+    public EventInfo getEventInfo() {
+        return eventInfo;
+    }
+
+    public void setNoofdayevent(int noofdayevent) {
+        this.noofdayevent = noofdayevent;
+    }
+
+    public int getNoofdayevent() {
+        return noofdayevent;
+    }
 
     public boolean getEventlist() {
         return eventlist;

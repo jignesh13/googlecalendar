@@ -38,7 +38,7 @@ public class GooglecalenderView extends LinearLayout {
     private int currentmonth = 0;
     private LocalDate mindate, maxdate;
     private HashMap<LocalDate, EventInfo> eventuser = new HashMap<>();
-
+    private int mDefaultEventColor = Color.parseColor("#9fc6e7");
     public GooglecalenderView(Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.viewpagerlay, this);
@@ -107,7 +107,7 @@ public class GooglecalenderView extends LinearLayout {
     }
 
     public void init(HashMap<LocalDate, EventInfo> eventhashmap, LocalDate mindate, LocalDate maxdate) {
-        eventuser = eventhashmap;
+        eventuser = new HashMap<>(eventhashmap);
         viewPager = findViewById(R.id.viewpager);
 
         this.mindate = mindate;
@@ -335,7 +335,7 @@ public class GooglecalenderView extends LinearLayout {
                 int type = 0;
                 if (s.startsWith("todaydate")) type = 2;
                 else if (s.equals("start")) type = 1;
-                else if (s.contains("jigs")) type = 3;
+                else if (s.startsWith("tojigs")) type = 3;
                 else Log.e("event1",eventhash.get(localDateStringEntry.getKey()).eventcolor+"");
                 if (type == 2 && eventModelslist.get(eventModelslist.size() - 1).getType() == 0 && eventModelslist.get(eventModelslist.size() - 1).getLocalDate().equals(localDateStringEntry.getKey())) {
 
@@ -362,10 +362,38 @@ public class GooglecalenderView extends LinearLayout {
                         //  if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
                         i++;
                     }
-                    Log.e("event",s);
-                    eventModelslist.add(new EventModel(s, localDateStringEntry.getKey(), type));
-                    indextrack.put(localDateStringEntry.getKey(), i);
-                    i++;
+                    String ss=s;
+                    int color=mDefaultEventColor;
+                    if (type==0){
+                        EventInfo myinfo=eventhashmap.get(localDateStringEntry.getKey());
+                        while (myinfo!=null&&!myinfo.title.equals(s)){
+                            myinfo=myinfo.nextnode;
+                        }
+                        color=myinfo.eventcolor==0?mDefaultEventColor:myinfo.eventcolor;
+                        if (myinfo.noofdayevent>1){
+                            ss=ss+" ("+localDateStringEntry.getKey().toString("d MMMM")+"-"+localDateStringEntry.getKey().plusDays(myinfo.noofdayevent-1).toString("d MMMM")+")";
+                        }
+
+                    }
+//                    if (noofday>1&&type==0){
+//                        LocalDate as=localDateStringEntry.getKey();
+//                        for (int jj=0;jj<noofday;jj++){
+//                            eventModelslist.add(new EventModel(s, as.plusDays(jj), type));
+//                            indextrack.put(as.plusDays(jj).plusDays(1), i);
+//                            i++;
+//                            eventModelslist.add(new EventModel("dup", eventModelslist.get(eventModelslist.size() - 1).getLocalDate(), 200));
+//                            // if (!indextrack.containsKey(localDateStringEntry.getKey()))indextrack.put(localDateStringEntry.getKey(),i);
+//                            i++;
+//                        }
+//                    }
+//                    else {
+                    EventModel mModel=new EventModel(ss, localDateStringEntry.getKey(), type);
+                    mModel.setColor(color);
+                        eventModelslist.add(mModel);
+                        indextrack.put(localDateStringEntry.getKey(), i);
+                        i++;
+  //                  }
+
                 }
 
 

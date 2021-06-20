@@ -6,7 +6,7 @@ android {
     buildToolsVersion "30.0.1"
     defaultConfig {
         applicationId "com.example.GoogleCalendar"
-        minSdkVersion 23
+        minSdkVersion 26
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"

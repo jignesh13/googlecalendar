@@ -13,6 +13,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.icu.util.LocaleData;
 import android.os.Build;
 import android.os.Handler;
 import android.text.Layout;
@@ -910,6 +911,8 @@ public class WeekView extends View {
 
 
         startPixel = startFromPixel;
+        float begin=startPixel;
+        Calendar start= (Calendar) today.clone();
 
         for (int dayNumber = leftDaysWithGaps + 1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
             // Check if the day is today.
@@ -924,30 +927,33 @@ public class WeekView extends View {
                 jHeaderTextPaint.setColor(Color.BLACK);
 
             }
+            if (dayNumber==leftDaysWithGaps+1)start=day;
 
             // Draw the day labels.
             String dayLabel1 = getDateTimeInterpreter().interpretDate(day);
             String dayLabel = getDateTimeInterpreter().interpretday(day);
             if (dayLabel == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null date");
-            if (mNumberOfVisibleDays != 1)
-                canvas.drawLine(startPixel, mHeaderHeight + mHeaderRowPadding * 3 - 105, startPixel, getHeight(), mHourSeparatorPaint);
-            else
-                canvas.drawLine(startPixel, mHeaderRowPadding / 3.0f, startPixel, getHeight(), mHourSeparatorPaint);
+
 
             float x = startPixel + mWidthPerDay / 2;
             float xx = startPixel - mHeaderColumnWidth / 2.0f;
             float y = (mHeaderTextHeight + mHeaderRowPadding * 1.76f + jHeaderTextHeight) - jHeaderTextHeight / 2.0f;
 
             int size = getResources().getDimensionPixelSize(R.dimen.todaysize);
+            if (mNumberOfVisibleDays != 1)
+                canvas.drawLine(startPixel, mHeaderHeight + mHeaderRowPadding * 3 - 105, startPixel, getHeight(), mHourSeparatorPaint);
+            else{
+                canvas.drawLine(startPixel, mHeaderRowPadding / 3.0f, startPixel, getHeight(), mHourSeparatorPaint);
 
+            }
             if (mNumberOfVisibleDays == 1) {
                 if (sameDay)
                     canvas.drawRoundRect(xx - size, y - size, xx + size, y + size, size, size, mTodayBackgroundPaint);
 
                 canvas.drawText(dayLabel, startPixel - mHeaderColumnWidth / 2.0f, mHeaderTextHeight + mHeaderRowPadding / 3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
                 canvas.drawText(dayLabel1, startPixel - mHeaderColumnWidth / 2.0f, mHeaderTextHeight + mHeaderRowPadding * 1.76f + jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
-                drawAllDayEvents(day, startPixel, canvas,dayNumber);
+                drawAllDayEvents(day, startPixel, canvas,dayNumber,false);
 
 
             } else {
@@ -955,11 +961,13 @@ public class WeekView extends View {
                     canvas.drawRoundRect(x - size, y - size, x + size, y + size, size, size, mTodayBackgroundPaint);
                 canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding / 3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
                 canvas.drawText(dayLabel1, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding * 1.76f + jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
-               drawAllDayEvents(day, startPixel, canvas,dayNumber);
+
+                 drawAllDayEvents(day, startPixel, canvas,dayNumber,false);
 
 
 
             }
+
             if (mShowNowLine && sameDay) {
                 float startY = mHeaderHeight + mHeaderRowPadding * 3 + mTimeTextHeight / 2 + mHeaderMarginBottom + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();
@@ -993,6 +1001,27 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
 
         }
+
+//        jheaderEventTextpaint.setColor(Color.BLACK);
+//        Calendar jday = (Calendar) today.clone();
+//        int df = (int) (mCurrentOrigin.x/mWidthPerDay);
+//        jday.add(Calendar.DATE, -df);
+//        String tit="test";
+//        if (mEventRects != null && mEventRects.size() > 0) {
+//
+//            Log.e("size",mEventRects.size()+"");
+//            for (int i = 0; i < mEventRects.size(); i++) {
+//                if (isSameDay(mEventRects.get(i).event.getStartTime(), jday) && mEventRects.get(i).event.isAllDay()&&mEventRects.get(i).event.isIsmoreday()) {
+//                    tit=mEventRects.get(i).event.getName();
+//                    canvas.drawText(tit, mHeaderColumnWidth, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
+//                }
+//            }
+//        }
+
+
+
+
+
 
     }
 
@@ -1079,7 +1108,7 @@ public class WeekView extends View {
      * @param startFromPixel The left position of the day area. The events will never go any left from this value.
      * @param canvas         The canvas to draw upon.
      */
-    private void drawAllDayEvents(Calendar date, float startFromPixel, Canvas canvas,int daynumber) {
+    private void drawAllDayEvents(Calendar date, float startFromPixel, Canvas canvas,int daynumber,boolean check) {
 
         if (mEventRects != null && mEventRects.size() > 0) {
 
@@ -1132,74 +1161,53 @@ public class WeekView extends View {
                         boolean mycheck=getNumberOfVisibleDays()!=1&&mEventRects.get(i).event.isIsmoreday();
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
 
-                            if (mycheck){
+                        if (mycheck){
 
-                                if (true){
+                            if (true){
 
-                                    float startat = startFromPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startFromPixel;
-                                    float wid = mWidthPerDay;
-                                    mEventRects.get(i).rectF.left=startat;
-                                    if (mEventRects.get(i).event.getDaytype()!=1&&startat>200){
-                                        mEventRects.get(i).rectF.left=startat-mEventCornerRadius*2;
+                                float startat = startFromPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startFromPixel;
+                                float wid = mWidthPerDay;
+                                mEventRects.get(i).rectF.left=startat;
+                                if (mEventRects.get(i).event.getDaytype()!=1&&startat>200){
+                                    mEventRects.get(i).rectF.left=startat-mEventCornerRadius*2;
 
-                                    }
-
-                                    mEventRects.get(i).rectF.right=startFromPixel+(wid);
-                                    RectF fd= mEventRects.get(i).rectF;
-                                    if (mEventRects.get(i).event.getDaytype()==mEventRects.get(i).event.getNoofday())    {
-                                      fd.right=fd.right-10;
-                                    }
-                                    canvas.drawRoundRect(fd, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-
-                                    Log.e("ff"+daynumber,+startFromPixel+","+mEventRects.get(i).event.getDaytype()+","+mWidthPerDay+","+getWidth());
-                                    boolean cc=startFromPixel+mWidthPerDay>=getWidth();
-                                    if (mEventRects.get(i+1).event.isIsmoreday()==false)cc=true;
-
-
-                                        if (!cc){
-
-                                            canvas.drawText("", startat, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
-                                        }
-
-                                        else {
-                                            float ff=startat;
-                                            int k=i;
-
-                                            while (k>0&&mEventRects.get(k-1).event.isAllDay()&&mEventRects.get(k-1).event.getDaytype()==0){
-                                                k--;
-                                            }
-                                            while (k>0&&mEventRects.get(k-1).event.isIsmoreday()&&ff>mHeaderColumnWidth){
-                                                Log.e("ds",mEventRects.get(k-1).event.getName());
-
-                                                ff=ff-mWidthPerDay;
-                                                k--;
-                                                while (k>0&&mEventRects.get(k-1).event.isAllDay()&&mEventRects.get(k-1).event.getDaytype()==0){
-                                                    k--;
-                                                }
+                                }
+                                mEventRects.get(i).rectF.right=startFromPixel+(wid);
+                                RectF fd= mEventRects.get(i).rectF;
+                                if (mEventRects.get(i).event.getDaytype()==mEventRects.get(i).event.getNoofday())    {
+                                    fd.right=fd.right-10;
+                                }
+                                canvas.drawRoundRect(fd, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
+                                boolean cc=startFromPixel+mWidthPerDay>=getWidth();
+                                if (mEventRects.get(i+1).event.isIsmoreday()==false)cc=true;
+                                if (startFromPixel<mHeaderColumnWidth+5||mEventRects.get(i).event.getDaytype()==1){
+                                    Log.e("ff"+daynumber,+startFromPixel+","+mEventRects.get(i).event.getDaytype()+","+mHeaderColumnWidth+","+mWidthPerDay+","+new LocalDate(date.getTimeInMillis())+","+getWidth());
 
 
-                                            }
-
-                                            if (ff<mHeaderColumnWidth)ff=mHeaderColumnWidth;
-                                            canvas.drawText(mEventRects.get(i).event.getName(), ff+10, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
-
-
-                                        }
-
-
-
-
+                                    canvas.drawText(mEventRects.get(i).event.getName(), startat, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
 
                                 }
 
 
-                            }
-                            else {
 
-                                canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                                canvas.drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF.left + 12, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
+
+
+
+
+
+
+
 
                             }
+
+
+                        }
+                        else {
+
+                            canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
+                            canvas.drawText(mEventRects.get(i).event.getName(), mEventRects.get(i).rectF.left + 12, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
+
+                        }
                     } else
                         mEventRects.get(i).rectF = null;
                 }

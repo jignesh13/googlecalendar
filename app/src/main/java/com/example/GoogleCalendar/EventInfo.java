@@ -5,6 +5,7 @@ public class EventInfo {
     public boolean isallday;
     public int id;
     public String accountname;
+    public int noofdayevent;
     public long starttime;
     public long endtime;
     public EventInfo nextnode;

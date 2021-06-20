@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
@@ -63,7 +65,14 @@ public class MonthFragment extends Fragment {
                 dayModel.setMonth(localDate.getMonthOfYear());
                 dayModel.setYear(localDate.getYear());
                 if (alleventlist.containsKey(localDate)) {
-                    dayModel.setEvents(alleventlist.get(localDate).eventtitles);
+                    dayModel.setEventInfo(alleventlist.get(localDate));
+//                    if (alleventlist.get(localDate).isallday){
+//                        LocalDate localDate1=new LocalDate(alleventlist.get(localDate).starttime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
+//                        LocalDate localDate2=new LocalDate(alleventlist.get(localDate).endtime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
+//                       int day = Days.daysBetween(localDate1,localDate2).getDays();
+//                       dayModel.setNoofdayevent(day);
+//                       Log.e("noofday",dayModel.getEvents()[0]+","+day);
+//                    }
                 }
 
                 dayModel.setIsenable(false);
@@ -81,7 +90,14 @@ public class MonthFragment extends Fragment {
                 dayModel.setYear(localDate.getYear());
                 dayModel.setIsenable(false);
                 if (alleventlist.containsKey(localDate)) {
-                    dayModel.setEvents(alleventlist.get(localDate).eventtitles);
+                    dayModel.setEventInfo(alleventlist.get(localDate));
+//                    if (alleventlist.get(localDate).isallday){
+//                        LocalDate localDate1=new LocalDate(alleventlist.get(localDate).starttime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
+//                        LocalDate localDate2=new LocalDate(alleventlist.get(localDate).endtime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
+//                        int day = Days.daysBetween(localDate1,localDate2).getDays();
+//                        dayModel.setNoofdayevent(day);
+//                        Log.e("noofday",dayModel.getEvents()[0]+","+day);
+//                    }
                 }
                 adapterdata.add(dayModel);
             } else {
@@ -92,7 +108,14 @@ public class MonthFragment extends Fragment {
                 }
                 LocalDate mydate = new LocalDate(year, month, dayModel.getDay());
                 if (alleventlist.containsKey(mydate)) {
-                    dayModel.setEvents(alleventlist.get(mydate).eventtitles);
+                    dayModel.setEventInfo(alleventlist.get(mydate));
+//                    if (alleventlist.get(mydate).isallday){
+//                        LocalDate localDate1=new LocalDate(alleventlist.get(mydate).starttime, DateTimeZone.forID(alleventlist.get(mydate).timezone));
+//                        LocalDate localDate2=new LocalDate(alleventlist.get(mydate).endtime, DateTimeZone.forID(alleventlist.get(mydate).timezone));
+//                        int day = Days.daysBetween(localDate1,localDate2).getDays();
+//                        dayModel.setNoofdayevent(day);
+//                        Log.e("noofday",dayModel.getEvents()[0]+","+day);
+//                    }
                 }
                 adapterdata.add(dayModels.get(i - page));
 
