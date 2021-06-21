@@ -250,7 +250,7 @@ public class WeekViewEvent {
             event1.setNoofday(remainingDays);
             event1.setColor(this.getColor());
             events.add(event1);
-            Log.e("testname1",this.getName());
+
             // Add other days.
             Calendar otherDay = (Calendar) this.getStartTime().clone();
             otherDay.add(Calendar.DATE, 1);

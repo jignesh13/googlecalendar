@@ -181,7 +181,6 @@ public class WeekView extends View {
         public boolean onDown(MotionEvent e) {
 
             weekx = mCurrentOrigin.x;
-            Log.e("down", "down" + weekx);
             goToNearestOrigin();
             return true;
         }
@@ -254,7 +253,6 @@ public class WeekView extends View {
 
             mCurrentFlingDirection = mCurrentScrollDirection;
 
-            Log.e("curre", mCurrentOrigin.x + "," + mWidthPerDay + "," + weekx);
 
 
             float target = 0;
@@ -304,7 +302,6 @@ public class WeekView extends View {
                     invalidate();
                 }
             },100);
-            Log.e("curre1", mCurrentOrigin.x + "," + mWidthPerDay + "," + mCurrentFlingDirection);
 
 
             return true;
@@ -1181,7 +1178,6 @@ public class WeekView extends View {
                                 boolean cc=startFromPixel+mWidthPerDay>=getWidth();
                                 if (mEventRects.get(i+1).event.isIsmoreday()==false)cc=true;
                                 if (startFromPixel<mHeaderColumnWidth+5||mEventRects.get(i).event.getDaytype()==1){
-                                    Log.e("ff"+daynumber,+startFromPixel+","+mEventRects.get(i).event.getDaytype()+","+mHeaderColumnWidth+","+mWidthPerDay+","+new LocalDate(date.getTimeInMillis())+","+getWidth());
 
 
                                     canvas.drawText(mEventRects.get(i).event.getName(), startat, mEventRects.get(i).rectF.centerY() - jheaderEventheight, jheaderEventTextpaint);
@@ -2238,7 +2234,6 @@ public class WeekView extends View {
         if (event.getAction() == MotionEvent.ACTION_UP && !mIsZooming && mCurrentFlingDirection == Direction.NONE) {
 
             if (mCurrentScrollDirection == Direction.RIGHT || mCurrentScrollDirection == Direction.LEFT) {
-                Log.e("up", mCurrentOrigin.x + "");
                 if (true) {
 
                     float k = 0;
@@ -2267,7 +2262,6 @@ public class WeekView extends View {
 //                        previous*=-1;
 //                    }
                     if (Math.abs(Math.abs(mCurrentOrigin.x + k) - Math.abs(next)) < Math.abs(Math.abs(mCurrentOrigin.x + k) - Math.abs(previous))) {
-                        Log.e("realnext", previous + "," + mCurrentOrigin.x + "," + next + "");
 
 
                         mCurrentOrigin.x = next;
@@ -2281,7 +2275,6 @@ public class WeekView extends View {
                         },100);
 
                     } else {
-                        Log.e("realprev", previous + "," + mCurrentOrigin.x + "," + next + "");
 
                         mCurrentOrigin.x = previous;
 
@@ -2332,7 +2325,6 @@ public class WeekView extends View {
             // snap to nearest day
             leftDays = Math.round(leftDays);
         }
-        Log.e("xpos", mCurrentOrigin.x + "," + mHeaderColumnWidth + "," + leftDays + "," + mCurrentScrollDirection);
         int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay + mColumnGap));
 
         if (nearestOrigin != 0) {
@@ -2373,7 +2365,6 @@ public class WeekView extends View {
             // snap to nearest day
             leftDays = Math.round(leftDays);
         }
-        Log.e("xpos", mCurrentOrigin.x + "," + mHeaderColumnWidth + "," + leftDays + "," + mCurrentScrollDirection);
         int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay + mColumnGap));
 
         if (nearestOrigin != 0) {

@@ -414,7 +414,6 @@ public class JCalendarMonthView extends View  {
                 int k=topspace[(i*7)+j];
 
                 while (eventInfo!=null) {
-                    Log.e("noofday",eventInfo.noofdayevent+","+eventInfo.title+","+k);
                     int row=i;
                     int col=j;
                     int jnoofday=eventInfo.noofdayevent;
@@ -483,7 +482,6 @@ public class JCalendarMonthView extends View  {
                             for (int ia=1;ia<jnoofday;ia++){
                                 if (begin+ia>41)continue;
                                 topspace[begin+ia]= k+1;
-                                Log.e("update",eventInfo.title+","+ topspace[begin+ia]+","+(begin+ia));
 
                             }
 

@@ -479,7 +479,6 @@ public class MainActivity extends AppCompatActivity
         });
 
         eventalllist = new ArrayList<>();
-        Log.e("create", "oncreate" + eventalllist.size());
         indextrack = new HashMap<>();
         dupindextrack = new HashMap<>();
         mAppBar = findViewById(R.id.app_bar);
@@ -765,7 +764,6 @@ public class MainActivity extends AppCompatActivity
                     //calendarView.setLayoutParams(new CollapsingToolbarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,500));
                     int totalScrollRange = appBarLayout.getTotalScrollRange();
                     float progress = (float) (-verticalOffset) / (float) totalScrollRange;
-                    Log.e("progress",progress+"");
                     if (monthviewpager.getVisibility()==View.GONE&&mNestedView.getVisibility()==View.VISIBLE)mAppBar.setElevation(20+(20*Math.abs(1-progress)));
                     if (weekviewcontainer.getVisibility()==View.VISIBLE){
                         mAppBar.setElevation(20-(20*Math.abs(progress)));
@@ -904,7 +902,6 @@ public class MainActivity extends AppCompatActivity
      */
     @Subscribe
     public void onEvent(MonthChange event) {
-        Log.e("call", "onEvent(MonthChange event)");
 
 
         if (!isAppBarExpanded()) {
@@ -943,7 +940,6 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onEvent(MessageEvent event) {
 
-        Log.e("call", "onEvent(MessageEvent event)");
         int previous = lastchangeindex;
         if (previous != -1) {
             int totalremove = 0;
@@ -1064,7 +1060,6 @@ public class MainActivity extends AppCompatActivity
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
-        Log.e("dd", height1 + "=" + height);
         int width = displayMetrics.widthPixels;
         return height1;
     }
@@ -1109,11 +1104,8 @@ public class MainActivity extends AppCompatActivity
      */
     @Subscribe
     public void onEvent(final AddEvent event) {
-        Log.e("call", "onEvent(final AddEvent event)");
         eventalllist = event.getArrayList();
-        for (EventModel eventModel:eventalllist){
-            Log.e("ffs",eventModel.getEventname());
-        }
+
 
 
         final TypedValue tv = new TypedValue();
@@ -1121,7 +1113,6 @@ public class MainActivity extends AppCompatActivity
 
             int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
             int monthheight = getDeviceHeight() - actionBarHeight - getnavigationHeight() - getStatusBarHeight();
-            Log.e("monthheight", monthheight + "");
             int recyheight = monthheight - getResources().getDimensionPixelSize(R.dimen.monthtopspace);
             int singleitem = (recyheight - 18) / 6;
 
@@ -1877,7 +1868,6 @@ public class MainActivity extends AppCompatActivity
         if (!isgivepermission)return new ArrayList<>();
         LocalDate initial = new LocalDate(newYear,newMonth,1);
         int length=initial.dayOfMonth().getMaximumValue();
-        Log.e("change",alleventlist.size()+","+length);
         List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
 
         for (int i=1;i<=length;i++){
@@ -1890,7 +1880,6 @@ public class MainActivity extends AppCompatActivity
                     Calendar endTime = (Calendar) Calendar.getInstance(TimeZone.getTimeZone(eventInfo.timezone));
                     endTime.setTimeInMillis(eventInfo.endtime);
                    int dau= Days.daysBetween(new LocalDate(eventInfo.endtime), new LocalDate(eventInfo.starttime)).getDays();
-                    Log.e("name",eventInfo.title+","+new LocalDate(eventInfo.endtime)+","+dau);
 
                     WeekViewEvent event = new WeekViewEvent(eventInfo.id, eventInfo.title, startTime, endTime,eventInfo.accountname);
 

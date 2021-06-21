@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.joda.time.Months;
 
 import java.util.ArrayList;
@@ -140,7 +142,6 @@ public class GooglecalenderView extends LinearLayout {
 
                     String s[] = {"tojigs" + minweek.toString("d").toUpperCase() + " - " + minweek.plusDays(6).toString(lastpattern).toUpperCase()};
 
-                    Log.e("test",minweek.toString());
                     if (!eventhash.containsKey(minweek)) eventhash.put(minweek, new EventInfo(s));
 
                     minweek = minweek.plusWeeks(1);
@@ -150,7 +151,7 @@ public class GooglecalenderView extends LinearLayout {
                     String lastpattern = minweek.getYear() == currentyear ? "d MMM" : "d MMM YYYY";
                     String s[] = {"tojigs" + minweek.toString("d MMM").toUpperCase() + " - " + minweek.plusDays(6).toString(lastpattern).toUpperCase()};
 
-                    Log.e("test1",minweek.toString());
+
                     if (!eventhash.containsKey(minweek)) eventhash.put(minweek, new EventInfo(s));
 
                     minweek = minweek.plusWeeks(1);
@@ -252,12 +253,12 @@ public class GooglecalenderView extends LinearLayout {
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
-                Log.e("onPageSelected", position + "");
+
                 MainActivity mainActivity = (MainActivity) context;
                 currentmonth = position;
 
                 if (!mainActivity.isAppBarClosed()) {
-                    Log.e("onPageSelected", "Googlecalendaraview");
+
                     adjustheight();
                     if (mainActivity.mNestedView.getVisibility()==VISIBLE)EventBus.getDefault().post(new MessageEvent(new LocalDate(myPagerAdapter.monthModels.get(position).getYear(), myPagerAdapter.monthModels.get(position).getMonth(), 1)));
                     else {
@@ -336,7 +337,7 @@ public class GooglecalenderView extends LinearLayout {
                 if (s.startsWith("todaydate")) type = 2;
                 else if (s.equals("start")) type = 1;
                 else if (s.startsWith("tojigs")) type = 3;
-                else Log.e("event1",eventhash.get(localDateStringEntry.getKey()).eventcolor+"");
+
                 if (type == 2 && eventModelslist.get(eventModelslist.size() - 1).getType() == 0 && eventModelslist.get(eventModelslist.size() - 1).getLocalDate().equals(localDateStringEntry.getKey())) {
 
                 } else {
@@ -373,6 +374,15 @@ public class GooglecalenderView extends LinearLayout {
                         if (myinfo.noofdayevent>1){
                             ss=ss+" ("+localDateStringEntry.getKey().toString("d MMMM")+"-"+localDateStringEntry.getKey().plusDays(myinfo.noofdayevent-1).toString("d MMMM")+")";
                         }
+                        else if (myinfo.isallday==false){
+                            LocalDateTime start=new LocalDateTime(myinfo.starttime, DateTimeZone.forID(myinfo.timezone));
+                            LocalDateTime end=new LocalDateTime(myinfo.endtime, DateTimeZone.forID(myinfo.timezone));
+                            String sf=start.toString("a").equals(end.toString("a"))?"":"a";
+
+                            ss=ss+" ("+start.toString("h:mm "+sf+"")+"-"+end.toString("h:mm a")+")";
+
+                        }
+
 
                     }
 //                    if (noofday>1&&type==0){
@@ -422,11 +432,11 @@ public class GooglecalenderView extends LinearLayout {
             final int position = viewPager.getCurrentItem();
             // myPagerAdapter.getFirstFragments().get(position).updategrid();
             RecyclerView recyclerView = (RecyclerView) viewPager.getChildAt(0);
-            Log.e("call","upgrade0");
+
 
             MonthPagerAdapter.MonthViewHolder monthViewHolder = (MonthPagerAdapter.MonthViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
             if (monthViewHolder != null && monthViewHolder.jCalendarMonthTopView != null ) {
-                Log.e("call","upgrade");
+
                 monthViewHolder.jCalendarMonthTopView.requestLayout();
                 monthViewHolder.jCalendarMonthTopView.invalidate();
 
