@@ -2,7 +2,6 @@
 
 Sample Google Calendar project get all event information, holiday ,birthday, appointment etc from google account which is sync with your device and show different kind of layout with different color for event
 
-https://user-images.githubusercontent.com/20221469/152988501-d80ba5a7-207d-4642-a447-ca4790d1f78b.mp4
 
 Sample Google Calendar contains all the features that you find in other calendar app including Day view, Week view, Month Views, recent event, today event, easily navigation between monthview and calendarview and awesome design with all of this 
 
@@ -18,7 +17,9 @@ Make copy of the official Google Calendar app design and implement monthview,day
             calendarView.init(eventlist,mintime,maxtime);
 //string[]  if same day contain  more than one event
 ```
-<img src="finalimage.jpg" width="751" height="1000" />&nbsp;&nbsp;&nbsp;&nbsp;[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)
+https://user-images.githubusercontent.com/20221469/152988501-d80ba5a7-207d-4642-a447-ca4790d1f78b.mp4
+
+<!---<img src="finalimage.jpg" width="751" height="1000" />-->
 
  <!---[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)-->
 
