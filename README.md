@@ -2,6 +2,7 @@
 
 Sample Google Calendar project get all event information, holiday ,birthday, appointment etc from google account which is sync with your device and show different kind of layout with different color for event
 
+https://user-images.githubusercontent.com/20221469/152988501-d80ba5a7-207d-4642-a447-ca4790d1f78b.mp4
 
 Sample Google Calendar contains all the features that you find in other calendar app including Day view, Week view, Month Views, recent event, today event, easily navigation between monthview and calendarview and awesome design with all of this 
 
