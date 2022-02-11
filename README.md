@@ -17,6 +17,12 @@ Make copy of the official Google Calendar app design and implement monthview,day
             calendarView.init(eventlist,mintime,maxtime);
 //string[]  if same day contain  more than one event
 ```
+## Download apk
+
+https://raw.githubusercontent.com/jignesh13/googlecalendar/jignesh13-apk-upload/Jcalendar-debug.apk
+
+
+
 https://user-images.githubusercontent.com/20221469/152988501-d80ba5a7-207d-4642-a447-ca4790d1f78b.mp4
 
 <!---<img src="finalimage.jpg" width="751" height="1000" />-->
