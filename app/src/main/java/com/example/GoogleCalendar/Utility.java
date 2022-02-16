@@ -167,8 +167,8 @@ public class Utility {
                             nextnode.noofdayevent=day;
 
                         }
-                        else if (difference<86400000)eventInfo.noofdayevent=0;
-                        else eventInfo.noofdayevent=1;
+                        else if (difference<86400000)nextnode.noofdayevent=0;
+                        else nextnode.noofdayevent=1;
                         prev.nextnode = nextnode;
 
 

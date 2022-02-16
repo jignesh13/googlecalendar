@@ -299,7 +299,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:itemIconPadding="16dp"
-
         android:id="@+id/navigation_view"
         android:background="@android:color/white"
        app:itemBackground="@drawable/nav_back"

@@ -1,5 +1,9 @@
 package com.example.GoogleCalendar.weekview;
 
+import android.util.Log;
+
+import org.joda.time.LocalDate;
+
 import java.util.Calendar;
 
 /**
@@ -22,7 +26,9 @@ public class WeekViewUtil {
      * @return Whether the times are on the same day.
      */
     public static boolean isSameDay(Calendar dayOne, Calendar dayTwo) {
-        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
+        return new LocalDate(dayOne.getTimeInMillis()).isEqual(new LocalDate(dayTwo.getTimeInMillis()));
+//        Log.e("compare".,new LocalDate(dayOne.getTimeInMillis()) +"=="+new LocalDate(dayTwo.getTimeInMillis()));
+//        return dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR) && dayOne.get(Calendar.DAY_OF_YEAR) == dayTwo.get(Calendar.DAY_OF_YEAR);
     }
 
 

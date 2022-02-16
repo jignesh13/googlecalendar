@@ -14,23 +14,29 @@ import android.graphics.Typeface;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.widget.AutoScrollHelper;
+import androidx.viewpager.widget.ViewPager;
 
 public class JCalendarMonthView extends View  {
     float eachcellheight, eachcellwidth;
     long lastsec;
     int selectedcell;
+    private int currentscrollstate;
     private Paint paint, mHeaderTextPaint, jDateTextPaint, jeventRectPaint, jeventtextpaint, jselectrectpaint, jtodaypaint;
     private Typeface dayfont;
     private int dayHeight, daytextsize, datemargintop, linecolor, linewidth, daytextcolor, datetextsize, datetextcolor, eventtextsize;
@@ -45,6 +51,7 @@ public class JCalendarMonthView extends View  {
     private Rect jDateTextPaintRect,jeventtextpaintRect;
     private int currentdaynameindex;
     private GestureDetector mDetector;
+    private ViewPager viewPager;
     public JCalendarMonthView(Context context) {
         this(context, null);
     }
@@ -152,8 +159,6 @@ public class JCalendarMonthView extends View  {
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
-
-
         final int xtouch = (int) motionEvent.getX();
         final int ytouch = (int) motionEvent.getY();
         if (ytouch < dayHeight) return true;
@@ -168,77 +173,20 @@ public class JCalendarMonthView extends View  {
             lastsec = System.currentTimeMillis();
             return true;
 
-        } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+        } else if (currentscrollstate==0&&motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
 
 
-
-                        if (xtouch == downx && ytouch == downy && System.currentTimeMillis() - lastsec >= 80) {
-                            int column = (int) (xtouch / eachcellwidth);
-                            int row = (int) ((ytouch - dayHeight) / eachcellheight);
-                            int cell = (row * 7) + column;
-                            if (selectedcell != cell) {
-                                selectedcell = cell;
-                                int reachxend = (int) (eachcellwidth * (column + 1));
-                                int reachxstart = (int) (eachcellwidth * (column));
-                                int reachyend = (int) (eachcellheight * (row + 1) + dayHeight);
-                                int reachystart = (int) (eachcellheight * (row) + dayHeight);
-
-                                final int left = (int) (xtouch - reachxstart);
-                                final int right = (int) (reachxend - xtouch);
-                                final int top = (int) (ytouch - reachystart);
-                                final int bottom = (int) (reachyend - ytouch);
-                                ValueAnimator widthAnimator = ValueAnimator.ofInt(0, 100);
-                                widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                    @Override
-                                    public void onAnimationUpdate(ValueAnimator animation) {
-
-                                        int progress = (int) animation.getAnimatedValue();
-                                        int start = xtouch - ((left * progress) / 100);
-                                        int endside = xtouch + ((right * progress) / 100);
-                                        int topside = ytouch - ((top * progress) / 100);
-                                        int bottomside = ytouch + ((bottom * progress) / 100);
-                                        selectedrect = new Rect(start, topside, endside, bottomside);
-
-                                        invalidate();
-                                    }
-                                });
-                                widthAnimator.addListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        if (isup) {
-                                            selectedrect = null;
-                                            selectedcell = -1;
-                                            downx = -1;
-                                            downy = -1;
-                                            invalidate();
-                                        }
-                                    }
-                                });
-                                widthAnimator.setDuration(220);
-                                widthAnimator.start();
-                            }
-
-                        } else {
-                            selectedrect = null;
-                            selectedcell = -1;
-                            invalidate();
-                        }
-                         return super.onTouchEvent(motionEvent);
-        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-
-
-            if (xtouch == downx && ytouch == downy) {
+            if (xtouch == downx && ytouch == downy && System.currentTimeMillis() - lastsec >= 80) {
                 int column = (int) (xtouch / eachcellwidth);
                 int row = (int) ((ytouch - dayHeight) / eachcellheight);
                 int cell = (row * 7) + column;
-
+                if (selectedcell != cell) {
                     selectedcell = cell;
                     int reachxend = (int) (eachcellwidth * (column + 1));
                     int reachxstart = (int) (eachcellwidth * (column));
                     int reachyend = (int) (eachcellheight * (row + 1) + dayHeight);
                     int reachystart = (int) (eachcellheight * (row) + dayHeight);
-
 
                     final int left = (int) (xtouch - reachxstart);
                     final int right = (int) (reachxend - xtouch);
@@ -257,12 +205,12 @@ public class JCalendarMonthView extends View  {
                             selectedrect = new Rect(start, topside, endside, bottomside);
 
                             invalidate();
-                            if (progress==100){
-                                MainActivity mainActivity = (MainActivity) mContext;
-                                if (mainActivity != null&&selectedcell!=-1) {
-                                    DayModel dayModel = dayModels.get(selectedcell);
-                                    mainActivity.selectdateFromMonthPager(dayModel.getYear(), dayModel.getMonth(), dayModel.getDay());
-                                }
+                        }
+                    });
+                    widthAnimator.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            if (isup) {
                                 selectedrect = null;
                                 selectedcell = -1;
                                 downx = -1;
@@ -271,10 +219,65 @@ public class JCalendarMonthView extends View  {
                             }
                         }
                     });
-
-                    widthAnimator.setDuration(150);
+                    widthAnimator.setDuration(220);
                     widthAnimator.start();
+                }
 
+            } else {
+                selectedrect = null;
+                selectedcell = -1;
+                invalidate();
+            }
+            return super.onTouchEvent(motionEvent);
+        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+
+
+            if (xtouch == downx && ytouch == downy) {
+                int column = (int) (xtouch / eachcellwidth);
+                int row = (int) ((ytouch - dayHeight) / eachcellheight);
+                int cell = (row * 7) + column;
+
+                selectedcell = cell;
+                int reachxend = (int) (eachcellwidth * (column + 1));
+                int reachxstart = (int) (eachcellwidth * (column));
+                int reachyend = (int) (eachcellheight * (row + 1) + dayHeight);
+                int reachystart = (int) (eachcellheight * (row) + dayHeight);
+
+
+                final int left = (int) (xtouch - reachxstart);
+                final int right = (int) (reachxend - xtouch);
+                final int top = (int) (ytouch - reachystart);
+                final int bottom = (int) (reachyend - ytouch);
+                ValueAnimator widthAnimator = ValueAnimator.ofInt(0, 100);
+                widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+
+                        int progress = (int) animation.getAnimatedValue();
+                        int start = xtouch - ((left * progress) / 100);
+                        int endside = xtouch + ((right * progress) / 100);
+                        int topside = ytouch - ((top * progress) / 100);
+                        int bottomside = ytouch + ((bottom * progress) / 100);
+                        selectedrect = new Rect(start, topside, endside, bottomside);
+
+                        invalidate();
+                        if (progress==100){
+                            MainActivity mainActivity = (MainActivity) mContext;
+                            if (mainActivity != null&&selectedcell!=-1) {
+                                DayModel dayModel = dayModels.get(selectedcell);
+                                mainActivity.selectdateFromMonthPager(dayModel.getYear(), dayModel.getMonth(), dayModel.getDay());
+                            }
+                            selectedrect = null;
+                            selectedcell = -1;
+                            downx = -1;
+                            downy = -1;
+                            invalidate();
+                        }
+                    }
+                });
+
+                widthAnimator.setDuration(150);
+                widthAnimator.start();
 
 
             } else {
@@ -288,13 +291,17 @@ public class JCalendarMonthView extends View  {
             isup = true;
             return super.onTouchEvent(motionEvent);
         }
-        selectedrect = null;
-        selectedcell = -1;
-        downx = -1;
-        downy = -1;
-        invalidate();
+        else {
+            selectedrect = null;
+            selectedcell = -1;
+            downx = -1;
+            downy = -1;
+            invalidate();
+
+        }
 
         return super.onTouchEvent(motionEvent);
+
     }
 
     @Override
@@ -350,7 +357,61 @@ public class JCalendarMonthView extends View  {
         jtodaypaint.setColor(getResources().getColor(R.color.selectday));
 
 
-//        Log.e("height",rect.toString());
+
+
+        Log.e("height","Test");
+    }
+
+    ViewPager.OnPageChangeListener onPageChangeListener=new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+
+            Log.e("scrollstate",state+"");
+
+            if(state==2){
+
+                selectedrect = null;
+                selectedcell = -1;
+                downx = -1;
+                downy = -1;
+                invalidate();
+            }
+            currentscrollstate=state;
+
+        }
+    };
+    @Override
+    protected void onAttachedToWindow() {
+        Log.e("event","onAttachedToWindow");
+         viewPager= (ViewPager) getParent().getParent();
+        viewPager.addOnPageChangeListener(onPageChangeListener);
+        super.onAttachedToWindow();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        Log.e("event","onDetachedFromWindow");
+        viewPager.removeOnPageChangeListener(onPageChangeListener);
+        viewPager=null;
+        super.onDetachedFromWindow();
+    }
+
+    @Override
+    public boolean onDragEvent(DragEvent event) {
+        Log.e("event","drag");
+        return super.onDragEvent(event);
+
     }
 
     @Override
@@ -393,8 +454,8 @@ public class JCalendarMonthView extends View  {
                     canvas.drawText(dayname[j], (eachcellwidth * j + eachcellwidth / 2.0f) - mHeaderTextPaintRect.right / 2.0f, 5 + mHeaderTextPaintRect.height(), mHeaderTextPaint);
                 }
 
-
                 DayModel mydayModel=dayModels.get((i * 7) + j);
+
                 String ss =mydayModel.getDay()+"";
                 jDateTextPaint.getTextBounds(ss, 0, ss.length(), jDateTextPaintRect);
                 if (mydayModel.isToday()) {//istoday
@@ -414,6 +475,7 @@ public class JCalendarMonthView extends View  {
                 int k=topspace[(i*7)+j];
 
                 while (eventInfo!=null) {
+                    Log.e("jcalendar",mydayModel.toString()+","+eventInfo.noofdayevent);
                     int row=i;
                     int col=j;
                     int jnoofday=eventInfo.noofdayevent;
@@ -495,7 +557,9 @@ public class JCalendarMonthView extends View  {
 
                     RectF rect1 = new RectF();
                     rect1.left = (eachcellwidth * col) - linewidth;
-                    rect1.right = (eachcellwidth * (col + jnoofday));
+                    int calculateday=col+jnoofday>7?7-col:jnoofday;
+                    rect1.right = (eachcellwidth * (col + calculateday));
+                    Log.e("right",rect1.right+","+col + jnoofday);
                     rect1.top = dayHeight + (row * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height());
                     rect1.bottom = dayHeight + ((row + 1) * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height() + 50);
                     canvas.save();

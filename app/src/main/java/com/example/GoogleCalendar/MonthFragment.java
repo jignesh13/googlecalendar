@@ -16,6 +16,7 @@ import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -43,7 +44,7 @@ public class MonthFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static MonthFragment newInstance(int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, EventInfo> alleventlist, int singleitemheight) {
+    public static MonthFragment newInstance(int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, EventInfo> alleventlist, int singleitemheight,HashMap<LocalDate, EventInfo> effectmonthlist) throws CloneNotSupportedException {
         MonthFragment fragmentFirst = new MonthFragment();
         Bundle args = new Bundle();
         args.putInt("singleitemheight", singleitemheight);
@@ -53,9 +54,19 @@ public class MonthFragment extends Fragment {
         LocalDate prevmonth = new LocalDate(year, month, 1);
         LocalDate todaydate = new LocalDate();
         ArrayList<DayModel> adapterdata = new ArrayList<>(43);
+        for (LocalDate effectmonth:effectmonthlist.keySet()) {
+            Log.e("jeffect"+effectmonth.toString(),effectmonthlist.get(effectmonth)+"");
+        }
+
+
         for (int i = 0; i < 42; i++) {
             if (i < page) {
+                //prev month
+
+
                 LocalDate localDate = prevmonth.minusDays(page - i);
+
+
 
                 DayModel dayModel = new DayModel();
                 if (localDate.isEqual(todaydate)) {
@@ -65,22 +76,53 @@ public class MonthFragment extends Fragment {
                 dayModel.setMonth(localDate.getMonthOfYear());
                 dayModel.setYear(localDate.getYear());
                 if (alleventlist.containsKey(localDate)) {
+
                     dayModel.setEventInfo(alleventlist.get(localDate));
-//                    if (alleventlist.get(localDate).isallday){
-//                        LocalDate localDate1=new LocalDate(alleventlist.get(localDate).starttime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
-//                        LocalDate localDate2=new LocalDate(alleventlist.get(localDate).endtime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
-//                       int day = Days.daysBetween(localDate1,localDate2).getDays();
-//                       dayModel.setNoofdayevent(day);
-//                       Log.e("noofday",dayModel.getEvents()[0]+","+day);
-//                    }
+
                 }
+                if(i==0){
+
+                    if(effectmonthlist.containsKey(prevmonth)){
+                        LocalDate startdate=new LocalDate(effectmonthlist.get(prevmonth).starttime);
+                        if(startdate.isBefore(localDate)||startdate.isEqual(localDate)){
+                            HashMap<String,String> containevent=new HashMap<>();
+                            EventInfo myinfo= (EventInfo) effectmonthlist.get(prevmonth);
+                            containevent.put(myinfo.id+"","1");
+                            EventInfo newobj=new EventInfo(myinfo);
+                            EventInfo begning=newobj;
+                            while (myinfo.nextnode!=null){
+                                myinfo=myinfo.nextnode;
+                                newobj.nextnode=new EventInfo(myinfo);
+                                newobj=newobj.nextnode;
+                                containevent.put(myinfo.id+"","1");
+                            }
+                            List<EventInfo> infolist=new ArrayList<>();
+                            EventInfo originalevent=alleventlist.get(localDate);
+                            while (originalevent!=null){
+                                if(!containevent.containsKey(originalevent.id+"")){
+                                    infolist.add(originalevent);
+                                }
+                                originalevent=originalevent.nextnode;
+                            }
+                            for(EventInfo eventInfo:infolist){
+                                newobj.nextnode=new EventInfo(eventInfo);
+                                newobj=newobj.nextnode;
+
+                            }
+                            dayModel.setEventInfo(begning);
+                        }
+                    }
+                }
+
 
                 dayModel.setIsenable(false);
                 adapterdata.add(dayModel);
 
             } else if (i >= dayModels.size() + page) {
-
+                //next month
                 LocalDate localDate = prevmonth.plusDays(i - (page));
+                Log.e("dateelseif",localDate.toString());
+
                 DayModel dayModel = new DayModel();
                 if (localDate.isEqual(todaydate)) {
                     dayModel.setToday(true);
@@ -90,7 +132,12 @@ public class MonthFragment extends Fragment {
                 dayModel.setYear(localDate.getYear());
                 dayModel.setIsenable(false);
                 if (alleventlist.containsKey(localDate)) {
-                    dayModel.setEventInfo(alleventlist.get(localDate));
+                    EventInfo eventInfo=alleventlist.get(localDate);
+//                    while(eventInfo.isalreadyset){
+//                        eventInfo=eventInfo.nextnode;
+//                        if(eventInfo==null)break;
+//                    }
+                   if(eventInfo!=null) dayModel.setEventInfo(eventInfo);
 //                    if (alleventlist.get(localDate).isallday){
 //                        LocalDate localDate1=new LocalDate(alleventlist.get(localDate).starttime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
 //                        LocalDate localDate2=new LocalDate(alleventlist.get(localDate).endtime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
@@ -101,26 +148,73 @@ public class MonthFragment extends Fragment {
                 }
                 adapterdata.add(dayModel);
             } else {
+                //current month
                 DayModel dayModel = dayModels.get(i - page);
                 dayModel.setIsenable(true);
                 if (dayModel.isToday()) {
                     args.putInt("index", i % 7);
                 }
                 LocalDate mydate = new LocalDate(year, month, dayModel.getDay());
+                Log.e("dateelse",mydate.toString());
                 if (alleventlist.containsKey(mydate)) {
+
                     dayModel.setEventInfo(alleventlist.get(mydate));
-//                    if (alleventlist.get(mydate).isallday){
-//                        LocalDate localDate1=new LocalDate(alleventlist.get(mydate).starttime, DateTimeZone.forID(alleventlist.get(mydate).timezone));
-//                        LocalDate localDate2=new LocalDate(alleventlist.get(mydate).endtime, DateTimeZone.forID(alleventlist.get(mydate).timezone));
-//                        int day = Days.daysBetween(localDate1,localDate2).getDays();
-//                        dayModel.setNoofdayevent(day);
-//                        Log.e("noofday",dayModel.getEvents()[0]+","+day);
-//                    }
                 }
+                if(i==0){
+                    if(effectmonthlist.containsKey(prevmonth)){
+                        LocalDate startdate=new LocalDate(effectmonthlist.get(prevmonth).starttime);
+                        if(startdate.isBefore(mydate)||startdate.isEqual(mydate)){
+                            HashMap<String,String> containevent=new HashMap<>();
+                            EventInfo myinfo= (EventInfo) effectmonthlist.get(prevmonth);
+                            EventInfo newobj=new EventInfo(myinfo);
+                            EventInfo begning=newobj;
+                            containevent.put(myinfo.id+"","1");
+                            while (myinfo.nextnode!=null){
+                                myinfo=myinfo.nextnode;
+                                newobj.nextnode=new EventInfo(myinfo);
+                                newobj=newobj.nextnode;
+                                containevent.put(myinfo.id+"","1");
+                            }
+                            List<EventInfo> infolist=new ArrayList<>();
+                            EventInfo originalevent=alleventlist.get(mydate);
+                            while (originalevent!=null){
+                                if(!containevent.containsKey(originalevent.id+"")){
+                                    infolist.add(originalevent);
+                                }
+                                originalevent=originalevent.nextnode;
+                            }
+                            for(EventInfo eventInfo:infolist){
+                                newobj.nextnode=new EventInfo(eventInfo);
+                                newobj=newobj.nextnode;
+                            }
+
+                            dayModel.setEventInfo(begning);
+                        }
+                    }
+                }
+
                 adapterdata.add(dayModels.get(i - page));
 
             }
         }
+//        if(effectmonthlist.containsKey(prevmonth)){
+//
+//           EventInfo firstday = adapterdata.get(0).getEventInfo();
+//           if(firstday==null){
+//               DayModel dayModel=adapterdata.get(0);
+//               dayModel.setEventInfo(effectmonthlist.get(prevmonth));
+//               adapterdata.set(0,dayModel);
+//           }
+//           else {
+//
+//              EventInfo currentmodel=effectmonthlist.get(prevmonth);
+//              while (currentmodel.nextnode!=null)currentmodel=currentmodel.nextnode;
+//               DayModel dayModel=adapterdata.get(0);
+//               currentmodel.nextnode=firstday;
+//               dayModel.setEventInfo(currentmodel);
+//               adapterdata.set(0,dayModel);
+//           }
+//        }
         fragmentFirst.dayModels = adapterdata;
         fragmentFirst.setArguments(args);
         return fragmentFirst;

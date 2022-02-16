@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/googlecalendar.iml" filepath="$PROJECT_DIR$/.idea/googlecalendar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/googlecalendar.iml" filepath="$PROJECT_DIR$/.idea/modules/googlecalendar.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/googlecalendar.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/googlecalendar.app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/library/googlecalendar.library.iml" filepath="$PROJECT_DIR$/.idea/modules/library/googlecalendar.library.iml" />
     </modules>

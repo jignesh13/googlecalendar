@@ -31,5 +31,11 @@
             android:checked="false"
             android:icon="@drawable/ic_bottom"
             android:title="Month" />
+
+        <item
+            android:id="@+id/licenceviewitem"
+            android:checked="false"
+            android:icon="@drawable/privacy"
+            android:title="Privacy policy" />
     </group>
 </menu>

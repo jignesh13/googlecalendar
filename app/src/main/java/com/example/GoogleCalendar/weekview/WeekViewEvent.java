@@ -2,6 +2,8 @@ package com.example.GoogleCalendar.weekview;
 
 import android.util.Log;
 
+import org.joda.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -236,7 +238,9 @@ public class WeekViewEvent {
         // The first millisecond of the next day is still the same day. (no need to split events for this).
         Calendar endTime = (Calendar) this.getEndTime().clone();
         endTime.add(Calendar.MILLISECOND, -1);
+
         if (!isSameDay(this.getStartTime(), endTime)) {
+
             long remainingDays = Math.round((float) (endTime.getTimeInMillis() - getStartTime().getTimeInMillis()) / (24 * 60 * 60 * 1000));
             endTime = (Calendar) this.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
@@ -254,6 +258,7 @@ public class WeekViewEvent {
             // Add other days.
             Calendar otherDay = (Calendar) this.getStartTime().clone();
             otherDay.add(Calendar.DATE, 1);
+            Log.e("jtestbefore",this.getName()+new LocalDate(otherDay.getTimeInMillis()));
             while (!isSameDay(otherDay, this.getEndTime())) {
                 Calendar overDay = (Calendar) otherDay.clone();
                 overDay.set(Calendar.HOUR_OF_DAY, 0);
@@ -263,6 +268,7 @@ public class WeekViewEvent {
                 endOfOverDay.set(Calendar.MINUTE, 59);
 
                 WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(), null, overDay, endOfOverDay, this.isAllDay(),this.accountname);
+
                 eventMore.setColor(this.getColor());
                 eventMore.setIsmoreday(true);
                 eventMore.setActualstart(this.getStartTime());
