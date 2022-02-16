@@ -1,4 +1,4 @@
-# Google-Calendar
+# JGoogle-Calendar
 
 Sample Google Calendar project get all event information, holiday ,birthday, appointment etc from google account which is sync with your device and show different kind of layout with different color for event
 
