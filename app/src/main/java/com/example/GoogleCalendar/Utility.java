@@ -81,7 +81,7 @@ public class Utility {
             syncacc = cursor.getString(6);
 
             if (true) {
-
+Log.e(cursor.getString(1),cursor.getInt(7)+"");
                 LocalDate localDate = getDate(Long.parseLong(cursor.getString(3)));
 
                 if (!localDateHashMap.containsKey(localDate)) {

@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.util.DisplayMetrics;
+import android.util.EventLog;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -671,6 +672,7 @@ public class MainActivity extends AppCompatActivity
                                 newobj.isallday=eventInfo.isallday;
                                 newobj.eventcolor=eventInfo.eventcolor;
                                 newobj.endtime=eventInfo.endtime;
+                                newobj.accountname=eventInfo.accountname;
                                 newobj.isalreadyset=true;
                                 newobj.starttime=eventInfo.starttime;
                                 newobj.noofdayevent=noofdays;
@@ -687,6 +689,7 @@ public class MainActivity extends AppCompatActivity
                                 EventInfo newobj=new EventInfo();
                                 newobj.title=eventInfo.title;
                                 newobj.timezone=eventInfo.timezone;
+                                newobj.accountname=eventInfo.accountname;
                                 newobj.isallday=eventInfo.isallday;
                                 newobj.eventcolor=eventInfo.eventcolor;
                                 newobj.endtime=eventInfo.endtime;
@@ -952,6 +955,64 @@ public class MainActivity extends AppCompatActivity
             LocalDate mintime = new LocalDate().minusYears(5);
             LocalDate maxtime = new LocalDate().plusYears(5);
             alleventlist = Utility.readCalendarEvent(this, mintime, maxtime);
+            montheventlist=new HashMap<>();
+
+            for(LocalDate localDate:alleventlist.keySet()){
+                EventInfo eventInfo=alleventlist.get(localDate);
+                while (eventInfo!=null){
+                    if(eventInfo.noofdayevent>1){
+
+                        LocalDate nextmonth=localDate.plusMonths(1).withDayOfMonth(1);
+                        LocalDate enddate=new LocalDate(eventInfo.endtime);
+                        while (enddate.isAfter(nextmonth)){
+                            if(montheventlist.containsKey(nextmonth)){
+                                int firstday = nextmonth.dayOfMonth().withMinimumValue().dayOfWeek().get();
+                                if (firstday == 7) firstday = 0;
+                                int noofdays=Days.daysBetween(nextmonth,enddate).getDays()+firstday;
+                                EventInfo newobj=new EventInfo();
+                                newobj.title=eventInfo.title;
+                                newobj.timezone=eventInfo.timezone;
+                                newobj.isallday=eventInfo.isallday;
+                                newobj.eventcolor=eventInfo.eventcolor;
+                                newobj.endtime=eventInfo.endtime;
+                                newobj.isalreadyset=true;
+                                newobj.starttime=eventInfo.starttime;
+                                newobj.noofdayevent=noofdays;
+                                newobj.id=eventInfo.id;
+                                EventInfo beginnode=montheventlist.get(nextmonth);
+                                newobj.nextnode=beginnode;
+                                montheventlist.put(nextmonth,newobj);
+
+                            }
+                            else {
+                                int firstday = nextmonth.dayOfMonth().withMinimumValue().dayOfWeek().get();
+                                if (firstday == 7) firstday = 0;
+                                int noofdays=Days.daysBetween(nextmonth,enddate).getDays()+firstday;
+                                EventInfo newobj=new EventInfo();
+                                newobj.title=eventInfo.title;
+                                newobj.timezone=eventInfo.timezone;
+                                newobj.isallday=eventInfo.isallday;
+                                newobj.eventcolor=eventInfo.eventcolor;
+                                newobj.endtime=eventInfo.endtime;
+                                newobj.isalreadyset=true;
+                                newobj.starttime=eventInfo.starttime;
+                                newobj.noofdayevent=noofdays;
+                                newobj.id=eventInfo.id;
+                                montheventlist.put(nextmonth,newobj);
+
+                            }
+                            Log.e("nextmonth",nextmonth.toString());
+                            Log.e("jdata"+localDate.toString()+","+eventInfo.noofdayevent,eventInfo.title+","+new LocalDate(eventInfo.starttime)+","+new LocalDate(eventInfo.endtime));
+                            nextmonth=nextmonth.plusMonths(1).withDayOfMonth(1);
+                        }
+
+
+
+                    }
+                    eventInfo=eventInfo.nextnode;
+                }
+
+            }
             calendarView.init(alleventlist,mintime, maxtime);
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -1953,9 +2014,24 @@ public class MainActivity extends AppCompatActivity
 
 
     ///////////////////////////////////weekview implemention///////////////////////////////////////
-
+    /* Function to reverse the linked list */
+    EventInfo reverse(EventInfo node)
+    {
+        EventInfo prev = null;
+        EventInfo current = node;
+        EventInfo next = null;
+        while (current != null) {
+            next = current.nextnode;
+            current.nextnode = prev;
+            prev = current;
+            current = next;
+        }
+        node = prev;
+        return node;
+    }
     @Override
     public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
+
         HashMap<LocalDate,EventInfo> jmontheventlist = new HashMap<>(montheventlist);
         if (!isgivepermission)return new ArrayList<>();
         LocalDate initial = new LocalDate(newYear,newMonth,1);
@@ -1997,9 +2073,8 @@ public class MainActivity extends AppCompatActivity
                                 newobj=newobj.nextnode;
 
                             }
-
-
-                            Log.e("eventinfo",eventInfo+"");
+                          //  eventInfo=reverse(eventInfo);
+                            Log.e("jeventinfo",eventInfo.title+""+localDate);
 
 
 
@@ -2020,22 +2095,28 @@ public class MainActivity extends AppCompatActivity
                     LocalDate enddate=new LocalDate(endTime);
                     LocalDate maxdate=new LocalDate(newYear,newMonth,length);
 
-                    if(enddate.isAfter(maxdate)){
+                    if(enddate.isAfter(maxdate)) {
                         LocalDateTime localDateTime=new LocalDateTime(newYear,newMonth,length,23,59,59);
-                        Log.e("endtime", localDateTime.toDateTime(DateTimeZone.forTimeZone(endTime.getTimeZone())).toString());
-                        endTime.setTimeInMillis(localDateTime.toDateTime(DateTimeZone.forTimeZone(endTime.getTimeZone())).getMillis());
+
+                        int f=eventInfo.isallday?0:1000;
+
+                        endTime.setTimeInMillis(localDateTime.toDateTime().getMillis()+1000);
+
                     }
+
                     Log.e("title:"+eventInfo.title,new LocalDate(eventInfo.starttime).toString());
                    int dau= Days.daysBetween(new LocalDate(eventInfo.endtime), new LocalDate(eventInfo.starttime)).getDays();
 
                     WeekViewEvent event = new WeekViewEvent(eventInfo.id, eventInfo.title, startTime, endTime,eventInfo.accountname);
+                    event.setMyday(eventInfo.noofdayevent);
+
 
                     event.setAllDay(eventInfo.isallday);
                     event.setColor(eventInfo.eventcolor);
 //                    if (eventInfo.isallday)event.setColor(getResources().getColor(R.color.event_color_04));
 //                    else event.setColor(getResources().getColor(R.color.event_color_02));
                     events.add(event);
-                    eventInfo=eventInfo.nextnode;
+                   eventInfo=eventInfo.nextnode;
                 }
             }
         }

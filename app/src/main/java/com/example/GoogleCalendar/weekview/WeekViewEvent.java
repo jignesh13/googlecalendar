@@ -27,6 +27,24 @@ public class WeekViewEvent {
     private int  daytype;
     private boolean ismoreday;
     private long noofday;
+    private boolean alreadyset;
+    private int myday;
+
+    public int getMyday() {
+        return myday;
+    }
+
+    public void setMyday(int myday) {
+        this.myday = myday;
+    }
+
+    public boolean isAlreadyset() {
+        return alreadyset;
+    }
+
+    public void setAlreadyset(boolean alreadyset) {
+        this.alreadyset = alreadyset;
+    }
 
     public void setAccountname(String accountname) {
         this.accountname = accountname;
@@ -240,6 +258,7 @@ public class WeekViewEvent {
         endTime.add(Calendar.MILLISECOND, -1);
 
         if (!isSameDay(this.getStartTime(), endTime)) {
+            Log.e("jmore"+this.getName(),new LocalDate(getStartTime())+","+new LocalDate(this.getEndTime()));
 
             long remainingDays = Math.round((float) (endTime.getTimeInMillis() - getStartTime().getTimeInMillis()) / (24 * 60 * 60 * 1000));
             endTime = (Calendar) this.getStartTime().clone();
@@ -266,7 +285,6 @@ public class WeekViewEvent {
                 Calendar endOfOverDay = (Calendar) overDay.clone();
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
-
                 WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(), null, overDay, endOfOverDay, this.isAllDay(),this.accountname);
 
                 eventMore.setColor(this.getColor());

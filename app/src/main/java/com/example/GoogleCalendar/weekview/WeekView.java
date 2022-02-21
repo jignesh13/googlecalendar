@@ -313,7 +313,7 @@ public class WeekView extends View {
             // If the tap was on an event then trigger the callback.
             if (mEventRects != null && mEventClickListener != null) {
                 List<EventRect> reversedEventRects = mEventRects;
-               // Collections.reverse(reversedEventRects);
+                // Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventClickListener.onEventClick(event.event, event.rectF);
@@ -341,7 +341,7 @@ public class WeekView extends View {
 
             if (mEventLongPressListener != null && mEventRects != null) {
                 List<EventRect> reversedEventRects = mEventRects;
-             //   Collections.reverse(reversedEventRects);
+                //   Collections.reverse(reversedEventRects);
                 for (EventRect event : reversedEventRects) {
                     if (event.rectF != null && e.getX() > event.rectF.left && e.getX() < event.rectF.right && e.getY() > event.rectF.top && e.getY() < event.rectF.bottom) {
                         mEventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
@@ -959,7 +959,7 @@ public class WeekView extends View {
                 canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding / 3.0f, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
                 canvas.drawText(dayLabel1, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding * 1.76f + jHeaderTextHeight, sameDay ? jtodayHeaderTextPaint : jHeaderTextPaint);
 
-                 drawAllDayEvents(day, startPixel, canvas,dayNumber,false);
+                drawAllDayEvents(day, startPixel, canvas,dayNumber,false);
 
 
 
@@ -1175,8 +1175,7 @@ public class WeekView extends View {
                                     fd.right=fd.right-10;
                                 }
                                 canvas.drawRoundRect(fd, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                                boolean cc=startFromPixel+mWidthPerDay>=getWidth();
-                                if (mEventRects.get(i+1).event.isIsmoreday()==false)cc=true;
+
                                 if (startFromPixel<mHeaderColumnWidth+5||mEventRects.get(i).event.getDaytype()==1){
 
 
@@ -1427,15 +1426,19 @@ public class WeekView extends View {
         Collections.sort(events, new Comparator<WeekViewEvent>() {
             @Override
             public int compare(WeekViewEvent event1, WeekViewEvent event2) {
-                long start1 = event1.getStartTime().getTimeInMillis();
-                long start2 = event2.getStartTime().getTimeInMillis();
-                int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
-                if (comparator == 0) {
-                    long end1 = event1.getEndTime().getTimeInMillis();
-                    long end2 = event2.getEndTime().getTimeInMillis();
-                    comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
-                }
-                return comparator;
+                Log.e("mecheck"+event1.getName()+","+event2.getName(),event1.getMyday()+","+event2.getMyday());
+                return event1.getMyday()>event2.getMyday()?-1: event1.getMyday()<event2.getMyday()?1:0;
+//                    long end2 = event2.getEndTime().getTimeInMillis();
+
+//                long start1 = event1.getStartTime().getTimeInMillis();
+//                long start2 = event2.getStartTime().getTimeInMillis();
+//                int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
+//                if (comparator == 0) {
+//                    long end1 = event1.getEndTime().getTimeInMillis();
+//                    long end2 = event2.getEndTime().getTimeInMillis();
+//                    comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
+//                }
+//                return comparator;
             }
         });
     }
