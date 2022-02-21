@@ -61,7 +61,7 @@ https://user-images.githubusercontent.com/20221469/152988501-d80ba5a7-207d-4642-
 
 ✔️ Show Customize events – start time, duration, reminders etc
 
-✔️ Use different color for event,holida,birthday
+✔️ Use different color for event,holiday,birthday
 
 
 
