@@ -19,8 +19,7 @@ Make copy of the official Google Calendar app design and implement monthview,day
 ```
 ## Download apk
 
-https://raw.githubusercontent.com/jignesh13/googlecalendar/jignesh13-apk-upload/app-debug.apk
-
+https://raw.githubusercontent.com/jignesh13/googlecalendar/jignesh13-apk-upload/jCalendar-v1.0.8.apk
 
 https://user-images.githubusercontent.com/20221469/152988501-d80ba5a7-207d-4642-a447-ca4790d1f78b.mp4
 
@@ -61,7 +60,7 @@ https://user-images.githubusercontent.com/20221469/152988501-d80ba5a7-207d-4642-
 
 ✔️ Show Customize events – start time, duration, reminders etc
 
-✔️ Use different color for event,holida,birthday
+✔️ Use different color for event,holiday,birthday
 
 
 
