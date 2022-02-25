@@ -51,7 +51,6 @@ public class JCalendarMonthView extends View  {
     private Rect jDateTextPaintRect,jeventtextpaintRect;
     private int currentdaynameindex;
     private GestureDetector mDetector;
-    private ViewPager viewPager;
     public JCalendarMonthView(Context context) {
         this(context, null);
     }
@@ -391,21 +390,7 @@ public class JCalendarMonthView extends View  {
 
         }
     };
-    @Override
-    protected void onAttachedToWindow() {
-        Log.e("event","onAttachedToWindow");
-         viewPager= (ViewPager) getParent().getParent();
-        viewPager.addOnPageChangeListener(onPageChangeListener);
-        super.onAttachedToWindow();
-    }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        Log.e("event","onDetachedFromWindow");
-        viewPager.removeOnPageChangeListener(onPageChangeListener);
-        viewPager=null;
-        super.onDetachedFromWindow();
-    }
 
     @Override
     public boolean onDragEvent(DragEvent event) {
@@ -473,7 +458,7 @@ public class JCalendarMonthView extends View  {
                EventInfo eventInfo=mydayModel.getEventInfo();
                 float constant = (2 * datemargintop) + dayHeight + (i * eachcellheight) + jDateTextPaintRect.height();
                 int k=topspace[(i*7)+j];
-
+                int noofevent=0;
                 while (eventInfo!=null) {
                     Log.e("jcalendar",mydayModel.toString()+","+eventInfo.noofdayevent);
                     int row=i;
@@ -572,10 +557,23 @@ public class JCalendarMonthView extends View  {
                     colorrect.bottom = colorrect.top + 42;
                     int color=eventInfo.eventcolor==0?mDefaultEventColor:eventInfo.eventcolor;
                     jeventRectPaint.setColor(color);
-                    canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
-                    canvas.drawText(eventInfo.title, colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
+                    if(noofevent>2){
+
+                        jeventtextpaint.setColor(Color.BLACK);
+                        canvas.drawText("•••", colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
+
+                    }
+                    else {
+
+                        jeventtextpaint.setColor(Color.WHITE);
+                        canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
+
+                        canvas.drawText(eventInfo.title, colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
+
+                    }
                     canvas.restore();
                     k++;
+                    noofevent++;
                     eventInfo=eventInfo.nextnode;
                 }
             }
