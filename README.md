@@ -76,7 +76,9 @@ https://user-images.githubusercontent.com/20221469/152988501-d80ba5a7-207d-4642-
   
 ## License
    Copyright 2019 jignesh khunt
-
+   
+   [License](https://github.com/jignesh13/googlecalendar/blob/master/LICENSE)
+   
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
