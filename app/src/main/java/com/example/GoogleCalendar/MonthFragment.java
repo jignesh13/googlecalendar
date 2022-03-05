@@ -46,6 +46,7 @@ public class MonthFragment extends Fragment {
 
     public static MonthFragment newInstance(int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, EventInfo> alleventlist, int singleitemheight,HashMap<LocalDate, EventInfo> effectmonthlist) throws CloneNotSupportedException {
         MonthFragment fragmentFirst = new MonthFragment();
+        
         Bundle args = new Bundle();
         args.putInt("singleitemheight", singleitemheight);
         args.putInt("firstday", page);

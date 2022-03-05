@@ -42,7 +42,7 @@ public class JCalendarMonthView extends View  {
     private int dayHeight, daytextsize, datemargintop, linecolor, linewidth, daytextcolor, datetextsize, datetextcolor, eventtextsize;
     private Context mContext;
     private float downx, downy;
-    private String dayname[] = {"S", "M", "T", "W", "T", "F", "S"};
+    private String dayname[] = { "S","M", "T", "W", "T", "F", "S"};
     private Rect selectedrect;
     private boolean isup = false;
     private ArrayList<DayModel> dayModels;
@@ -564,7 +564,7 @@ public class JCalendarMonthView extends View  {
 
                     }
                     else {
-
+                        Log.e("noofevent",noofevent+"");
                         jeventtextpaint.setColor(Color.WHITE);
                         canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
 

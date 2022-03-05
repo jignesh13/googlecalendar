@@ -2440,6 +2440,19 @@ public class WeekView extends View {
      * @param date The date to show.
      */
     public void goToDate(Calendar date) {
+
+        if(getNumberOfVisibleDays()==7){
+            int diff=date.get(Calendar.DAY_OF_WEEK)-getFirstDayOfWeek();
+            Log.e("diff",diff+"");
+            if(diff<0){
+                date.add(Calendar.DAY_OF_MONTH, -(7-Math.abs(diff)));
+            }
+            else {
+                date.add(Calendar.DAY_OF_MONTH, -diff);
+            }
+
+        }
+
         mScroller.forceFinished(true);
         mCurrentScrollDirection = mCurrentFlingDirection = Direction.NONE;
 

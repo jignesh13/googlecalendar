@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity
     private View myshadow;
     long lasttime;
     int mycolor;
-     MyRecyclerView mNestedView;
+    MyRecyclerView mNestedView;
     private ViewPager monthviewpager;
     private HashMap<LocalDate, EventInfo> alleventlist;
     private HashMap<LocalDate, EventInfo> montheventlist;
@@ -416,14 +416,17 @@ public class MainActivity extends AppCompatActivity
                     monthviewpager.setVisibility(View.GONE);
                     mNestedView.setVisibility(View.GONE);
                     mWeekView.setNumberOfVisibleDays(7);
+
                     mWeekView.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
                     mWeekView.setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12, getResources().getDisplayMetrics()));
                     mWeekView.setAllDayEventHeight((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics()));
                     Calendar todaydate=Calendar.getInstance();
+
                     todaydate.set(Calendar.DAY_OF_MONTH,MainActivity.lastdate.getDayOfMonth());
                     todaydate.set(Calendar.MONTH,MainActivity.lastdate.getMonthOfYear()-1);
                     todaydate.set(Calendar.YEAR,MainActivity.lastdate.getYear());
-                    mWeekView.goToDate(todaydate);
+
+                     mWeekView.goToDate(todaydate);
                     CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) mAppBar.getLayoutParams();
                     ((MyAppBarBehavior) layoutParams.getBehavior()).setScrollBehavior(true);
                     mAppBar.setElevation(0);
