@@ -24,9 +24,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:fontFamily="@font/googlesansmed"
-        android:text="JCalendar"
+        android:text="JCalendar\n(v1.0.9)"
         android:textColor="#1A73E8"
-        android:textSize="20sp"
+        android:textSize="18sp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

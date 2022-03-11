@@ -8,34 +8,40 @@
         <item
             android:id="@+id/Schedule"
             android:checked="false"
+            android:icon="@drawable/ic_baseline_view_stream_24"
 
-            android:icon="@drawable/ic_verticals"
             android:title="Schedule" />
         <item
             android:id="@+id/Day"
             android:checked="false"
-            android:icon="@drawable/ic_box"
+            android:icon="@drawable/ic_baseline_calendar_view_day_24"
             android:title="Day" />
         <item
             android:id="@+id/threeday"
             android:checked="true"
-            android:icon="@drawable/ic_columns"
+            android:icon="@drawable/ic_baseline_view_week_24"
             android:title="3 days" />
         <item
             android:id="@+id/Week"
             android:checked="false"
-            android:icon="@drawable/ic_blocks"
+            android:icon="@drawable/ic_baseline_calendar_view_week_24"
             android:title="Week" />
         <item
             android:id="@+id/monthviewitem"
             android:checked="false"
-            android:icon="@drawable/ic_bottom"
+            android:icon="@drawable/ic_baseline_calendar_view_month_24"
             android:title="Month" />
 
         <item
+            android:id="@+id/yearviewitem"
+            android:checked="false"
+
+            android:icon="@drawable/ic_baseline_view_comfy_24"
+            android:title="Year" />
+        <item
             android:id="@+id/licenceviewitem"
             android:checked="false"
-            android:icon="@drawable/privacy"
+            android:icon="@drawable/ic_baseline_policy_24"
             android:title="Privacy policy" />
     </group>
 </menu>

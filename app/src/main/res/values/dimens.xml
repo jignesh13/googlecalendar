@@ -5,6 +5,8 @@
     <dimen name="pluseightdp">8dp</dimen>
     <dimen name="fourdp">4dp</dimen>
     <dimen name="onedp">4dp</dimen>
+    <dimen name="smalltextsize">15sp</dimen>
+    <dimen name="daytextsize">8sp</dimen>
 
     <dimen name="minuseightdp">-8dp</dimen>
     <dimen name="circlesize">11dp</dimen>
