@@ -17,10 +17,11 @@ import androidx.core.content.res.ResourcesCompat;
 public class YearView extends View {
     private String dayname[] = { "S","M", "T", "W", "T", "F", "S"};
     private Context mContext;
-    private Paint daypaint, mHeaderTextPaint,datepaint;
+    private Paint daypaint, mHeaderTextPaint,datepaint,todaypaint,roundpaint;
     private Rect mHeaderTextPaintRect,mdayrect,mdaterect;
    private String monthname="Jan";
    private int startofweek, month, noofday,year;
+   private LocalDate currentdate=LocalDate.now();
     public YearView(Context context) {
         super(context);
     }
@@ -69,6 +70,16 @@ public class YearView extends View {
         datepaint.setTypeface(ResourcesCompat.getFont(mContext, R.font.googlesans_regular));
         datepaint.setTextSize(getResources().getDimensionPixelSize(R.dimen.daytextsize));
 
+
+        todaypaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        todaypaint.setColor(Color.WHITE);
+        todaypaint.setTypeface(ResourcesCompat.getFont(mContext, R.font.googlesansmed));
+        todaypaint.setTextSize(getResources().getDimensionPixelSize(R.dimen.daytextsize));
+
+        roundpaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        roundpaint.setColor(Color.parseColor("#1a73e8"));
+        roundpaint.setStyle(Paint.Style.FILL);
+
     }
 
     @Override
@@ -103,72 +114,26 @@ public class YearView extends View {
                     for(int j=0;j<7;j++){
                         int dateindex=((i*7)+j);
                         if(dateindex<startofweek||startday>noofday)continue;
+                        LocalDate thisdate=new LocalDate(year,(m*3)+(n+1),startday);
                         String text=startday+"";
-                        Log.e("Text",text);
                         datepaint.getTextBounds(text, 0, text.length(), mdaterect);
-                        canvas.drawText(text,30+(eachmonthwidth*n)+(eachcellsize*j)+(eachcellsize/2.0f)-(mdaterect.width()/2.0f),endofdayheight+(eachcellheight*i)+(eachcellheight/2.0f)+(mdaterect.height()/2.0f),datepaint);
+                        if(thisdate.isEqual(currentdate)){
+                            canvas.drawCircle(30+(eachmonthwidth*n)+(eachcellsize*j)+(eachcellsize/2.0f),endofdayheight+(eachcellheight*i)+(eachcellheight/2.0f),eachcellsize/2.0f,roundpaint);
+                            canvas.drawText(text,30+(eachmonthwidth*n)+(eachcellsize*j)+(eachcellsize/2.0f)-(mdaterect.width()/2.0f),endofdayheight+(eachcellheight*i)+(eachcellheight/2.0f)+(mdaterect.height()/2.0f),todaypaint);
+
+                        }
+                        else {
+                            canvas.drawText(text,30+(eachmonthwidth*n)+(eachcellsize*j)+(eachcellsize/2.0f)-(mdaterect.width()/2.0f),endofdayheight+(eachcellheight*i)+(eachcellheight/2.0f)+(mdaterect.height()/2.0f),datepaint);
+
+                        }
+
                         startday++;
                     }
                 }
             }
         }
-//        float eachcellsize = eachmonthwidth/7.0f;
-//        canvas.drawText(monthname,(eachcellsize/2.0f)-(mdayrect.width()/2.0f),mHeaderTextPaintRect.height(),mHeaderTextPaint);
-//       //20 is topwidth
-//        for (int i=0;i<7;i++){
-//            canvas.drawText(dayname[i],(eachcellsize*i)+(eachcellsize/2.0f)-(mdayrect.width()/2.0f),mHeaderTextPaintRect.height()+mdayrect.height()+20,daypaint);
-//           }
-//        //20 is datestartheight
-//        float endofdayheight=mHeaderTextPaintRect.height()+mdayrect.height()+20+20;
-//        float remainingheight=getHeight()-endofdayheight;
-//        float eachcellheight=remainingheight/6.0f;
-//        int startday=1;
-//        for(int i=0;i<6;i++){
-//            for(int j=0;j<7;j++){
-//                int dateindex=((i*7)+j);
-//                if(dateindex<startofweek||startday>noofday)continue;
-//                String text=startday+"";
-//                Log.e("Text",text);
-//                datepaint.getTextBounds(text, 0, text.length(), mdaterect);
-//                canvas.drawText(text,(eachcellsize*j)+(eachcellsize/2.0f)-(mdaterect.width()/2.0f),endofdayheight+(eachcellheight*i)+(eachcellheight/2.0f)+(mdaterect.height()/2.0f),datepaint);
-//                startday++;
-//            }
-//        }
+
 
     }
-
-//    @Override
-//    protected void onDraw(Canvas canvas) {
-//        super.onDraw(canvas);
-//        float eachmonthsize=getWidth()/3.0f;
-//        for(int m=0;m<4;m++){
-//            for(int n=0;n<3;n++){
-//
-//            }
-//        }
-//        float eachcellsize = getWidth()/7.0f;
-//        canvas.drawText(monthname,(eachcellsize/2.0f)-(mdayrect.width()/2.0f),mHeaderTextPaintRect.height(),mHeaderTextPaint);
-//        //20 is topwidth
-//        for (int i=0;i<7;i++){
-//            canvas.drawText(dayname[i],(eachcellsize*i)+(eachcellsize/2.0f)-(mdayrect.width()/2.0f),mHeaderTextPaintRect.height()+mdayrect.height()+20,daypaint);
-//        }
-//        //20 is datestartheight
-//        float endofdayheight=mHeaderTextPaintRect.height()+mdayrect.height()+20+20;
-//        float remainingheight=getHeight()-endofdayheight;
-//        float eachcellheight=remainingheight/6.0f;
-//        int startday=1;
-//        for(int i=0;i<6;i++){
-//            for(int j=0;j<7;j++){
-//                int dateindex=((i*7)+j);
-//                if(dateindex<startofweek||startday>noofday)continue;
-//                String text=startday+"";
-//                Log.e("Text",text);
-//                datepaint.getTextBounds(text, 0, text.length(), mdaterect);
-//                canvas.drawText(text,(eachcellsize*j)+(eachcellsize/2.0f)-(mdaterect.width()/2.0f),endofdayheight+(eachcellheight*i)+(eachcellheight/2.0f)+(mdaterect.height()/2.0f),datepaint);
-//                startday++;
-//            }
-//        }
-//
-//    }
 
 }
