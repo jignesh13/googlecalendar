@@ -1,7 +1,6 @@
 package com.example.GoogleCalendar;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -17,12 +16,8 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
-import java.time.Duration;
 import java.util.Arrays;
-
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 
 import androidx.core.app.ActivityCompat;
 
@@ -81,7 +76,7 @@ public class Utility {
             syncacc = cursor.getString(6);
 
             if (true) {
-Log.e(cursor.getString(1),cursor.getInt(7)+"");
+                Log.e(cursor.getString(1), cursor.getInt(7) + "");
                 LocalDate localDate = getDate(Long.parseLong(cursor.getString(3)));
 
                 if (!localDateHashMap.containsKey(localDate)) {
@@ -89,29 +84,28 @@ Log.e(cursor.getString(1),cursor.getInt(7)+"");
                     eventInfo.id = cursor.getInt(0);
                     eventInfo.starttime = cursor.getLong(3);
                     eventInfo.endtime = cursor.getLong(4);
-                    if (cursor.getString(11)!=null) eventInfo.endtime = eventInfo.starttime+RFC2445ToMilliseconds(cursor.getString(11));
-                    eventInfo.accountname=cursor.getString(6);
+                    if (cursor.getString(11) != null)
+                        eventInfo.endtime = eventInfo.starttime + RFC2445ToMilliseconds(cursor.getString(11));
+                    eventInfo.accountname = cursor.getString(6);
                     eventInfo.timezone = cursor.getString(10);
                     eventInfo.eventtitles = new String[]{cursor.getString(1)};
                     eventInfo.isallday = cursor.getInt(7) == 1 ? true : false;
                     eventInfo.title = cursor.getString(1);
-                    eventInfo.eventcolor = cursor.getInt(8)==0? Color.parseColor("#009688"):cursor.getInt(8);
-                    long difference=eventInfo.endtime-eventInfo.starttime;
-                    if (difference>86400000){
-                        if (cursor.getInt(7)==0){
-                            eventInfo.endtime=eventInfo.endtime+86400000l;
+                    eventInfo.eventcolor = cursor.getInt(8) == 0 ? Color.parseColor("#009688") : cursor.getInt(8);
+                    long difference = eventInfo.endtime - eventInfo.starttime;
+                    if (difference > 86400000) {
+                        if (cursor.getInt(7) == 0) {
+                            eventInfo.endtime = eventInfo.endtime + 86400000l;
                         }
 
-                        LocalDateTime localDate1=new LocalDateTime( eventInfo.starttime, DateTimeZone.forID(eventInfo.timezone)).withTime(0,0,0,0);
-                        LocalDateTime localDate2=new LocalDateTime( eventInfo.endtime, DateTimeZone.forID(eventInfo.timezone)).withTime(23, 59, 59, 999);
+                        LocalDateTime localDate1 = new LocalDateTime(eventInfo.starttime, DateTimeZone.forID(eventInfo.timezone)).withTime(0, 0, 0, 0);
+                        LocalDateTime localDate2 = new LocalDateTime(eventInfo.endtime, DateTimeZone.forID(eventInfo.timezone)).withTime(23, 59, 59, 999);
 
-                        int day = Days.daysBetween(localDate1,localDate2).getDays();
-                        eventInfo.noofdayevent=day;
-                        eventInfo.isallday=true;
-                    }
-                    else if (difference<86400000)eventInfo.noofdayevent=0;
-                    else eventInfo.noofdayevent=1;
-
+                        int day = Days.daysBetween(localDate1, localDate2).getDays();
+                        eventInfo.noofdayevent = day;
+                        eventInfo.isallday = true;
+                    } else if (difference < 86400000) eventInfo.noofdayevent = 0;
+                    else eventInfo.noofdayevent = 1;
 
 
                     localDateHashMap.put(localDate, eventInfo);
@@ -120,7 +114,7 @@ Log.e(cursor.getString(1),cursor.getInt(7)+"");
                 } else {
                     EventInfo eventInfo = localDateHashMap.get(localDate);
                     EventInfo prev = eventInfo;
-                    while (prev.nextnode!=null)prev=prev.nextnode;
+                    while (prev.nextnode != null) prev = prev.nextnode;
                     String[] s = eventInfo.eventtitles;
 
                     boolean isneed = true;
@@ -142,33 +136,33 @@ Log.e(cursor.getString(1),cursor.getInt(7)+"");
 
                         EventInfo nextnode = new EventInfo();
                         nextnode.id = cursor.getInt(0);
-                        nextnode.starttime =cursor.getLong(3);
+                        nextnode.starttime = cursor.getLong(3);
                         nextnode.endtime = cursor.getLong(4);
-                        if (cursor.getString(11)!=null) nextnode.endtime = nextnode.starttime+RFC2445ToMilliseconds(cursor.getString(11));
+                        if (cursor.getString(11) != null)
+                            nextnode.endtime = nextnode.starttime + RFC2445ToMilliseconds(cursor.getString(11));
 
                         nextnode.isallday = cursor.getInt(7) == 1 ? true : false;
                         nextnode.timezone = cursor.getString(10);
                         nextnode.title = cursor.getString(1);
-                        nextnode.accountname=cursor.getString(6);
-                        nextnode.eventcolor = cursor.getInt(8)==0? Color.parseColor("#009688"):cursor.getInt(8);
-                        long difference=nextnode.endtime-nextnode.starttime;
+                        nextnode.accountname = cursor.getString(6);
+                        nextnode.eventcolor = cursor.getInt(8) == 0 ? Color.parseColor("#009688") : cursor.getInt(8);
+                        long difference = nextnode.endtime - nextnode.starttime;
 
-                        if (nextnode.endtime-nextnode.starttime>86400000){
-                            if (cursor.getInt(7)==0){
-                                nextnode.endtime=nextnode.endtime+86400000l;
+                        if (nextnode.endtime - nextnode.starttime > 86400000) {
+                            if (cursor.getInt(7) == 0) {
+                                nextnode.endtime = nextnode.endtime + 86400000l;
                             }
-                            nextnode.isallday=true;
-                            LocalDateTime localDate1=new LocalDateTime( nextnode.starttime, DateTimeZone.forID(nextnode.timezone)).withTime(0,0,0,0);
-                            LocalDateTime localDate2=new LocalDateTime( nextnode.endtime, DateTimeZone.forID(nextnode.timezone)).withTime(23, 59, 59, 999);
+                            nextnode.isallday = true;
+                            LocalDateTime localDate1 = new LocalDateTime(nextnode.starttime, DateTimeZone.forID(nextnode.timezone)).withTime(0, 0, 0, 0);
+                            LocalDateTime localDate2 = new LocalDateTime(nextnode.endtime, DateTimeZone.forID(nextnode.timezone)).withTime(23, 59, 59, 999);
 
 
-                            int day = Days.daysBetween(localDate1,localDate2).getDays();
+                            int day = Days.daysBetween(localDate1, localDate2).getDays();
 
-                            nextnode.noofdayevent=day;
+                            nextnode.noofdayevent = day;
 
-                        }
-                        else if (difference<86400000)nextnode.noofdayevent=0;
-                        else nextnode.noofdayevent=1;
+                        } else if (difference < 86400000) nextnode.noofdayevent = 0;
+                        else nextnode.noofdayevent = 1;
                         prev.nextnode = nextnode;
 
 
@@ -183,11 +177,11 @@ Log.e(cursor.getString(1),cursor.getInt(7)+"");
 
         return localDateHashMap;
     }
-    public static long RFC2445ToMilliseconds(String str)
-    {
+
+    public static long RFC2445ToMilliseconds(String str) {
 
 
-        if(str == null || str.isEmpty())
+        if (str == null || str.isEmpty())
             throw new IllegalArgumentException("Null or empty RFC string");
 
         int sign = 1;
@@ -203,13 +197,10 @@ Log.e(cursor.getString(1),cursor.getInt(7)+"");
 
         c = str.charAt(0);
 
-        if (c == '-')
-        {
+        if (c == '-') {
             sign = -1;
             index++;
-        }
-
-        else if (c == '+')
+        } else if (c == '+')
             index++;
 
         if (len < index)
@@ -218,7 +209,7 @@ Log.e(cursor.getString(1),cursor.getInt(7)+"");
         c = str.charAt(index);
 
         if (c != 'P')
-            throw new IllegalArgumentException("Duration.parse(str='" + str + "') expected 'P' at index="+ index);
+            throw new IllegalArgumentException("Duration.parse(str='" + str + "') expected 'P' at index=" + index);
 
         index++;
         c = str.charAt(index);
@@ -226,62 +217,42 @@ Log.e(cursor.getString(1),cursor.getInt(7)+"");
             index++;
 
         int n = 0;
-        for (; index < len; index++)
-        {
+        for (; index < len; index++) {
             c = str.charAt(index);
 
-            if (c >= '0' && c <= '9')
-            {
+            if (c >= '0' && c <= '9') {
                 n *= 10;
-                n += ((int)(c-'0'));
-            }
-
-            else if (c == 'W')
-            {
+                n += ((int) (c - '0'));
+            } else if (c == 'W') {
                 weeks = n;
                 n = 0;
-            }
-
-            else if (c == 'H')
-            {
+            } else if (c == 'H') {
                 hours = n;
                 n = 0;
-            }
-
-            else if (c == 'M')
-            {
+            } else if (c == 'M') {
                 minutes = n;
                 n = 0;
-            }
-
-            else if (c == 'S')
-            {
+            } else if (c == 'S') {
                 seconds = n;
                 n = 0;
-            }
-
-            else if (c == 'D')
-            {
+            } else if (c == 'D') {
                 days = n;
                 n = 0;
-            }
-
-            else if (c == 'T')
-            {
-            }
-            else
-                throw new IllegalArgumentException ("Duration.parse(str='" + str + "') unexpected char '" + c + "' at index=" + index);
+            } else if (c == 'T') {
+            } else
+                throw new IllegalArgumentException("Duration.parse(str='" + str + "') unexpected char '" + c + "' at index=" + index);
         }
 
         long factor = 1000 * sign;
-        long result = factor * ((7*24*60*60*weeks)
-                + (24*60*60*days)
-                + (60*60*hours)
-                + (60*minutes)
+        long result = factor * ((7 * 24 * 60 * 60 * weeks)
+                + (24 * 60 * 60 * days)
+                + (60 * 60 * hours)
+                + (60 * minutes)
                 + seconds);
 
         return result;
     }
+
     public static void getDataFromCalendarTable(Context context) {
         Cursor cur = null;
         ContentResolver cr = context.getContentResolver();

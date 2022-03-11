@@ -12,20 +12,20 @@ public class DayModel {
     private boolean eventlist;
     private boolean isenable;
 
-    public void setEventInfo(EventInfo eventInfo) {
-        this.eventInfo = eventInfo;
-    }
-
     public EventInfo getEventInfo() {
         return eventInfo;
     }
 
-    public void setNoofdayevent(int noofdayevent) {
-        this.noofdayevent = noofdayevent;
+    public void setEventInfo(EventInfo eventInfo) {
+        this.eventInfo = eventInfo;
     }
 
     public int getNoofdayevent() {
         return noofdayevent;
+    }
+
+    public void setNoofdayevent(int noofdayevent) {
+        this.noofdayevent = noofdayevent;
     }
 
     public boolean getEventlist() {

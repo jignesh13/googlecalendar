@@ -1,12 +1,11 @@
 package com.example.GoogleCalendar;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,8 +50,8 @@ public class YearFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_year, container, false);
-        YearView yearView=view.findViewById(R.id.yearview);
+        View view = inflater.inflate(R.layout.fragment_year, container, false);
+        YearView yearView = view.findViewById(R.id.yearview);
         yearView.updateYearView(year);
         return view;
     }

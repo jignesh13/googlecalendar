@@ -4,24 +4,17 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
@@ -39,14 +32,13 @@ public class MonthFragment extends Fragment {
     private int index;
 
 
-
     public MonthFragment() {
         // Required empty public constructor
     }
 
-    public static MonthFragment newInstance(int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, EventInfo> alleventlist, int singleitemheight,HashMap<LocalDate, EventInfo> effectmonthlist) throws CloneNotSupportedException {
+    public static MonthFragment newInstance(int month, int year, int page, ArrayList<DayModel> dayModels, HashMap<LocalDate, EventInfo> alleventlist, int singleitemheight, HashMap<LocalDate, EventInfo> effectmonthlist) throws CloneNotSupportedException {
         MonthFragment fragmentFirst = new MonthFragment();
-        
+
         Bundle args = new Bundle();
         args.putInt("singleitemheight", singleitemheight);
         args.putInt("firstday", page);
@@ -55,8 +47,8 @@ public class MonthFragment extends Fragment {
         LocalDate prevmonth = new LocalDate(year, month, 1);
         LocalDate todaydate = new LocalDate();
         ArrayList<DayModel> adapterdata = new ArrayList<>(43);
-        for (LocalDate effectmonth:effectmonthlist.keySet()) {
-            Log.e("jeffect"+effectmonth.toString(),effectmonthlist.get(effectmonth)+"");
+        for (LocalDate effectmonth : effectmonthlist.keySet()) {
+            Log.e("jeffect" + effectmonth.toString(), effectmonthlist.get(effectmonth) + "");
         }
 
 
@@ -66,7 +58,6 @@ public class MonthFragment extends Fragment {
 
 
                 LocalDate localDate = prevmonth.minusDays(page - i);
-
 
 
                 DayModel dayModel = new DayModel();
@@ -81,33 +72,33 @@ public class MonthFragment extends Fragment {
                     dayModel.setEventInfo(alleventlist.get(localDate));
 
                 }
-                if(i==0){
+                if (i == 0) {
 
-                    if(effectmonthlist.containsKey(prevmonth)){
-                        LocalDate startdate=new LocalDate(effectmonthlist.get(prevmonth).starttime);
-                        if(startdate.isBefore(localDate)||startdate.isEqual(localDate)){
-                            HashMap<String,String> containevent=new HashMap<>();
-                            EventInfo myinfo= (EventInfo) effectmonthlist.get(prevmonth);
-                            containevent.put(myinfo.id+"","1");
-                            EventInfo newobj=new EventInfo(myinfo);
-                            EventInfo begning=newobj;
-                            while (myinfo.nextnode!=null){
-                                myinfo=myinfo.nextnode;
-                                newobj.nextnode=new EventInfo(myinfo);
-                                newobj=newobj.nextnode;
-                                containevent.put(myinfo.id+"","1");
+                    if (effectmonthlist.containsKey(prevmonth)) {
+                        LocalDate startdate = new LocalDate(effectmonthlist.get(prevmonth).starttime);
+                        if (startdate.isBefore(localDate) || startdate.isEqual(localDate)) {
+                            HashMap<String, String> containevent = new HashMap<>();
+                            EventInfo myinfo = (EventInfo) effectmonthlist.get(prevmonth);
+                            containevent.put(myinfo.id + "", "1");
+                            EventInfo newobj = new EventInfo(myinfo);
+                            EventInfo begning = newobj;
+                            while (myinfo.nextnode != null) {
+                                myinfo = myinfo.nextnode;
+                                newobj.nextnode = new EventInfo(myinfo);
+                                newobj = newobj.nextnode;
+                                containevent.put(myinfo.id + "", "1");
                             }
-                            List<EventInfo> infolist=new ArrayList<>();
-                            EventInfo originalevent=alleventlist.get(localDate);
-                            while (originalevent!=null){
-                                if(!containevent.containsKey(originalevent.id+"")){
+                            List<EventInfo> infolist = new ArrayList<>();
+                            EventInfo originalevent = alleventlist.get(localDate);
+                            while (originalevent != null) {
+                                if (!containevent.containsKey(originalevent.id + "")) {
                                     infolist.add(originalevent);
                                 }
-                                originalevent=originalevent.nextnode;
+                                originalevent = originalevent.nextnode;
                             }
-                            for(EventInfo eventInfo:infolist){
-                                newobj.nextnode=new EventInfo(eventInfo);
-                                newobj=newobj.nextnode;
+                            for (EventInfo eventInfo : infolist) {
+                                newobj.nextnode = new EventInfo(eventInfo);
+                                newobj = newobj.nextnode;
 
                             }
                             dayModel.setEventInfo(begning);
@@ -122,7 +113,7 @@ public class MonthFragment extends Fragment {
             } else if (i >= dayModels.size() + page) {
                 //next month
                 LocalDate localDate = prevmonth.plusDays(i - (page));
-                Log.e("dateelseif",localDate.toString());
+                Log.e("dateelseif", localDate.toString());
 
                 DayModel dayModel = new DayModel();
                 if (localDate.isEqual(todaydate)) {
@@ -133,12 +124,12 @@ public class MonthFragment extends Fragment {
                 dayModel.setYear(localDate.getYear());
                 dayModel.setIsenable(false);
                 if (alleventlist.containsKey(localDate)) {
-                    EventInfo eventInfo=alleventlist.get(localDate);
+                    EventInfo eventInfo = alleventlist.get(localDate);
 //                    while(eventInfo.isalreadyset){
 //                        eventInfo=eventInfo.nextnode;
 //                        if(eventInfo==null)break;
 //                    }
-                   if(eventInfo!=null) dayModel.setEventInfo(eventInfo);
+                    if (eventInfo != null) dayModel.setEventInfo(eventInfo);
 //                    if (alleventlist.get(localDate).isallday){
 //                        LocalDate localDate1=new LocalDate(alleventlist.get(localDate).starttime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
 //                        LocalDate localDate2=new LocalDate(alleventlist.get(localDate).endtime, DateTimeZone.forID(alleventlist.get(localDate).timezone));
@@ -156,37 +147,37 @@ public class MonthFragment extends Fragment {
                     args.putInt("index", i % 7);
                 }
                 LocalDate mydate = new LocalDate(year, month, dayModel.getDay());
-                Log.e("dateelse",mydate.toString());
+                Log.e("dateelse", mydate.toString());
                 if (alleventlist.containsKey(mydate)) {
 
                     dayModel.setEventInfo(alleventlist.get(mydate));
                 }
-                if(i==0){
-                    if(effectmonthlist.containsKey(prevmonth)){
-                        LocalDate startdate=new LocalDate(effectmonthlist.get(prevmonth).starttime);
-                        if(startdate.isBefore(mydate)||startdate.isEqual(mydate)){
-                            HashMap<String,String> containevent=new HashMap<>();
-                            EventInfo myinfo= (EventInfo) effectmonthlist.get(prevmonth);
-                            EventInfo newobj=new EventInfo(myinfo);
-                            EventInfo begning=newobj;
-                            containevent.put(myinfo.id+"","1");
-                            while (myinfo.nextnode!=null){
-                                myinfo=myinfo.nextnode;
-                                newobj.nextnode=new EventInfo(myinfo);
-                                newobj=newobj.nextnode;
-                                containevent.put(myinfo.id+"","1");
+                if (i == 0) {
+                    if (effectmonthlist.containsKey(prevmonth)) {
+                        LocalDate startdate = new LocalDate(effectmonthlist.get(prevmonth).starttime);
+                        if (startdate.isBefore(mydate) || startdate.isEqual(mydate)) {
+                            HashMap<String, String> containevent = new HashMap<>();
+                            EventInfo myinfo = (EventInfo) effectmonthlist.get(prevmonth);
+                            EventInfo newobj = new EventInfo(myinfo);
+                            EventInfo begning = newobj;
+                            containevent.put(myinfo.id + "", "1");
+                            while (myinfo.nextnode != null) {
+                                myinfo = myinfo.nextnode;
+                                newobj.nextnode = new EventInfo(myinfo);
+                                newobj = newobj.nextnode;
+                                containevent.put(myinfo.id + "", "1");
                             }
-                            List<EventInfo> infolist=new ArrayList<>();
-                            EventInfo originalevent=alleventlist.get(mydate);
-                            while (originalevent!=null){
-                                if(!containevent.containsKey(originalevent.id+"")){
+                            List<EventInfo> infolist = new ArrayList<>();
+                            EventInfo originalevent = alleventlist.get(mydate);
+                            while (originalevent != null) {
+                                if (!containevent.containsKey(originalevent.id + "")) {
                                     infolist.add(originalevent);
                                 }
-                                originalevent=originalevent.nextnode;
+                                originalevent = originalevent.nextnode;
                             }
-                            for(EventInfo eventInfo:infolist){
-                                newobj.nextnode=new EventInfo(eventInfo);
-                                newobj=newobj.nextnode;
+                            for (EventInfo eventInfo : infolist) {
+                                newobj.nextnode = new EventInfo(eventInfo);
+                                newobj = newobj.nextnode;
                             }
 
                             dayModel.setEventInfo(begning);
@@ -236,8 +227,8 @@ public class MonthFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_month, container, false);
-        JCalendarMonthView jCalendarMonthView=view.findViewById(R.id.jcalendarmonthview);
-        jCalendarMonthView.setDayModels(dayModels,index);
+        JCalendarMonthView jCalendarMonthView = view.findViewById(R.id.jcalendarmonthview);
+        jCalendarMonthView.setDayModels(dayModels, index);
 
 
 //        RecyclerView gridView = view.findViewById(R.id.recyclerview);
@@ -274,7 +265,7 @@ public class MonthFragment extends Fragment {
         @Override
         public MonthViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
-         //   RelativeLayout relativeLayout = new RelativeLayout(getActivity());
+            //   RelativeLayout relativeLayout = new RelativeLayout(getActivity());
 
             // Defining the RelativeLayout layout parameters.
             // In this case I want to fill its parent

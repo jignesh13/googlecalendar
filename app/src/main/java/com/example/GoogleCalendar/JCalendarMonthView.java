@@ -11,28 +11,20 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewParent;
-import android.view.ViewTreeObserver;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.core.widget.AutoScrollHelper;
 import androidx.viewpager.widget.ViewPager;
 
-public class JCalendarMonthView extends View  {
+public class JCalendarMonthView extends View {
     float eachcellheight, eachcellwidth;
     long lastsec;
     int selectedcell;
@@ -42,15 +34,45 @@ public class JCalendarMonthView extends View  {
     private int dayHeight, daytextsize, datemargintop, linecolor, linewidth, daytextcolor, datetextsize, datetextcolor, eventtextsize;
     private Context mContext;
     private float downx, downy;
-    private String dayname[] = { "S","M", "T", "W", "T", "F", "S"};
+    private String dayname[] = {"S", "M", "T", "W", "T", "F", "S"};
     private Rect selectedrect;
+    ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+
+            Log.e("scrollstate", state + "");
+
+            if (state == 2) {
+
+                selectedrect = null;
+                selectedcell = -1;
+                downx = -1;
+                downy = -1;
+                invalidate();
+            }
+            currentscrollstate = state;
+
+        }
+    };
     private boolean isup = false;
     private ArrayList<DayModel> dayModels;
     private int mDefaultEventColor = Color.parseColor("#9fc6e7");
     private Rect mHeaderTextPaintRect;
-    private Rect jDateTextPaintRect,jeventtextpaintRect;
+    private Rect jDateTextPaintRect, jeventtextpaintRect;
     private int currentdaynameindex;
     private GestureDetector mDetector;
+
     public JCalendarMonthView(Context context) {
         this(context, null);
     }
@@ -58,13 +80,6 @@ public class JCalendarMonthView extends View  {
     public JCalendarMonthView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
-
-    public void setDayModels(ArrayList<DayModel> dayModels,int currentdaynameindex) {
-        this.dayModels = dayModels;
-        this.currentdaynameindex = currentdaynameindex;
-        invalidate();
-    }
-
 
 
     public JCalendarMonthView(final Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -93,58 +108,16 @@ public class JCalendarMonthView extends View  {
             mDetector = new GestureDetector(context, new MyGestureListener());
 
 
-
-
-
-
         } finally {
             a.recycle();
         }
 
     }
-    // In the SimpleOnGestureListener subclass you should override
-    // onDown and any other gesture that you want to detect.
-    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
-        @Override
-        public boolean onDown(MotionEvent event) {
-            Log.d("TAG","onDown: ");
-
-            // don't return false here or else none of the other
-            // gestures will work
-            return true;
-        }
-
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            Log.i("TAG", "onSingleTapConfirmed: ");
-            return true;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent e) {
-            Log.i("TAG", "onLongPress: ");
-        }
-
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            Log.i("TAG", "onDoubleTap: ");
-            return true;
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2,
-                                float distanceX, float distanceY) {
-            Log.i("TAG", "onScroll: ");
-            return true;
-        }
-
-        @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2,
-                               float velocityX, float velocityY) {
-            Log.d("TAG", "onFling: ");
-            return true;
-        }
+    public void setDayModels(ArrayList<DayModel> dayModels, int currentdaynameindex) {
+        this.dayModels = dayModels;
+        this.currentdaynameindex = currentdaynameindex;
+        invalidate();
     }
 
 //    @Override
@@ -155,13 +128,11 @@ public class JCalendarMonthView extends View  {
 //        return super.dispatchTouchEvent(event);
 //    }
 
-
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         final int xtouch = (int) motionEvent.getX();
         final int ytouch = (int) motionEvent.getY();
         if (ytouch < dayHeight) return true;
-
 
 
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
@@ -172,8 +143,7 @@ public class JCalendarMonthView extends View  {
             lastsec = System.currentTimeMillis();
             return true;
 
-        } else if (currentscrollstate==0&&motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-
+        } else if (currentscrollstate == 0 && motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
 
             if (xtouch == downx && ytouch == downy && System.currentTimeMillis() - lastsec >= 80) {
@@ -260,9 +230,9 @@ public class JCalendarMonthView extends View  {
                         selectedrect = new Rect(start, topside, endside, bottomside);
 
                         invalidate();
-                        if (progress==100){
+                        if (progress == 100) {
                             MainActivity mainActivity = (MainActivity) mContext;
-                            if (mainActivity != null&&selectedcell!=-1) {
+                            if (mainActivity != null && selectedcell != -1) {
                                 DayModel dayModel = dayModels.get(selectedcell);
                                 mainActivity.selectdateFromMonthPager(dayModel.getYear(), dayModel.getMonth(), dayModel.getDay());
                             }
@@ -289,8 +259,7 @@ public class JCalendarMonthView extends View  {
 
             isup = true;
             return super.onTouchEvent(motionEvent);
-        }
-        else {
+        } else {
             selectedrect = null;
             selectedcell = -1;
             downx = -1;
@@ -313,7 +282,7 @@ public class JCalendarMonthView extends View  {
 
         mHeaderTextPaintRect = new Rect();
         jDateTextPaintRect = new Rect();
-        jeventtextpaintRect=new Rect();
+        jeventtextpaintRect = new Rect();
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.STROKE);
@@ -356,45 +325,12 @@ public class JCalendarMonthView extends View  {
         jtodaypaint.setColor(getResources().getColor(R.color.selectday));
 
 
-
-
-        Log.e("height","Test");
+        Log.e("height", "Test");
     }
-
-    ViewPager.OnPageChangeListener onPageChangeListener=new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-
-            Log.e("scrollstate",state+"");
-
-            if(state==2){
-
-                selectedrect = null;
-                selectedcell = -1;
-                downx = -1;
-                downy = -1;
-                invalidate();
-            }
-            currentscrollstate=state;
-
-        }
-    };
-
 
     @Override
     public boolean onDragEvent(DragEvent event) {
-        Log.e("event","drag");
+        Log.e("event", "drag");
         return super.onDragEvent(event);
 
     }
@@ -429,19 +365,20 @@ public class JCalendarMonthView extends View  {
             begining = begining + eachcellheight;
 
         }
-        int[] topspace=new int[42];
-        for (int i = 0; i < 7&&dayModels!=null&&dayModels.size()==42; i++) {
+        int[] topspace = new int[42];
+        for (int i = 0; i < 7 && dayModels != null && dayModels.size() == 42; i++) {
             for (int j = 0; j < 7 && i < 6; j++) {
 
                 if (i == 0) {
-                    if (j == currentdaynameindex) mHeaderTextPaint.setColor(getResources().getColor(R.color.selectday));//todaycolor
+                    if (j == currentdaynameindex)
+                        mHeaderTextPaint.setColor(getResources().getColor(R.color.selectday));//todaycolor
                     else mHeaderTextPaint.setColor(daytextcolor);
                     canvas.drawText(dayname[j], (eachcellwidth * j + eachcellwidth / 2.0f) - mHeaderTextPaintRect.right / 2.0f, 5 + mHeaderTextPaintRect.height(), mHeaderTextPaint);
                 }
 
-                DayModel mydayModel=dayModels.get((i * 7) + j);
+                DayModel mydayModel = dayModels.get((i * 7) + j);
 
-                String ss =mydayModel.getDay()+"";
+                String ss = mydayModel.getDay() + "";
                 jDateTextPaint.getTextBounds(ss, 0, ss.length(), jDateTextPaintRect);
                 if (mydayModel.isToday()) {//istoday
                     float centerx = ((eachcellwidth * j) + eachcellwidth / 2.0f);
@@ -450,28 +387,29 @@ public class JCalendarMonthView extends View  {
                     jDateTextPaint.setColor(Color.WHITE);
                     canvas.drawRoundRect(centerx - max, centery - max, centerx + max, centery + max, max, max, jtodaypaint);
                 } else {
-                    if (!mydayModel.isenable()) jDateTextPaint.setColor(daytextcolor);//date disable color
+                    if (!mydayModel.isenable())
+                        jDateTextPaint.setColor(daytextcolor);//date disable color
                     else jDateTextPaint.setColor(datetextcolor);//date enable color
                 }
 
                 canvas.drawText(ss, ((eachcellwidth * j) + eachcellwidth / 2.0f), datemargintop + dayHeight + (i * eachcellheight) + jDateTextPaintRect.height(), jDateTextPaint);
-               EventInfo eventInfo=mydayModel.getEventInfo();
+                EventInfo eventInfo = mydayModel.getEventInfo();
                 float constant = (2 * datemargintop) + dayHeight + (i * eachcellheight) + jDateTextPaintRect.height();
-                int k=topspace[(i*7)+j];
-                int noofevent=0;
-                while (eventInfo!=null) {
-                    Log.e("jcalendar",mydayModel.toString()+","+eventInfo.noofdayevent);
-                    int row=i;
-                    int col=j;
-                    int jnoofday=eventInfo.noofdayevent;
-                    if (jnoofday==0)jnoofday=1;
-                    if (jnoofday>1){
-                        boolean b=true;
-                        int myrow=row+1;
-                        if ((row*7)+col+jnoofday>=(myrow*7)){
-                            while (b&&myrow<6){
-                                if ((row*7)+col+jnoofday<((myrow+1)*7)){
-                                    int diff=(row*7)+j+jnoofday-(myrow)*7;
+                int k = topspace[(i * 7) + j];
+                int noofevent = 0;
+                while (eventInfo != null) {
+                    Log.e("jcalendar", mydayModel.toString() + "," + eventInfo.noofdayevent);
+                    int row = i;
+                    int col = j;
+                    int jnoofday = eventInfo.noofdayevent;
+                    if (jnoofday == 0) jnoofday = 1;
+                    if (jnoofday > 1) {
+                        boolean b = true;
+                        int myrow = row + 1;
+                        if ((row * 7) + col + jnoofday >= (myrow * 7)) {
+                            while (b && myrow < 6) {
+                                if ((row * 7) + col + jnoofday < ((myrow + 1) * 7)) {
+                                    int diff = (row * 7) + j + jnoofday - (myrow) * 7;
                                     RectF rect1 = new RectF();
                                     rect1.left = (eachcellwidth * 0) - linewidth;
                                     rect1.right = (eachcellwidth * diff);
@@ -483,21 +421,20 @@ public class JCalendarMonthView extends View  {
                                     colorrect.left = rect1.left + 8;//0th column left padding
                                     colorrect.right = rect1.right - 12;
                                     float myconstant = (2 * datemargintop) + dayHeight + (myrow * eachcellheight) + jDateTextPaintRect.height();
-                                    int newk=topspace[(myrow*7)+0];
+                                    int newk = topspace[(myrow * 7) + 0];
 
                                     colorrect.top = myconstant + (42 * newk) + (3 * newk);
                                     colorrect.bottom = colorrect.top + 42;
-                                    int color=eventInfo.eventcolor==0?mDefaultEventColor:eventInfo.eventcolor;
+                                    int color = eventInfo.eventcolor == 0 ? mDefaultEventColor : eventInfo.eventcolor;
                                     jeventRectPaint.setColor(color);
                                     canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
                                     canvas.drawText(eventInfo.title, colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
                                     canvas.restore();
 
-                                    b=false;
+                                    b = false;
 
 
-                                }
-                                else {
+                                } else {
                                     RectF rect1 = new RectF();
                                     rect1.left = (eachcellwidth * 0) - linewidth;
                                     rect1.right = (eachcellwidth * (0 + 7));
@@ -509,11 +446,11 @@ public class JCalendarMonthView extends View  {
                                     colorrect.left = rect1.left + 8;//0th column left padding
                                     colorrect.right = rect1.right - 12;
                                     float myconstant = (2 * datemargintop) + dayHeight + (myrow * eachcellheight) + jDateTextPaintRect.height();
-                                    int newk=topspace[(myrow*7)+0];
+                                    int newk = topspace[(myrow * 7) + 0];
 
                                     colorrect.top = myconstant + (42 * newk) + (3 * newk);
                                     colorrect.bottom = colorrect.top + 42;
-                                    int color=eventInfo.eventcolor==0?mDefaultEventColor:eventInfo.eventcolor;
+                                    int color = eventInfo.eventcolor == 0 ? mDefaultEventColor : eventInfo.eventcolor;
                                     jeventRectPaint.setColor(color);
                                     canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
                                     canvas.drawText(eventInfo.title, colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
@@ -524,17 +461,13 @@ public class JCalendarMonthView extends View  {
                             }
                         }
 
-                            int begin=(i*7)+j;
+                        int begin = (i * 7) + j;
 
-                            for (int ia=1;ia<jnoofday;ia++){
-                                if (begin+ia>41)continue;
-                                topspace[begin+ia]= k+1;
+                        for (int ia = 1; ia < jnoofday; ia++) {
+                            if (begin + ia > 41) continue;
+                            topspace[begin + ia] = k + 1;
 
-                            }
-
-
-
-
+                        }
 
 
                     }
@@ -542,9 +475,9 @@ public class JCalendarMonthView extends View  {
 
                     RectF rect1 = new RectF();
                     rect1.left = (eachcellwidth * col) - linewidth;
-                    int calculateday=col+jnoofday>7?7-col:jnoofday;
+                    int calculateday = col + jnoofday > 7 ? 7 - col : jnoofday;
                     rect1.right = (eachcellwidth * (col + calculateday));
-                    Log.e("right",rect1.right+","+col + jnoofday);
+                    Log.e("right", rect1.right + "," + col + jnoofday);
                     rect1.top = dayHeight + (row * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height());
                     rect1.bottom = dayHeight + ((row + 1) * eachcellheight);//(2 * datemargintop + dayHeight + (i * eachcellheight) + rect.height() + 50);
                     canvas.save();
@@ -555,16 +488,15 @@ public class JCalendarMonthView extends View  {
                     colorrect.right = rect1.right - 12;
                     colorrect.top = constant + (42 * k) + (3 * k);
                     colorrect.bottom = colorrect.top + 42;
-                    int color=eventInfo.eventcolor==0?mDefaultEventColor:eventInfo.eventcolor;
+                    int color = eventInfo.eventcolor == 0 ? mDefaultEventColor : eventInfo.eventcolor;
                     jeventRectPaint.setColor(color);
-                    if(noofevent>2){
+                    if (noofevent > 2) {
 
                         jeventtextpaint.setColor(Color.BLACK);
                         canvas.drawText("•••", colorrect.left + 5, colorrect.centerY() + (jeventtextpaintRect.height() / 2.0f), jeventtextpaint);
 
-                    }
-                    else {
-                        Log.e("noofevent",noofevent+"");
+                    } else {
+                        Log.e("noofevent", noofevent + "");
                         jeventtextpaint.setColor(Color.WHITE);
                         canvas.drawRoundRect(colorrect, 6, 6, jeventRectPaint);
 
@@ -574,10 +506,55 @@ public class JCalendarMonthView extends View  {
                     canvas.restore();
                     k++;
                     noofevent++;
-                    eventInfo=eventInfo.nextnode;
+                    eventInfo = eventInfo.nextnode;
                 }
             }
 
+        }
+    }
+
+    // In the SimpleOnGestureListener subclass you should override
+    // onDown and any other gesture that you want to detect.
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d("TAG", "onDown: ");
+
+            // don't return false here or else none of the other
+            // gestures will work
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            Log.i("TAG", "onSingleTapConfirmed: ");
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            Log.i("TAG", "onLongPress: ");
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            Log.i("TAG", "onDoubleTap: ");
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                float distanceX, float distanceY) {
+            Log.i("TAG", "onScroll: ");
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d("TAG", "onFling: ");
+            return true;
         }
     }
 }

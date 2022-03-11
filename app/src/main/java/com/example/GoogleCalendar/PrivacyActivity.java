@@ -1,18 +1,16 @@
 package com.example.GoogleCalendar;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 
 public class PrivacyActivity extends AppCompatActivity {
@@ -21,16 +19,17 @@ public class PrivacyActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_privacy);
-        Toolbar toolbar=findViewById(R.id.toolbar2);
+        Toolbar toolbar = findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
-        ActionBar actionBar=getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
         //actionBar.setTitle("Privacy");
-        TextView textView=findViewById(R.id.privacytext);
+        TextView textView = findViewById(R.id.privacytext);
         textView.setText(LoadData("licence.txt"));
 
     }
+
     public String LoadData(String inFile) {
         String tContents = "";
 
@@ -52,7 +51,7 @@ public class PrivacyActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);

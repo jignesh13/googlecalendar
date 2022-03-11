@@ -34,7 +34,7 @@ public class ReadCalendar {
 
                     String _id = cursor.getString(0);
 
-                    System.out.println("Id: " + _id );
+                    System.out.println("Id: " + _id);
                     calendarIds.add(_id);
                 }
             }
