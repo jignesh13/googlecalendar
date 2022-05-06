@@ -1,0 +1,68 @@
+{
+  "status": 0,
+  "meta": {
+    "code": 200,
+    "message": "success"
+  },
+  "message": "success",
+  "data": [
+    {
+      "booking_id": 1,
+      "service_name": "brokill",
+      "booking_date": "2022-04-26 00:00:00",
+      "booking_slot": "2022-04-26 12:04:14",
+      "booking_status": "accepted"
+    },
+    {
+      "booking_id": 2,
+      "service_name": "naveen",
+      "booking_date": "2022-04-26 15:28:01",
+      "booking_slot": "2022-04-27 15:28:01",
+      "booking_status": "1"
+    },
+    {
+      "booking_id": 3,
+      "service_name": "MANIKANDAN MK",
+      "booking_date": "2022-04-26 00:00:00",
+      "booking_slot": "2022-04-26 12:04:14",
+      "booking_status": "0"
+    },
+    {
+      "booking_id": 4,
+      "service_name": "MANIKANDAN MK",
+      "booking_date": "2022-04-30 00:00:00",
+      "booking_slot": "2022-06-26 01:04:14",
+      "booking_status": "0"
+    },
+    {
+      "booking_id": 5,
+      "service_name": "naveen",
+      "booking_date": "2022-05-06 00:00:00",
+      "booking_slot": "2022-05-26 01:04:14",
+      "booking_status": "0"
+    },
+    {
+      "booking_id": 6,
+      "service_name": "naveen",
+      "booking_date": "2022-05-07 00:00:00",
+      "booking_slot": "2022-05-26 01:04:14",
+      "booking_status": "0"
+    },
+    {
+      "booking_id": 7,
+      "service_name": "naveen",
+      "booking_date": "2022-05-28 00:00:00",
+      "booking_slot": "2022-06-26 01:04:14",
+      "booking_status": "0"
+    },
+    {
+      "booking_id": 8,
+      "service_name": "MANIKANDAN MK",
+      "booking_date": "2022-05-20 00:00:00",
+      "booking_slot": "2022-04-26 12:04:14",
+      "booking_status": "0"
+    }
+  ],
+  "errors": "error",
+  "total_items": 8
+}

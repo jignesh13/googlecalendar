@@ -15,9 +15,17 @@ import org.joda.time.Days;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import androidx.core.app.ActivityCompat;
 
@@ -27,76 +35,68 @@ public class Utility {
 
     public static HashMap<LocalDate, EventInfo> localDateHashMap = new HashMap<>();
 
-    public static HashMap<LocalDate, EventInfo> readCalendarEvent(Context context, LocalDate mintime, LocalDate maxtime) {
-
-//        CalendarProvider calendarProvider = new CalendarProvider(context);
-//
-//        List<Calendar> calendars = calendarProvider.getCalendars().getList();
-//        for(int i=0;i<calendars.size();i++){
-//            List<Event> calendars1 = calendarProvider.getEvents(calendars.get(i).id).getList();
-//            for (Event event:calendars1) {
-//                Log.e("name"+calendars.get(i).id,event.title+","+event.eventColor+","+calendars.get(i).calendarColor+","+event.calendarColor);
-//            }
-//
-//        }
-        int f = 1;
-        String selection = "(( " + CalendarContract.Events.SYNC_EVENTS + " = " + f + " ) AND ( " + CalendarContract.Events.DTSTART + " >= " + mintime.toDateTimeAtStartOfDay().getMillis() + " ) AND ( " + CalendarContract.Events.DTSTART + " <= " + maxtime.toDateTimeAtStartOfDay().getMillis() + " ))";
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+    public static String loadJSONFromAsset(Context context) {
+        String json = null;
+        try {
+            InputStream is = context.getAssets().open("data.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
             return null;
         }
-//        int ff=0;
-//      Cursor cursor1=  context.getContentResolver().query(CalendarContract.Colors.CONTENT_URI,new String[]{"color","color_index","color_type","account_name"},null,null);
-//        cursor1.moveToFirst();
-//        while (cursor1.moveToNext()) {
-//        Log.e("str"+ff,cursor1.getString(0)+","+cursor1.getString(1)+","+cursor1.getString(2)+","+cursor1.getString(3));
-//ff++;
-//        }
-        Cursor cursor = context.getContentResolver().query(
-                CalendarContract.Events.CONTENT_URI,
-                new String[]{"_id", "title", "description",
-                        "dtstart", "dtend", "eventLocation", "calendar_displayName", CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_COLOR, CalendarContract.Events.CALENDAR_COLOR, CalendarContract.Events.EVENT_TIMEZONE, CalendarContract.Events.DURATION}, null,
-                null, null);
+        return json;
+    }
+
+    public static HashMap<LocalDate, EventInfo> readCalendarEvent(Context context, LocalDate mintime, LocalDate maxtime) throws JSONException {
 
 
-        cursor.moveToFirst();
+//        Cursor cursor = context.getContentResolver().query(
+//                CalendarContract.Events.CONTENT_URI,
+//                new String[]{"_id", "title", "description",
+//                        "dtstart", "dtend", "eventLocation", "calendar_displayName", CalendarContract.Events.ALL_DAY, CalendarContract.Events.EVENT_COLOR, CalendarContract.Events.CALENDAR_COLOR, CalendarContract.Events.EVENT_TIMEZONE, CalendarContract.Events.DURATION}, null,
+//                null, null);
+//
+//
+//        cursor.moveToFirst();
         // fetching calendars name
 
+        String data = loadJSONFromAsset(context);
+        JSONObject jsonObject = new JSONObject(data);
+        JSONArray jsonArray = jsonObject.getJSONArray("data");
 
         // fetching calendars id
         String syncacc = null;
-        while (cursor.moveToNext()) {
+        int count=0;
+        while (count<jsonArray.length()) {
 
-            syncacc = cursor.getString(6);
+            JSONObject object = jsonArray.getJSONObject(count);
+
 
             if (true) {
-                Log.e(cursor.getString(1), cursor.getInt(7) + "");
-                LocalDate localDate = getDate(Long.parseLong(cursor.getString(3)));
 
-                if (!localDateHashMap.containsKey(localDate)) {
+                LocalDate startlocalDate = LocalDate.parse(object.getString("booking_date"), DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss"));
+                LocalDate endlocalDate = LocalDate.parse(object.getString("booking_slot"), DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss"));
+
+                if (!localDateHashMap.containsKey(startlocalDate)) {
                     EventInfo eventInfo = new EventInfo();
-                    eventInfo.id = cursor.getInt(0);
-                    eventInfo.starttime = cursor.getLong(3);
-                    eventInfo.endtime = cursor.getLong(4);
-                    if (cursor.getString(11) != null)
-                        eventInfo.endtime = eventInfo.starttime + RFC2445ToMilliseconds(cursor.getString(11));
-                    eventInfo.accountname = cursor.getString(6);
-                    eventInfo.timezone = cursor.getString(10);
-                    eventInfo.eventtitles = new String[]{cursor.getString(1)};
-                    eventInfo.isallday = cursor.getInt(7) == 1 ? true : false;
-                    eventInfo.title = cursor.getString(1);
-                    eventInfo.eventcolor = cursor.getInt(8) == 0 ? Color.parseColor("#009688") : cursor.getInt(8);
+                    eventInfo.id = object.getInt("booking_id");
+                    eventInfo.starttime = startlocalDate.toDate().getTime();
+                    eventInfo.timezone = TimeZone.getDefault().getID();
+                    eventInfo.endtime = endlocalDate.toDate().getTime();
+
+
+                    eventInfo.eventtitles = new String[]{object.getString("service_name")};
+                    eventInfo.isallday = true;
+                    eventInfo.eventcolor = Color.parseColor("#009688");
+
+                    eventInfo.title = object.getString("service_name");
                     long difference = eventInfo.endtime - eventInfo.starttime;
                     if (difference > 86400000) {
-                        if (cursor.getInt(7) == 0) {
                             eventInfo.endtime = eventInfo.endtime + 86400000l;
-                        }
 
                         LocalDateTime localDate1 = new LocalDateTime(eventInfo.starttime, DateTimeZone.forID(eventInfo.timezone)).withTime(0, 0, 0, 0);
                         LocalDateTime localDate2 = new LocalDateTime(eventInfo.endtime, DateTimeZone.forID(eventInfo.timezone)).withTime(23, 59, 59, 999);
@@ -106,20 +106,18 @@ public class Utility {
                         eventInfo.isallday = true;
                     } else if (difference < 86400000) eventInfo.noofdayevent = 0;
                     else eventInfo.noofdayevent = 1;
-
-
-                    localDateHashMap.put(localDate, eventInfo);
+                    localDateHashMap.put(startlocalDate, eventInfo);
 
 
                 } else {
-                    EventInfo eventInfo = localDateHashMap.get(localDate);
+                    EventInfo eventInfo = localDateHashMap.get(startlocalDate);
                     EventInfo prev = eventInfo;
                     while (prev.nextnode != null) prev = prev.nextnode;
                     String[] s = eventInfo.eventtitles;
 
                     boolean isneed = true;
                     for (int i = 0; i < s.length; i++) {
-                        if (s[i].equals(cursor.getString(1))) {
+                        if (s[i].equals(object.getString("service_name"))) {
 
                             isneed = false;
                             break;
@@ -131,27 +129,23 @@ public class Utility {
                     if (isneed) {
 
                         String ss[] = Arrays.copyOf(s, s.length + 1);
-                        ss[ss.length - 1] = cursor.getString(1);
+                        ss[ss.length - 1] = object.getString("service_name");
                         eventInfo.eventtitles = ss;
 
                         EventInfo nextnode = new EventInfo();
-                        nextnode.id = cursor.getInt(0);
-                        nextnode.starttime = cursor.getLong(3);
-                        nextnode.endtime = cursor.getLong(4);
-                        if (cursor.getString(11) != null)
-                            nextnode.endtime = nextnode.starttime + RFC2445ToMilliseconds(cursor.getString(11));
-
-                        nextnode.isallday = cursor.getInt(7) == 1 ? true : false;
-                        nextnode.timezone = cursor.getString(10);
-                        nextnode.title = cursor.getString(1);
-                        nextnode.accountname = cursor.getString(6);
-                        nextnode.eventcolor = cursor.getInt(8) == 0 ? Color.parseColor("#009688") : cursor.getInt(8);
-                        long difference = nextnode.endtime - nextnode.starttime;
+                        nextnode.id = object.getInt("booking_id");
+                        nextnode.starttime = startlocalDate.toDate().getTime();
+                        nextnode.endtime = endlocalDate.toDate().getTime();
+                        nextnode.isallday = true;
+                        nextnode.timezone = TimeZone.getDefault().getID();
+                        nextnode.title = object.getString("service_name");
+//                        nextnode.accountname = cursor.getString(6);
+                        nextnode.eventcolor = Color.parseColor("#009688");
+                       long difference = nextnode.endtime - nextnode.starttime;
 
                         if (nextnode.endtime - nextnode.starttime > 86400000) {
-                            if (cursor.getInt(7) == 0) {
-                                nextnode.endtime = nextnode.endtime + 86400000l;
-                            }
+                            eventInfo.endtime = eventInfo.endtime + 86400000l;
+
                             nextnode.isallday = true;
                             LocalDateTime localDate1 = new LocalDateTime(nextnode.starttime, DateTimeZone.forID(nextnode.timezone)).withTime(0, 0, 0, 0);
                             LocalDateTime localDate2 = new LocalDateTime(nextnode.endtime, DateTimeZone.forID(nextnode.timezone)).withTime(23, 59, 59, 999);
@@ -166,12 +160,13 @@ public class Utility {
                         prev.nextnode = nextnode;
 
 
-                        localDateHashMap.put(localDate, eventInfo);
+                        localDateHashMap.put(startlocalDate, eventInfo);
                     }
 
                 }
             }
 
+            count++;
 
         }
 

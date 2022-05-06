@@ -55,6 +55,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.json.JSONException;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -646,7 +647,11 @@ public class MainActivity extends AppCompatActivity
             isgivepermission = true;
             LocalDate mintime = new LocalDate().minusYears(5);
             LocalDate maxtime = new LocalDate().plusYears(5);
-            alleventlist = Utility.readCalendarEvent(this, mintime, maxtime);
+            try {
+                alleventlist = Utility.readCalendarEvent(this, mintime, maxtime);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             montheventlist = new HashMap<>();
 
             for (LocalDate localDate : alleventlist.keySet()) {
@@ -948,7 +953,11 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == 200 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             LocalDate mintime = new LocalDate().minusYears(5);
             LocalDate maxtime = new LocalDate().plusYears(5);
-            alleventlist = Utility.readCalendarEvent(this, mintime, maxtime);
+            try {
+                alleventlist = Utility.readCalendarEvent(this, mintime, maxtime);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             montheventlist = new HashMap<>();
 
             for (LocalDate localDate : alleventlist.keySet()) {
