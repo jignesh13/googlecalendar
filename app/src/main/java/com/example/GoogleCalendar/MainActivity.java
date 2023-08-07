@@ -1363,8 +1363,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public List<? extends WeekViewEvent> onMonthChange(int newYear, int newMonth) {
 
-        HashMap<LocalDate, EventInfo> jmontheventlist = new HashMap<>(montheventlist);
+
         if (!isgivepermission) return new ArrayList<>();
+        HashMap<LocalDate, EventInfo> jmontheventlist = new HashMap<>(montheventlist);
         LocalDate initial = new LocalDate(newYear, newMonth, 1);
         int length = initial.dayOfMonth().getMaximumValue();
         List<WeekViewEvent> events = new ArrayList<WeekViewEvent>();
