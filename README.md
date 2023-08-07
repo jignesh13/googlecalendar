@@ -1,5 +1,7 @@
 # JGoogle-Calendar
 
+This repository contains an Android Calendar App that provides a user-friendly and feature-rich calendar experience for Android devices. The app allows users to manage their schedules, events, and reminders efficiently.
+
 Sample Google Calendar project get all event information, holiday ,birthday, appointment etc from google account which is sync with your device and show different kind of layout with different color for event
 
 
@@ -28,40 +30,25 @@ https://user-images.githubusercontent.com/20221469/160238961-30cc2904-508c-4ccc-
  <!---[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/OV6SHoLu6c4/sddefault.jpg)](https://www.youtube.com/watch?v=OV6SHoLu6c4)-->
 
  ## feature
-✔️ Collapse toolbar with calendarview same like google calendar app
+- Intuitive and interactive calendar interface for seamless navigation and event management.
+- Add, edit, and delete events with customizable details such as title, time, location, and reminders.
+- View events in different calendar views (day, week, month) for a comprehensive overview.
+- Quick access to upcoming events and agenda for efficient planning.
+- Integration with device calendar to sync events with other applications.
+- Customizable event categories and color-coded labels for easy organization.
+- Reminder notifications and alerts for upcoming events.
+- Support for recurring events and all-day events.
+- User-friendly UI with smooth animations and transitions.
+- Localization support for multiple language
 
-✔️ Smooth scrolling with month change during scrolling
+## Getting Started
 
-✔️ Zoom in and Zoom out Calendar weekview,Dayview and 3-day view
+To use the Android Calendar App, follow these steps:
 
-✔️ scrolling with parallexeffect in image of months
-
-✔️ Left side event day animation same as google calendar app
-
-✔️ When date select from top side smooth scroll accroding to him and many more
-
-✔️ No ads or annoying popups
-
-✔️ Different color event for appropriate layout
-
-✔️ No internet access needed, giving you more privacy & security
-
-✔️ Only the bare minimum permissions required
-
-✔️ Emphasis on simplicity – does what a calendar needs to do!
-
-✔️ Open source
-
-✔️ Fully customizable themes & calendar / event widgets
-
-✔️ Daily, weekly, monthly, yearly & event views on the calendar
-
-✔️ Easily Show holidays, birthdays, anniversaries & appointments
-
-✔️ Show Customize events – start time, duration, reminders etc
-
-✔️ Use different color for event,holiday,birthday
-
+1. Clone or download the repository.
+2. Open the project in Android Studio.
+3. Build and run the app on an Android device or emulator.
+4. Explore the different calendar views, create events, and manage your schedule.
 
 
 
